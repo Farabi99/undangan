@@ -1,0 +1,14 @@
+const { execSync } = require('child_process');
+const ffmpeg = require('ffmpeg-static');
+const path = require('path');
+
+const raw = 'C:/Users/902222/.gemini/antigravity/brain/22a8a866-3ba5-427e-b601-bdc046945d95/scratch/raw_syukuran.mp3';
+const finalOut = path.resolve(__dirname, '../public/audio/syukuran.mp3');
+
+// Start exactly at 26.0s as requested by user
+// Duration = 186.5 - 26.0 = 160.5s
+const cmd = `"${ffmpeg}" -y -ss 26.0 -to 186.5 -i "${raw}" -af "afade=t=in:ss=0:d=0.06,afade=t=out:st=158.0:d=2.4" -c:a libmp3lame -b:a 192k "${finalOut}"`;
+
+console.log('Exporting syukuran.mp3 starting at 26s...');
+execSync(cmd, { stdio: 'inherit' });
+console.log('Export complete:', finalOut);

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar Tamu — Admin Undangan</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=<%= Date.now() %>">
+  <link rel="icon" type="image/svg+xml" href="/img/logo-fs-badge.svg?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+  <nav class="admin-nav">
+    <div class="admin-nav-brand">💍 Admin Undangan (<%= couple.short %>)</div>
+    <div class="admin-nav-links">
+      <a href="/admin/guests" class="active">Daftar Tamu</a>
+      <a href="/admin/import">Import Spreadsheet</a>
+      <a href="/admin/rsvps">Rekap RSVP</a>
+      <a href="/admin/wishes">Moderasi Ucapan</a>
+      <div class="export-dropdown-wrap">
+        <button type="button" class="btn-adm btn-adm-outline" onclick="toggleExportMenu(event)">📥 Ekspor Data ▾</button>
+        <div id="exportMenu" class="export-menu-dropdown">
+          <a href="/admin/export?format=xlsx" class="export-menu-item">📊 Format Excel (.xlsx)</a>
+          <a href="/admin/export?format=csv" class="export-menu-item">📄 Format CSV (.csv)</a>
+        </div>
+      </div>
+      <a href="/" target="_blank">Lihat Web ↗</a>
+      <a href="/admin/logout" style="color: #FFA39E;">Keluar</a>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+
+    <!-- Flash message alerts -->
+    <% if (success) { %>
+      <div class="admin-alert admin-alert-success">
+        <% if (success === 'added') { %>✓ Berhasil menambahkan tamu baru!
+        <% } else if (success === 'updated') { %>✓ Data tamu berhasil diperbarui!
+        <% } else if (success === 'deleted') { %>✓ Tamu berhasil dihapus.
+        <% } else if (success === 'bulk_deleted') { %>✓ Berhasil menghapus tamu yang dipilih.
+        <% } else if (success === 'rsvp_saved') { %>✓ Status RSVP berhasil disimpan!
+        <% } else { %>✓ Tindakan berhasil diselesaikan.
+        <% } %>
+      </div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="admin-alert admin-alert-error">
+        <% if (error === 'nama_wajib') { %>⚠️ Nama tamu wajib diisi!
+        <% } else if (error === 'tamu_tidak_ada') { %>⚠️ Data tamu tidak ditemukan.
+        <% } else if (error === 'slug_terpakai') { %>⚠️ Tautan URL / slug tersebut sudah digunakan oleh tamu lain. Silakan gunakan slug lain.
+        <% } else if (error === 'slug_reserved') { %>⚠️ Tautan URL / slug tersebut tidak diizinkan karena merupakan kata kunci sistem (reserved).
+        <% } else { %>⚠️ Terjadi kesalahan. Silakan coba lagi.
+        <% } %>
+      </div>
+    <% } %>
+
+    <!-- Interactive Metrics & Quick Filters -->
+    <div class="admin-stats-grid">
+      <a href="/admin/guests" class="admin-stat-card <%= !status ? 'stat-active' : '' %>" title="Tampilkan semua tamu">
+        <div class="admin-stat-label">Total Tamu Diundang</div>
+        <div class="admin-stat-value"><%= stats.totalGuests || 0 %></div>
+        <div class="stat-hint">Lihat Semua</div>
+      </a>
+      <a href="/admin/guests?status=opened" class="admin-stat-card <%= status === 'opened' ? 'stat-active' : '' %>" title="Filter tamu yang sudah buka link">
+        <div class="admin-stat-label">Telah Buka Link</div>
+        <div class="admin-stat-value" style="color: #2E7D32;"><%= stats.totalOpened || 0 %></div>
+        <div class="stat-hint">Filter Sudah Buka</div>
+      </a>
+      <a href="/admin/guests?status=attending" class="admin-stat-card <%= status === 'attending' ? 'stat-active' : '' %>" title="Filter tamu konfirmasi hadir">
+        <div class="admin-stat-label">Konfirmasi Hadir</div>
+        <div class="admin-stat-value" style="color: var(--admin-success);"><%= stats.totalAttending || 0 %></div>
+        <div class="stat-hint">Filter Hadir</div>
+      </a>
+      <a href="/admin/guests?status=absent" class="admin-stat-card <%= status === 'absent' ? 'stat-active' : '' %>" title="Filter tamu tidak hadir">
+        <div class="admin-stat-label">Tidak Hadir</div>
+        <div class="admin-stat-value" style="color: var(--admin-error);"><%= stats.totalAbsent || 0 %></div>
+        <div class="stat-hint">Filter Berhalangan</div>
+      </a>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Perkiraan Pax Hadir</div>
+        <div class="admin-stat-value" style="color: #6F7425;"><%= stats.totalPax || 0 %></div>
+        <div class="stat-hint">Orang</div>
+      </div>
+    </div>
+
+    <!-- Add Guest Form (Collapsible/Clean) -->
+    <div class="admin-card">
+      <div class="admin-header-row">
+        <div>
+          <h2 style="font-size: 1.15rem; margin: 0 0 0.25rem 0;">+ Tambah Tamu Manual</h2>
+          <p style="font-size: 0.8rem; color: var(--admin-text-sub); margin: 0;">Buat 1 undangan langsung atau buka menu <a href="/admin/import">Import Spreadsheet</a> untuk impor ratusan nama sekaligus.</p>
+        </div>
+      </div>
+
+      <form action="/admin/guests/add" method="POST" class="add-guest-form">
+        <div>
+          <label class="form-micro-label">Sapaan / Gelar</label>
+          <input type="text" name="title" class="input-adm" placeholder="Bpk. / Ibu / Dr.">
+        </div>
+        <div style="grid-column: span 2;">
+          <label class="form-micro-label">Nama Tamu *</label>
+          <input type="text" name="name" class="input-adm" placeholder="Daeng Muhammad Alfarabi" required>
+        </div>
+        <div>
+          <label class="form-micro-label">+ Pasangan?</label>
+          <select name="with_partner" class="input-adm">
+            <option value="0">Tidak</option>
+            <option value="1">Ya</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-micro-label">Maks Pax</label>
+          <input type="number" name="max_pax" value="2" min="1" max="10" class="input-adm">
+        </div>
+        <div>
+          <label class="form-micro-label">No. WhatsApp</label>
+          <input type="text" name="phone" placeholder="081234567890" class="input-adm">
+        </div>
+        <div>
+          <label class="form-micro-label">Kategori / Grup</label>
+          <input type="text" name="grp" placeholder="Sahabat / Keluarga" class="input-adm">
+        </div>
+        <div>
+          <label class="form-micro-label">Desain Acara</label>
+          <select name="event_type" class="input-adm">
+            <option value="both">Keduanya (Akad + Syukuran)</option>
+            <option value="reception">🌙 Syukuran Saja (Navy &amp; Silver)</option>
+            <option value="akad">🌸 Akad Saja (Dusty Rose &amp; Cream)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-micro-label">Kustom Slug / URL</label>
+          <input type="text" name="slug" placeholder="otomatis jika kosong" class="input-adm" style="font-family: monospace;">
+        </div>
+        <div>
+          <button type="submit" class="btn-adm btn-adm-primary" style="height: 35px; width: 100%;">+ Tambah</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Guest List Table with Filters & Bulk Actions -->
+    <div class="admin-card">
+      <div class="admin-header-row">
+        <div>
+          <h2 style="font-size: 1.15rem; margin: 0;">Daftar Tamu Undangan (<%= guests.length %>)</h2>
+          <% if (q || grp || status || event_type) { %>
+            <p style="font-size: 0.8rem; color: var(--admin-primary); margin: 0.2rem 0 0;">
+              🔍 Menampilkan hasil filter aktif
+            </p>
+          <% } %>
+        </div>
+
+        <!-- Comprehensive Filter Form -->
+        <form method="GET" action="/admin/guests" class="filter-bar">
+          <input type="text" name="q" value="<%= q || '' %>" placeholder="Cari nama, URL, HP..." class="input-adm" style="min-width: 160px;">
+          
+          <select name="grp" class="input-adm" onchange="this.form.submit()">
+            <option value="">Semua Kategori</option>
+            <% groups.forEach(function(g) { %>
+              <option value="<%= g %>" <%= grp === g ? 'selected' : '' %>><%= g %></option>
+            <% }); %>
+          </select>
+
+          <select name="status" class="input-adm" onchange="this.form.submit()">
+            <option value="">Semua Status RSVP</option>
+            <option value="attending" <%= status === 'attending' ? 'selected' : '' %>>✓ Konfirmasi Hadir</option>
+            <option value="absent" <%= status === 'absent' ? 'selected' : '' %>>✗ Tidak Hadir</option>
+            <option value="unconfirmed" <%= status === 'unconfirmed' ? 'selected' : '' %>>⏳ Belum Konfirmasi</option>
+            <option value="opened" <%= status === 'opened' ? 'selected' : '' %>>👁️ Sudah Buka Link</option>
+            <option value="unopened" <%= status === 'unopened' ? 'selected' : '' %>>🔒 Belum Buka Link</option>
+          </select>
+
+          <select name="event_type" class="input-adm" onchange="this.form.submit()">
+            <option value="">Semua Desain Acara</option>
+            <option value="both" <%= event_type === 'both' ? 'selected' : '' %>>Keduanya (Akad + Syukuran)</option>
+            <option value="reception" <%= event_type === 'reception' ? 'selected' : '' %>>🌙 Syukuran (Navy)</option>
+            <option value="akad" <%= event_type === 'akad' ? 'selected' : '' %>>🌸 Akad (Dusty Rose)</option>
+          </select>
+
+          <button type="submit" class="btn-adm btn-adm-outline">Cari</button>
+          <% if (q || grp || status || event_type) { %>
+            <a href="/admin/guests" class="btn-adm btn-adm-danger" style="text-decoration:none;">✕ Reset</a>
+          <% } %>
+        </form>
+      </div>
+
+      <!-- Floating Bulk Action Toolbar (Appears when >= 1 checkbox checked) -->
+      <div id="bulkToolbar" class="bulk-toolbar" style="display: none;">
+        <div class="bulk-info">
+          <span id="bulkCount">0</span> tamu dipilih
+        </div>
+        <div class="bulk-actions">
+          <form id="bulkDeleteForm" action="/admin/guests/bulk-delete" method="POST" onsubmit="return confirmBulkDelete()">
+            <input type="hidden" name="ids" id="bulkDeleteIds" value="">
+            <button type="submit" class="btn-adm btn-adm-danger">🗑️ Hapus Tamu Terpilih</button>
+          </form>
+          <button type="button" class="btn-adm btn-adm-outline" onclick="clearBulkSelection()">Batal</button>
+        </div>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="guestsTable">
+          <thead>
+            <tr>
+              <th style="width: 38px; text-align: center;">
+                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" title="Pilih Semua">
+              </th>
+              <th>Nama Tamu</th>
+              <th>Acara</th>
+              <th>Kategori</th>
+              <th>Maks</th>
+              <th>Dibuka</th>
+              <th>Status RSVP</th>
+              <th>Tautan Unik</th>
+              <th style="text-align: right; min-width: 170px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (guests.length === 0) { %>
+              <tr>
+                <td colspan="9" style="text-align: center; color: var(--admin-text-sub); padding: 3rem 1rem;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
+                  <p style="margin: 0; font-size: 0.95rem;">Tidak ada tamu yang cocok dengan filter saat ini.</p>
+                  <p style="margin: 0.5rem 0 0; font-size: 0.85rem;"><a href="/admin/guests">Reset Filter</a> atau <a href="/admin/import">Import Tamu</a></p>
+                </td>
+              </tr>
+            <% } %>
+
+            <% guests.forEach(function(g) { 
+               const isReception = g.event_type === 'reception';
+               const path = isReception ? 'syukuran/' + g.slug : g.slug;
+               const fullUrl = protocol + '://' + host + '/' + path;
+               const guestJson = JSON.stringify({
+                 id: g.id,
+                 slug: g.slug,
+                 title: g.title || '',
+                 name: g.name,
+                 with_partner: g.with_partner,
+                 partner_name: g.partner_name || '',
+                 max_pax: g.max_pax,
+                 phone: g.phone || '',
+                 grp: g.grp || '',
+                 event_type: g.event_type || 'both',
+                 attending: g.attending,
+                 pax: g.pax,
+                 wish: g.wish || '',
+                 fullUrl: fullUrl
+               });
+            %>
+              <tr id="row-<%= g.id %>">
+                <td style="text-align: center;">
+                  <input type="checkbox" class="guest-checkbox" value="<%= g.id %>" onchange="updateBulkState()">
+                </td>
+                <td>
+                  <strong><%= g.title ? g.title + ' ' : '' %><%= g.name %></strong>
+                  <% if (g.with_partner) { %>
+                    <span style="font-size: 0.75rem; color: var(--admin-text-sub); display: block;">
+                      + <%= g.partner_name || 'Pasangan' %>
+                    </span>
+                  <% } %>
+                  <% if (g.phone) { %>
+                    <span style="font-size: 0.75rem; color: var(--admin-text-sub); display: block;">
+                      📱 <%= g.phone %>
+                    </span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (isReception) { %>
+                    <span class="badge" style="background: #0B132B; color: #E2E8F0; border: 1px solid rgba(226,232,240,0.3);">🌙 Syukuran (Navy)</span>
+                  <% } else if (g.event_type === 'akad') { %>
+                    <span class="badge" style="background: #FAF0EE; color: #8E4F49; border: 1px solid rgba(201,138,134,0.45);">🌸 Akad (Dusty Rose)</span>
+                  <% } else { %>
+                    <span class="badge badge-muted">Keduanya</span>
+                  <% } %>
+                </td>
+                <td>
+                  <%= g.grp || '-' %>
+                </td>
+                <td>
+                  <%= g.max_pax %> pax
+                </td>
+                <td>
+                  <% if (g.open_count > 0) { %>
+                    <span class="badge badge-success" title="Dibuka <%= g.open_count %> kali">✓ <%= g.open_count %>x</span>
+                  <% } else { %>
+                    <span class="badge badge-muted">Belum</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (g.attending === 1) { %>
+                    <span class="badge badge-success" title="Doa: <%= g.wish || '-' %>">Hadir (<%= g.pax %> pax)</span>
+                  <% } else if (g.attending === 0) { %>
+                    <span class="badge badge-danger">Tidak Hadir</span>
+                  <% } else { %>
+                    <span class="badge badge-muted">Belum Respon</span>
+                  <% } %>
+                </td>
+                <td>
+                  <a href="/<%= path %>" target="_blank" style="text-decoration: none;">
+                    <code style="font-size: 0.78rem; background: #eee; padding: 2px 6px; border-radius: 4px; color: #333;">/<%= path %></code>
+                  </a>
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                  <!-- WhatsApp Modal Trigger -->
+                  <button type="button" class="btn-adm btn-adm-wa" onclick='openWaModal(<%- guestJson %>)' title="Kirim Undangan WhatsApp">
+                    💬 WA
+                  </button>
+
+                  <!-- Copy link -->
+                  <button type="button" class="btn-adm btn-adm-outline" onclick="copyLink('<%= fullUrl %>', this)" title="Salin Tautan Undangan">
+                    📋
+                  </button>
+
+                  <!-- Edit Guest Modal Trigger -->
+                  <button type="button" class="btn-adm btn-adm-outline" onclick='openEditModal(<%- guestJson %>)' title="Edit Data Tamu">
+                    ✏️
+                  </button>
+
+                  <!-- Manual RSVP Trigger -->
+                  <button type="button" class="btn-adm btn-adm-outline" onclick='openRsvpModal(<%- guestJson %>)' title="Catat / Ubah RSVP Manual">
+                    📝
+                  </button>
+
+                  <!-- QR Code View -->
+                  <button type="button" class="btn-adm btn-adm-outline" onclick="showQr('<%= g.slug %>', '<%= g.name %>')" title="Lihat QR Code">
+                    🔲
+                  </button>
+
+                  <!-- Delete Guest -->
+                  <form action="/admin/guests/<%= g.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Hapus <%= g.name %>?')">
+                    <button type="submit" class="btn-adm btn-adm-danger" title="Hapus Tamu">✕</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Guest -->
+  <div id="editModal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box">
+      <div class="admin-modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem;">✏️ Edit Data Tamu</h3>
+        <button type="button" class="btn-close-modal" onclick="closeEditModal()">✕</button>
+      </div>
+      <form id="editGuestForm" method="POST" action="">
+        <div class="admin-modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label class="form-micro-label">Sapaan / Gelar</label>
+              <input type="text" id="editTitle" name="title" class="input-adm" style="width: 100%;">
+            </div>
+            <div>
+              <label class="form-micro-label">Nama Tamu *</label>
+              <input type="text" id="editName" name="name" class="input-adm" required style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label class="form-micro-label">+ Pasangan?</label>
+              <select id="editWithPartner" name="with_partner" class="input-adm" style="width: 100%;">
+                <option value="0">Tidak</option>
+                <option value="1">Ya</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-micro-label">Nama Pasangan</label>
+              <input type="text" id="editPartnerName" name="partner_name" class="input-adm" placeholder="Opsional" style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label class="form-micro-label">Maksimal Pax</label>
+              <input type="number" id="editMaxPax" name="max_pax" min="1" max="10" class="input-adm" style="width: 100%;">
+            </div>
+            <div>
+              <label class="form-micro-label">No. WhatsApp</label>
+              <input type="text" id="editPhone" name="phone" class="input-adm" placeholder="081234567890" style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label class="form-micro-label">Kategori / Grup</label>
+              <input type="text" id="editGrp" name="grp" class="input-adm" placeholder="Sahabat" style="width: 100%;">
+            </div>
+            <div>
+              <label class="form-micro-label">Desain Acara</label>
+              <select id="editEventType" name="event_type" class="input-adm" style="width: 100%;" onchange="updateEditSlugPrefix()">
+                <option value="both">Keduanya (Akad + Syukuran)</option>
+                <option value="reception">🌙 Syukuran (Navy &amp; Silver)</option>
+                <option value="akad">🌸 Akad (Dusty Rose &amp; Cream)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label class="form-micro-label">Tautan URL / Slug *</label>
+            <div style="display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 4px; padding: 0 0.5rem;">
+              <span id="editSlugPrefix" style="font-size: 0.85rem; color: var(--admin-text-sub); font-family: monospace; font-weight: 600; user-select: none;">/</span>
+              <input type="text" id="editSlug" name="slug" class="input-adm" required style="border: none; background: transparent; padding-left: 0.2rem; width: 100%; font-family: monospace;" placeholder="farhan">
+            </div>
+            <p style="font-size: 0.72rem; color: var(--admin-text-sub); margin: 0.25rem 0 0;">
+              Slug menentukan tautan undangan tamu (contoh: <code>domain.com/farhan</code>). Hanya huruf kecil, angka, dan tanda hubung (-).
+            </p>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-adm btn-adm-outline" onclick="closeEditModal()">Batal</button>
+          <button type="submit" class="btn-adm btn-adm-primary">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: WhatsApp Message Generator with 3 Templates -->
+  <div id="waModal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box" style="max-width: 540px;">
+      <div class="admin-modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem;">💬 Kirim Undangan WhatsApp</h3>
+        <button type="button" class="btn-close-modal" onclick="closeWaModal()">✕</button>
+      </div>
+      <div class="admin-modal-body">
+        <div style="background: #F8FAF9; padding: 0.75rem; border-radius: 6px; border: 1px solid #E1E8E5; margin-bottom: 1rem; font-size: 0.85rem;">
+          <div><strong>Penerima:</strong> <span id="waModalGuestName"></span></div>
+          <div style="color: var(--admin-text-sub); font-size: 0.78rem;"><strong>No. HP:</strong> <span id="waModalPhone">-</span> | <strong>Tautan:</strong> <span id="waModalUrl" style="word-break: break-all;"></span></div>
+        </div>
+
+        <!-- Template Tabs -->
+        <label class="form-micro-label">Pilih Gaya Pesan:</label>
+        <div class="wa-template-tabs">
+          <button type="button" class="tab-btn active" onclick="switchWaTemplate('formal', this)">📜 Formal (Baku / Orang Tua / VIP)</button>
+          <button type="button" class="tab-btn" onclick="switchWaTemplate('casual', this)">☕ Santai (Sahabat / Teman)</button>
+          <button type="button" class="tab-btn" onclick="switchWaTemplate('english', this)">🌐 English</button>
+        </div>
+
+        <div style="margin-top: 0.85rem;">
+          <label class="form-micro-label">Pratinjau &amp; Kustomisasi Pesan:</label>
+          <textarea id="waMessageText" class="input-adm" rows="7" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; line-height: 1.5;"></textarea>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-adm btn-adm-outline" onclick="copyWaText()">📋 Salin Pesan</button>
+        <a id="waDirectBtn" href="#" target="_blank" class="btn-adm btn-adm-wa" style="text-decoration:none;">
+          Buka WhatsApp ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Manual RSVP Override -->
+  <div id="rsvpModal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box" style="max-width: 440px;">
+      <div class="admin-modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem;">📝 Catat / Ubah RSVP Tamu</h3>
+        <button type="button" class="btn-close-modal" onclick="closeRsvpModal()">✕</button>
+      </div>
+      <form id="rsvpForm" method="POST" action="">
+        <div class="admin-modal-body">
+          <p style="margin: 0 0 1rem; font-size: 0.88rem; color: var(--admin-text-sub);">
+            Catat konfirmasi yang diterima secara lisan, telepon, atau chat WhatsApp untuk tamu:
+            <strong id="rsvpModalGuestName" style="color: var(--admin-text); display: block; font-size: 1rem; margin-top: 0.2rem;"></strong>
+          </p>
+
+          <div style="margin-bottom: 1rem;">
+            <label class="form-micro-label">Status Kehadiran:</label>
+            <div style="display: flex; gap: 1rem; margin-top: 0.35rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="attending" value="1" id="rsvpAttendingYes" onchange="toggleRsvpPax(true)">
+                <span class="badge badge-success">✓ Hadir</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="attending" value="0" id="rsvpAttendingNo" onchange="toggleRsvpPax(false)">
+                <span class="badge badge-danger">✗ Tidak Hadir</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="rsvpPaxWrap" style="margin-bottom: 1rem;">
+            <label class="form-micro-label">Jumlah Orang Hadir (Pax):</label>
+            <input type="number" id="rsvpPaxInput" name="pax" min="1" max="10" value="1" class="input-adm" style="width: 100%;">
+            <small style="color: var(--admin-text-sub); font-size: 0.75rem;">Maksimal kuota tamu ini: <span id="rsvpModalMaxPax">2</span> pax</small>
+          </div>
+
+          <div>
+            <label class="form-micro-label">Catatan / Ucapan:</label>
+            <textarea id="rsvpWishInput" name="wish" class="input-adm" rows="3" placeholder="Contoh: Konfirmasi via WA, hadir sekeluarga." style="width: 100%; box-sizing: border-box;"></textarea>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-adm btn-adm-outline" onclick="closeRsvpModal()">Batal</button>
+          <button type="submit" class="btn-adm btn-adm-primary">Simpan RSVP</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: QR Code Preview -->
+  <div id="qrModal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box" style="max-width: 340px; text-align: center;">
+      <div class="admin-modal-header">
+        <h3 id="qrGuestName" style="margin: 0; font-size: 1.1rem;"></h3>
+        <button type="button" class="btn-close-modal" onclick="document.getElementById('qrModal').style.display='none'">✕</button>
+      </div>
+      <div class="admin-modal-body">
+        <img id="qrImage" src="" alt="QR Code" style="width: 220px; height: 220px; margin: 0 auto; display: block; border: 1px solid #DFE3E8; border-radius: 8px;">
+        <p style="font-size: 0.78rem; color: var(--admin-text-sub); margin: 0.75rem 0 0;">
+          Dapat dicetak atau discan pada saat registrasi kehadiran tamu.
+        </p>
+      </div>
+      <div class="admin-modal-footer" style="justify-content: center;">
+        <button type="button" class="btn-adm btn-adm-outline" onclick="document.getElementById('qrModal').style.display='none'">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Feedback Notification -->
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script>
+    // State variables
+    var currentGuestForWa = null;
+
+    // Toast Helper
+    function showToast(msg) {
+      var t = document.getElementById('adminToast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 2500);
+    }
+
+    // Copy URL Helper
+    function copyLink(str, btn) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(str).then(function() {
+          showToast('✓ Tautan undangan berhasil disalin!');
+        });
+      } else {
+        var el = document.createElement('textarea');
+        el.value = str;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        showToast('✓ Tautan undangan berhasil disalin!');
+      }
+    }
+
+    // Toggle Export Menu
+    function toggleExportMenu(e) {
+      e.stopPropagation();
+      var m = document.getElementById('exportMenu');
+      m.classList.toggle('show');
+    }
+    document.addEventListener('click', function() {
+      var m = document.getElementById('exportMenu');
+      if (m) m.classList.remove('show');
+    });
+
+    // Bulk Selection Logic
+    function toggleSelectAll(master) {
+      var checkboxes = document.querySelectorAll('.guest-checkbox');
+      checkboxes.forEach(function(cb) {
+        cb.checked = master.checked;
+      });
+      updateBulkState();
+    }
+
+    function updateBulkState() {
+      var checkboxes = document.querySelectorAll('.guest-checkbox:checked');
+      var toolbar = document.getElementById('bulkToolbar');
+      var countEl = document.getElementById('bulkCount');
+      var idsInput = document.getElementById('bulkDeleteIds');
+
+      var ids = [];
+      checkboxes.forEach(function(cb) {
+        ids.push(cb.value);
+      });
+
+      if (ids.length > 0) {
+        toolbar.style.display = 'flex';
+        countEl.textContent = ids.length;
+        idsInput.value = ids.join(',');
+      } else {
+        toolbar.style.display = 'none';
+        idsInput.value = '';
+        var master = document.getElementById('selectAllCheckbox');
+        if (master) master.checked = false;
+      }
+    }
+
+    function clearBulkSelection() {
+      var checkboxes = document.querySelectorAll('.guest-checkbox');
+      checkboxes.forEach(function(cb) { cb.checked = false; });
+      var master = document.getElementById('selectAllCheckbox');
+      if (master) master.checked = false;
+      updateBulkState();
+    }
+
+    function confirmBulkDelete() {
+      var count = document.getElementById('bulkCount').textContent;
+      return confirm('Apakah Anda yakin ingin menghapus ' + count + ' tamu terpilih secara permanen?');
+    }
+
+    function updateEditSlugPrefix() {
+      var et = document.getElementById('editEventType');
+      var prefix = document.getElementById('editSlugPrefix');
+      if (prefix && et) {
+        prefix.textContent = et.value === 'reception' ? '/syukuran/' : '/';
+      }
+    }
+
+    // Edit Modal Logic
+    function openEditModal(g) {
+      document.getElementById('editGuestForm').action = '/admin/guests/' + g.id + '/edit';
+      document.getElementById('editTitle').value = g.title || '';
+      document.getElementById('editName').value = g.name || '';
+      document.getElementById('editWithPartner').value = g.with_partner ? '1' : '0';
+      document.getElementById('editPartnerName').value = g.partner_name || '';
+      document.getElementById('editMaxPax').value = g.max_pax || 2;
+      document.getElementById('editPhone').value = g.phone || '';
+      document.getElementById('editGrp').value = g.grp || '';
+      document.getElementById('editEventType').value = g.event_type || 'both';
+      document.getElementById('editSlug').value = g.slug || '';
+      updateEditSlugPrefix();
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Manual RSVP Modal Logic
+    function openRsvpModal(g) {
+      document.getElementById('rsvpForm').action = '/admin/guests/' + g.id + '/rsvp';
+      document.getElementById('rsvpModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name;
+      document.getElementById('rsvpModalMaxPax').textContent = g.max_pax || 2;
+      document.getElementById('rsvpPaxInput').max = g.max_pax || 2;
+
+      if (g.attending === 1) {
+        document.getElementById('rsvpAttendingYes').checked = true;
+        document.getElementById('rsvpPaxWrap').style.display = 'block';
+        document.getElementById('rsvpPaxInput').value = g.pax || 1;
+      } else if (g.attending === 0) {
+        document.getElementById('rsvpAttendingNo').checked = true;
+        document.getElementById('rsvpPaxWrap').style.display = 'none';
+        document.getElementById('rsvpPaxInput').value = 0;
+      } else {
+        document.getElementById('rsvpAttendingYes').checked = true;
+        document.getElementById('rsvpPaxWrap').style.display = 'block';
+        document.getElementById('rsvpPaxInput').value = 1;
+      }
+      document.getElementById('rsvpWishInput').value = g.wish || '';
+      document.getElementById('rsvpModal').style.display = 'flex';
+    }
+
+    function toggleRsvpPax(isYes) {
+      document.getElementById('rsvpPaxWrap').style.display = isYes ? 'block' : 'none';
+    }
+
+    function closeRsvpModal() {
+      document.getElementById('rsvpModal').style.display = 'none';
+    }
+
+    // WhatsApp Modal Logic
+    function openWaModal(g) {
+      currentGuestForWa = g;
+      document.getElementById('waModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name;
+      document.getElementById('waModalPhone').textContent = g.phone || 'Belum diisi';
+      document.getElementById('waModalUrl').textContent = g.fullUrl;
+
+      // Set default template (formal)
+      var tabs = document.querySelectorAll('.wa-template-tabs .tab-btn');
+      tabs.forEach(function(t) { t.classList.remove('active'); });
+      tabs[0].classList.add('active');
+      generateWaText('formal');
+
+      document.getElementById('waModal').style.display = 'flex';
+    }
+
+    function switchWaTemplate(type, btn) {
+      var tabs = document.querySelectorAll('.wa-template-tabs .tab-btn');
+      tabs.forEach(function(t) { t.classList.remove('active'); });
+      btn.classList.add('active');
+      generateWaText(type);
+    }
+
+    function generateWaText(type) {
+      if (!currentGuestForWa) return;
+      var g = currentGuestForWa;
+      var salutation = g.title ? g.title + ' ' : '';
+      var recipientName = salutation + g.name + (g.with_partner ? ' & Pasangan' : '');
+      var isRec = g.event_type === 'reception';
+      var text = '';
+
+      if (type === 'formal') {
+        text = "Kepada Yth. " + recipientName + ",\n\n" +
+          "Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri hari bahagia pernikahan kami.\n\n" +
+          "Informasi lengkap acara dan konfirmasi kehadiran dapat diakses melalui tautan undangan berikut:\n" +
+          g.fullUrl + "\n\n" +
+          "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\n" +
+          "Salam hangat,\n" +
+          "<%= couple.short %>";
+      } else if (type === 'casual') {
+        text = "Halo " + g.name + "! 👋\n\n" +
+          "Alhamdulillah, dengan penuh rasa syukur kami ingin mengundang kamu untuk hadir di hari bahagia pernikahan kami: <%= couple.short %>.\n\n" +
+          "Untuk detail acara dan RSVP kehadiran, silakan buka tautan berikut ya:\n" +
+          g.fullUrl + "\n\n" +
+          "Kehadiran dan doa restu darimu sangat berarti bagi kami. Sampai jumpa di hari bahagia kami!\n\n" +
+          "Warm regards,\n" +
+          "<%= couple.short %>";
+      } else if (type === 'english') {
+        text = "Dear " + recipientName + ",\n\n" +
+          "Together with our families, we joyfully invite you to celebrate our wedding: <%= couple.short %>.\n\n" +
+          "Please find the event details and kindly confirm your RSVP via the following link:\n" +
+          g.fullUrl + "\n\n" +
+          "Your presence and blessings will make our special day even more meaningful.\n\n" +
+          "Warm regards,\n" +
+          "<%= couple.short %>";
+      }
+
+      var textarea = document.getElementById('waMessageText');
+      textarea.value = text;
+      updateWaDirectBtn();
+    }
+
+    function updateWaDirectBtn() {
+      if (!currentGuestForWa) return;
+      var msg = encodeURIComponent(document.getElementById('waMessageText').value);
+      var phone = (currentGuestForWa.phone || '').replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+      
+      var waBtn = document.getElementById('waDirectBtn');
+      if (phone) {
+        waBtn.href = 'https://wa.me/' + phone + '?text=' + msg;
+      } else {
+        waBtn.href = 'https://wa.me/?text=' + msg;
+      }
+    }
+
+    document.getElementById('waMessageText').addEventListener('input', updateWaDirectBtn);
+
+    function copyWaText() {
+      var textarea = document.getElementById('waMessageText');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textarea.value).then(function() {
+          showToast('✓ Pesan WhatsApp berhasil disalin!');
+        });
+      } else {
+        textarea.select();
+        document.execCommand('copy');
+        showToast('✓ Pesan WhatsApp berhasil disalin!');
+      }
+    }
+
+    function closeWaModal() {
+      document.getElementById('waModal').style.display = 'none';
+      currentGuestForWa = null;
+    }
+
+    // QR Modal
+    function showQr(slug, name) {
+      document.getElementById('qrGuestName').textContent = name;
+      document.getElementById('qrImage').src = '/admin/guests/' + slug + '/qr';
+      document.getElementById('qrModal').style.display = 'flex';
+    }
+
+    // Close modals on clicking backdrop
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('admin-modal-backdrop')) {
+        e.target.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

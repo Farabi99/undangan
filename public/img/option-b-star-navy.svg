@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  
+    <defs>
+      <filter id="luxuryDepth" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.65"/>
+      </filter>
+      <linearGradient id="goldLetterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="50%" stop-color="#FFFDF7"/>
+        <stop offset="100%" stop-color="#F4EADB"/>
+      </linearGradient>
+      <linearGradient id="goldAccentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFF9E6"/>
+        <stop offset="40%" stop-color="#EED59B"/>
+        <stop offset="100%" stop-color="#C5A048"/>
+      </linearGradient>
+      <linearGradient id="silverLetterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="45%" stop-color="#F8FAFC"/>
+        <stop offset="100%" stop-color="#E2E8F0"/>
+      </linearGradient>
+      <linearGradient id="silverAccentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="40%" stop-color="#CBD5E1"/>
+        <stop offset="100%" stop-color="#94A3B8"/>
+      </linearGradient>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="50%" stop-color="#CBD5E1"/>
+        <stop offset="100%" stop-color="#64748B"/>
+      </linearGradient>
+    </defs>
+  
+  <circle cx="250" cy="250" r="248" fill="#0E1B33"/>
+  
+    <!-- Outer Double Luxury Rings with Beaded Track -->
+    <circle cx="250" cy="250" r="234" fill="none" stroke="url(#ringGrad)" stroke-width="2.5" filter="url(#luxuryDepth)"/>
+    <circle cx="250" cy="250" r="222" fill="none" stroke="rgba(203, 213, 225, 0.75)" stroke-width="1.2" stroke-dasharray="3.5 4.5"/>
+    
+    <!-- North & South Diamond Star Finials -->
+    <g fill="url(#ringGrad)" filter="url(#luxuryDepth)">
+      <path d="M 250 8 L 253.5 17.5 L 263 21 L 253.5 24.5 L 250 34 L 246.5 24.5 L 237 21 L 246.5 17.5 Z"/>
+      <path d="M 250 466 L 253.5 475.5 L 263 479 L 253.5 482.5 L 250 492 L 246.5 482.5 L 237 479 L 246.5 475.5 Z"/>
+    </g>
+    <!-- East & West Accent Beads -->
+    <circle cx="16" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.75)"/>
+    <circle cx="484" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.75)"/>
+  
+
+  <g filter="url(#luxuryDepth)">
+    <!-- Letter F (Left: x=88 to x=190, y=165 to y=345) -->
+    <path d="
+      M 88 165 
+      L 190 165 
+      L 190 196 
+      L 178 196 
+      C 174 182, 166 179, 148 179 
+      L 136 179 
+      L 136 242 
+      L 170 242 
+      C 178 242, 182 238, 184 228 
+      L 189 228 
+      L 189 260 
+      L 184 260 
+      C 182 250, 178 246, 170 246 
+      L 136 246 
+      L 136 321 
+      C 136 333, 142 336, 156 337 
+      L 156 345 
+      L 88 345 
+      L 88 337 
+      C 102 336, 108 333, 108 321 
+      L 108 189 
+      C 108 177, 102 174, 88 173 
+      Z" 
+      fill="url(#silverLetterGrad)" 
+      stroke="#080E1C" 
+      stroke-width="1.2"/>
+
+    <!-- Central Sparkling 8-Point Diamond Star with Celestial Rays -->
+    <g transform="translate(250, 255)">
+      <!-- Radiant Hairline Accents -->
+      <line x1="-32" y1="0" x2="-18" y2="0" stroke="url(#silverAccentGrad)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="18" y1="0" x2="32" y2="0" stroke="url(#silverAccentGrad)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="0" y1="-32" x2="0" y2="-18" stroke="url(#silverAccentGrad)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="0" y1="18" x2="0" y2="32" stroke="url(#silverAccentGrad)" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Diamond Star Polygon -->
+      <path d="
+        M 0 -26 
+        L 4.5 -7 
+        L 22 -5 
+        L 7.5 4 
+        L 12 22 
+        L 0 10 
+        L -12 22 
+        L -7.5 4 
+        L -22 -5 
+        L -4.5 -7 
+        Z" 
+        fill="url(#silverAccentGrad)"/>
+      <circle cx="0" cy="0" r="3" fill="#080E1C"/>
+    </g>
+
+    <!-- Letter S (Right: x=310 to x=412, y=165 to y=345) -->
+    <path d="
+      M 405 204 
+      C 398 178, 380 165, 355 165 
+      C 328 165, 312 178, 312 196 
+      C 312 212, 326 224, 348 234 
+      C 376 248, 400 262, 400 294 
+      C 400 330, 370 348, 340 348 
+      C 310 348, 288 332, 280 308 
+      L 300 302 
+      C 305 320, 320 332, 340 332 
+      C 365 332, 380 318, 380 294 
+      C 380 272, 362 258, 336 246 
+      C 310 232, 294 218, 294 194 
+      C 294 168, 318 152, 352 152 
+      C 378 152, 396 164, 404 184 
+      Z" 
+      fill="url(#silverLetterGrad)" 
+      stroke="#080E1C" 
+      stroke-width="1.2"/>
+  </g>
+</svg>

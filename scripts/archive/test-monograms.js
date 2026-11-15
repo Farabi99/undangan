@@ -1,0 +1,182 @@
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
+
+const outDir = path.join(__dirname, '..', 'public', 'img', 'test-logo-options');
+fs.mkdirSync(outDir, { recursive: true });
+
+function generateOption1_RoyalInterlock(isSilver) {
+  const primaryFill = isSilver ? '#FFFFFF' : '#FFFFFF';
+  const secondaryFill = isSilver ? 'url(#silverGrad)' : 'url(#goldGrad)';
+  const strokeColor = isSilver ? '#080E1C' : '#525A45';
+  const ringStroke = isSilver ? 'rgba(226, 232, 240, 0.85)' : 'rgba(255, 255, 255, 0.9)';
+  const innerRing = isSilver ? 'rgba(203, 213, 225, 0.6)' : 'rgba(212, 185, 110, 0.75)';
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF7"/>
+      <stop offset="35%" stop-color="#EEDCB0"/>
+      <stop offset="100%" stop-color="#C5A850"/>
+    </linearGradient>
+    <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="30%" stop-color="#F1F5F9"/>
+      <stop offset="70%" stop-color="#CBD5E1"/>
+      <stop offset="100%" stop-color="#94A3B8"/>
+    </linearGradient>
+    <mask id="fMask">
+      <!-- White reveals, black cuts out a clean 4px gap around S -->
+      <rect width="500" height="500" fill="white"/>
+      <path d="M 285 130 C 345 130, 360 175, 335 210 C 310 245, 240 260, 240 295 C 240 330, 280 355, 320 345 C 345 340, 360 315, 360 315" 
+            fill="none" stroke="black" stroke-width="36" stroke-linecap="round"/>
+    </mask>
+  </defs>
+
+  <!-- Outer Double Luxury Rings with Delicate Micro-Dots -->
+  <circle cx="250" cy="250" r="232" fill="none" stroke="${ringStroke}" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="250" cy="250" r="222" fill="none" stroke="${innerRing}" stroke-width="1" stroke-dasharray="3 4"/>
+
+  <!-- North/South Diamond Stars -->
+  <g fill="${ringStroke}" filter="url(#shadow)">
+    <path d="M 250 10 L 253 18 L 261 21 L 253 24 L 250 32 L 247 24 L 239 21 L 247 18 Z"/>
+    <path d="M 250 468 L 253 476 L 261 479 L 253 482 L 250 490 L 247 482 L 239 479 L 247 476 Z"/>
+  </g>
+
+  <!-- East/West Accent Beads -->
+  <circle cx="18" cy="250" r="3.5" fill="${innerRing}"/>
+  <circle cx="482" cy="250" r="3.5" fill="${innerRing}"/>
+
+  <!-- MONOGRAM GROUP -->
+  <g filter="url(#shadow)">
+
+    <!-- LETTER F (Positioned gracefully left of center) -->
+    <!-- Architectural Roman Serif with crystal-clear legibility -->
+    <g id="letterF">
+      <!-- Main Stem & Serifs -->
+      <path d="
+        M 155 125 
+        L 285 125 
+        L 285 160 
+        L 268 160 
+        C 265 145, 255 140, 235 140 
+        L 212 140 
+        L 212 230 
+        L 260 230 
+        C 272 230, 276 226, 278 215 
+        L 288 215 
+        L 288 260 
+        L 278 260 
+        C 276 248, 272 245, 260 245 
+        L 212 245 
+        L 212 345 
+        C 212 365, 218 370, 240 372 
+        L 240 385 
+        L 145 385 
+        L 145 372 
+        C 165 370, 172 365, 172 345 
+        L 172 165 
+        C 172 145, 165 140, 145 138 
+        L 145 125 
+        Z" 
+        fill="${primaryFill}" 
+        stroke="${strokeColor}" 
+        stroke-width="1.2"/>
+    </g>
+
+    <!-- LETTER S (Positioned right of center, interlocking through F) -->
+    <!-- Classical Didone Curves with Distinct Tear Terminals -->
+    <g id="letterS">
+      <!-- White/Navy Knockout Contour to create 3D interlacing gap -->
+      <path d="
+        M 320 185 
+        C 320 152, 298 135, 268 135 
+        C 235 135, 218 150, 218 172 
+        C 218 194, 236 210, 268 226 
+        C 312 248, 342 272, 342 312 
+        C 342 358, 302 388, 252 388 
+        C 215 388, 185 368, 178 335 
+        L 202 328 
+        C 208 352, 226 368, 255 368 
+        C 292 368, 318 346, 318 314 
+        C 318 285, 298 268, 260 248 
+        C 220 226, 195 204, 195 170 
+        C 195 134, 228 115, 268 115 
+        C 302 115, 330 132, 338 162 
+        Z"
+        fill="none"
+        stroke="${strokeColor}"
+        stroke-width="7"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+      <!-- True S Glyph -->
+      <path d="
+        M 320 185 
+        C 320 152, 298 135, 268 135 
+        C 235 135, 218 150, 218 172 
+        C 218 194, 236 210, 268 226 
+        C 312 248, 342 272, 342 312 
+        C 342 358, 302 388, 252 388 
+        C 215 388, 185 368, 178 335 
+        L 202 328 
+        C 208 352, 226 368, 255 368 
+        C 292 368, 318 346, 318 314 
+        C 318 285, 298 268, 260 248 
+        C 220 226, 195 204, 195 170 
+        C 195 134, 228 115, 268 115 
+        C 302 115, 330 132, 338 162 
+        Z"
+        fill="${secondaryFill}"
+        stroke="${strokeColor}"
+        stroke-width="1.2"/>
+
+      <!-- Teardrop Finial Accents -->
+      <circle cx="330" cy="172" r="7.5" fill="${secondaryFill}"/>
+      <circle cx="188" cy="342" r="7.5" fill="${secondaryFill}"/>
+    </g>
+
+  </g>
+</svg>`;
+}
+
+async function run() {
+  const svgGold = generateOption1_RoyalInterlock(false);
+  const svgSilver = generateOption1_RoyalInterlock(true);
+
+  fs.writeFileSync(path.join(outDir, 'option1-gold.svg'), svgGold);
+  fs.writeFileSync(path.join(outDir, 'option1-silver.svg'), svgSilver);
+
+  // Render on dark navy background
+  const navyBg = Buffer.from(`
+    <svg width="500" height="500">
+      <rect width="500" height="500" fill="#080E1C"/>
+    </svg>
+  `);
+  
+  await sharp(Buffer.from(svgSilver))
+    .composite([{ input: navyBg, blend: 'dest-over' }])
+    .png()
+    .toFile(path.join(outDir, 'option1-silver-preview.png'));
+
+  // Render on sage background
+  const sageBg = Buffer.from(`
+    <svg width="500" height="500">
+      <rect width="500" height="500" fill="#7E836C"/>
+    </svg>
+  `);
+
+  await sharp(Buffer.from(svgGold))
+    .composite([{ input: sageBg, blend: 'dest-over' }])
+    .png()
+    .toFile(path.join(outDir, 'option1-gold-preview.png'));
+
+  console.log('Option 1 rendered successfully!');
+}
+
+run().catch(console.error);
+

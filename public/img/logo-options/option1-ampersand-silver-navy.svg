@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  
+    <defs>
+      <filter id="luxuryDepth" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
+      </filter>
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFDF7"/>
+        <stop offset="35%" stop-color="#F3E5C8"/>
+        <stop offset="70%" stop-color="#D4B96E"/>
+        <stop offset="100%" stop-color="#B89638"/>
+      </linearGradient>
+      <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="30%" stop-color="#F1F5F9"/>
+        <stop offset="70%" stop-color="#CBD5E1"/>
+        <stop offset="100%" stop-color="#94A3B8"/>
+      </linearGradient>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="50%" stop-color="#CBD5E1"/>
+        <stop offset="100%" stop-color="#64748B"/>
+      </linearGradient>
+    </defs>
+  
+  <circle cx="250" cy="250" r="248" fill="#0E1B33"/>
+  
+    <!-- Outer Double Luxury Rings with Beaded Track -->
+    <circle cx="250" cy="250" r="234" fill="none" stroke="url(#ringGrad)" stroke-width="2.5" filter="url(#luxuryDepth)"/>
+    <circle cx="250" cy="250" r="222" fill="none" stroke="rgba(203, 213, 225, 0.7)" stroke-width="1.2" stroke-dasharray="3.5 4.5"/>
+    
+    <!-- North & South Diamond Star Finials -->
+    <g fill="url(#ringGrad)" filter="url(#luxuryDepth)">
+      <path d="M 250 8 L 253.5 17.5 L 263 21 L 253.5 24.5 L 250 34 L 246.5 24.5 L 237 21 L 246.5 17.5 Z"/>
+      <path d="M 250 466 L 253.5 475.5 L 263 479 L 253.5 482.5 L 250 492 L 246.5 482.5 L 237 479 L 246.5 475.5 Z"/>
+    </g>
+    <!-- East & West Accent Beads -->
+    <circle cx="16" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.7)"/>
+    <circle cx="484" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.7)"/>
+  
+
+  <g filter="url(#luxuryDepth)">
+    <!-- ==============================================
+         LETTER F (Left Side: Classical Luxury Roman Serif)
+         ============================================== -->
+    <path id="serifF" d="
+      M 95 145 
+      L 205 145 
+      L 205 180 
+      L 192 180 
+      C 188 165, 178 160, 160 160 
+      L 146 160 
+      L 146 232 
+      L 182 232 
+      C 192 232, 196 228, 198 218 
+      L 204 218 
+      L 204 256 
+      L 198 256 
+      C 196 246, 192 242, 182 242 
+      L 146 242 
+      L 146 325 
+      C 146 342, 152 346, 168 348 
+      L 168 358 
+      L 88 358 
+      L 88 348 
+      C 104 346, 110 342, 110 325 
+      L 110 180 
+      C 110 163, 104 159, 88 157 
+      L 88 145 
+      Z" 
+      fill="url(#silverGrad)" 
+      stroke="#080E1C" 
+      stroke-width="1.2"/>
+
+    <!-- ==============================================
+         AMPERSAND '&' (Center: Delicate Calligraphic Swash)
+         ============================================== -->
+    <path id="calligraphicAmpersand" d="
+      M 264 228 
+      C 274 212, 278 196, 268 184 
+      C 258 172, 240 174, 234 186 
+      C 228 198, 234 214, 248 230 
+      L 230 258 
+      C 214 274, 206 292, 216 308 
+      C 226 324, 248 326, 264 316 
+      C 276 308, 284 294, 296 276 
+      L 284 270 
+      C 275 284, 266 295, 255 298 
+      C 245 301, 236 297, 232 288 
+      C 228 279, 232 268, 244 254 
+      L 258 236 
+      L 278 266 
+      C 286 278, 295 288, 305 292 
+      L 310 286 
+      C 298 280, 288 268, 280 254 
+      Z
+      M 256 218 
+      C 246 206, 244 194, 248 188 
+      C 252 182, 260 182, 264 188 
+      C 268 194, 266 204, 256 218 
+      Z" 
+      fill="#CBD5E1"/>
+
+    <!-- ==============================================
+         LETTER S (Right Side: Classical Luxury Roman Serif)
+         ============================================== -->
+    <path id="serifS" d="
+      M 395 186 
+      C 390 162, 372 145, 342 145 
+      C 314 145, 296 158, 296 178 
+      C 296 196, 312 208, 338 220 
+      C 370 234, 396 252, 396 286 
+      C 396 328, 362 358, 320 358 
+      C 285 358, 258 338, 250 310 
+      L 272 302 
+      C 278 324, 296 338, 322 338 
+      C 352 338, 372 318, 372 288 
+      C 372 264, 352 248, 322 234 
+      C 290 220, 272 202, 272 174 
+      C 272 142, 300 125, 338 125 
+      C 368 125, 388 138, 396 160 
+      Z" 
+      fill="url(#silverGrad)" 
+      stroke="#080E1C" 
+      stroke-width="1.2"/>
+  </g>
+</svg>

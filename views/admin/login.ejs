@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Admin — Undangan Pernikahan</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=<%= Date.now() %>">
+  <link rel="icon" type="image/svg+xml" href="/img/logo-fs-badge.svg?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: #3A3028;
+    }
+    .login-box {
+      background: #FFFFFF;
+      border-radius: 8px;
+      padding: 2.25rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="admin-body">
+  <div class="login-wrapper">
+    <div class="login-box">
+      <h2 style="font-size: 1.35rem; margin-bottom: 0.5rem; text-align: center;">Admin Undangan</h2>
+      <p style="font-size: 0.85rem; color: var(--admin-text-sub); text-align: center; margin-bottom: 1.75rem;">
+        Masukkan kata sandi admin untuk mengelola daftar tamu &amp; RSVP.
+      </p>
+
+      <% if (error) { %>
+        <div style="background: #FFE7D9; color: #B72136; padding: 0.65rem 0.85rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1.25rem;">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <% if (!hasPassword) { %>
+        <div style="background: #FFF1D6; color: #B78103; padding: 0.75rem; border-radius: 6px; font-size: 0.82rem; margin-bottom: 1.25rem;">
+          <strong>Perhatian:</strong> <code>ADMIN_PASSWORD</code> belum diatur di file environment. Anda dapat langsung masuk atau mengatur password di server.
+        </div>
+      <% } %>
+
+      <form action="/admin/login" method="POST">
+        <div style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.35rem;">Kata Sandi</label>
+          <input type="password" name="password" class="input-adm" style="width: 100%; box-sizing: border-box;" placeholder="••••••••" autofocus>
+        </div>
+        <button type="submit" class="btn-adm btn-adm-primary" style="width: 100%; justify-content: center; padding: 0.65rem;">
+          Masuk ke Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

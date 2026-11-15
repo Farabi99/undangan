@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <filter id="monogramGlow2" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <linearGradient id="sGradSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="35%" stop-color="#F1F5F9"/>
+      <stop offset="70%" stop-color="#CBD5E1"/>
+      <stop offset="100%" stop-color="#94A3B8"/>
+    </linearGradient>
+    <linearGradient id="sGradGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF7"/>
+      <stop offset="35%" stop-color="#EEDCB0"/>
+      <stop offset="100%" stop-color="#C5A850"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Luxury Ring Cartouche -->
+  <circle cx="250" cy="250" r="234" fill="none" stroke="rgba(226, 232, 240, 0.85)" stroke-width="2.2" filter="url(#monogramGlow2)"/>
+  <circle cx="250" cy="250" r="224" fill="none" stroke="rgba(203, 213, 225, 0.65)" stroke-width="1.2" stroke-dasharray="3.5 4.5"/>
+
+  <!-- Star Accents -->
+  <g fill="rgba(226, 232, 240, 0.85)" filter="url(#monogramGlow2)">
+    <path d="M 250 8 L 253.5 17 L 262 20.5 L 253.5 24 L 250 33 L 246.5 24 L 238 20.5 L 246.5 17 Z"/>
+    <path d="M 250 467 L 253.5 476 L 262 479.5 L 253.5 483 L 250 492 L 246.5 483 L 238 479.5 L 246.5 476 Z"/>
+  </g>
+  <circle cx="16" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.65)"/>
+  <circle cx="484" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.65)"/>
+
+  <!-- MONOGRAM GLYPHS -->
+  <g filter="url(#monogramGlow2)">
+
+    <!-- LETTER F (Left Side: x=110 to x=240, completely unobstructed) -->
+    <path d="
+      M 115 130 
+      L 245 130 
+      L 245 168 
+      L 230 168 
+      C 227 152, 218 146, 198 146 
+      L 174 146 
+      L 174 230 
+      L 218 230 
+      C 230 230, 234 225, 236 215 
+      L 246 215 
+      L 246 258 
+      L 236 258 
+      C 234 248, 230 244, 218 244 
+      L 174 244 
+      L 174 345 
+      C 174 365, 180 370, 200 372 
+      L 200 385 
+      L 105 385 
+      L 105 372 
+      C 125 370, 132 365, 132 345 
+      L 132 165 
+      C 132 145, 125 140, 105 138 
+      L 105 130 
+      Z" 
+      fill="#FFFFFF"
+      stroke="#080E1C"
+      stroke-width="1"/>
+
+    <!-- Intertwined Calligraphic Ampersand in the center (&) -->
+    <path d="
+      M 264 265 
+      C 255 245, 235 210, 248 190 
+      C 256 178, 270 178, 276 188 
+      C 282 198, 274 212, 260 230 
+      L 225 285 
+      C 214 302, 210 318, 218 330 
+      C 228 345, 252 345, 272 328 
+      C 282 318, 290 305, 298 290 
+      L 306 295 
+      C 295 315, 282 334, 268 346 
+      C 246 364, 218 362, 204 340 
+      C 194 322, 198 300, 212 280 
+      L 246 226 
+      C 258 208, 262 195, 256 185 
+      C 250 175, 240 176, 234 186 
+      C 224 202, 240 235, 252 258 
+      Z"
+      fill="rgba(203, 213, 225, 0.65)"
+      opacity="0.9"/>
+
+    <!-- LETTER S (Right Side: x=260 to x=390, completely unobstructed) -->
+    <path d="
+      M 385 190 
+      C 385 152, 358 130, 320 130 
+      C 280 130, 260 152, 260 178 
+      C 260 205, 282 222, 318 240 
+      C 366 264, 396 288, 396 332 
+      C 396 378, 356 405, 305 405 
+      C 262 405, 230 382, 220 345 
+      L 246 336 
+      C 254 364, 275 382, 308 382 
+      C 348 382, 370 360, 370 330 
+      C 370 298, 346 278, 308 258 
+      C 262 234, 236 212, 236 176 
+      C 236 138, 272 112, 320 112 
+      C 360 112, 388 132, 400 168 
+      Z" 
+      fill="url(#sGradSilver)" 
+      stroke="#080E1C" 
+      stroke-width="1"/>
+
+    <!-- S Terminals -->
+    <circle cx="396" cy="176" r="8" fill="#FFFFFF" stroke="#080E1C" stroke-width="1"/>
+    <circle cx="232" cy="350" r="8" fill="url(#sGradSilver)" stroke="#080E1C" stroke-width="1"/>
+
+  </g>
+</svg>

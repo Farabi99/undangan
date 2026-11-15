@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  
+    <defs>
+      <filter id="luxuryDepth" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
+      </filter>
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFDF7"/>
+        <stop offset="35%" stop-color="#F3E5C8"/>
+        <stop offset="70%" stop-color="#D4B96E"/>
+        <stop offset="100%" stop-color="#B89638"/>
+      </linearGradient>
+      <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="30%" stop-color="#F1F5F9"/>
+        <stop offset="70%" stop-color="#CBD5E1"/>
+        <stop offset="100%" stop-color="#94A3B8"/>
+      </linearGradient>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="50%" stop-color="#CBD5E1"/>
+        <stop offset="100%" stop-color="#64748B"/>
+      </linearGradient>
+    </defs>
+  
+  <circle cx="250" cy="250" r="248" fill="#0E1B33"/>
+  
+    <!-- Outer Double Luxury Rings with Beaded Track -->
+    <circle cx="250" cy="250" r="234" fill="none" stroke="url(#ringGrad)" stroke-width="2.5" filter="url(#luxuryDepth)"/>
+    <circle cx="250" cy="250" r="222" fill="none" stroke="rgba(203, 213, 225, 0.7)" stroke-width="1.2" stroke-dasharray="3.5 4.5"/>
+    
+    <!-- North & South Diamond Star Finials -->
+    <g fill="url(#ringGrad)" filter="url(#luxuryDepth)">
+      <path d="M 250 8 L 253.5 17.5 L 263 21 L 253.5 24.5 L 250 34 L 246.5 24.5 L 237 21 L 246.5 17.5 Z"/>
+      <path d="M 250 466 L 253.5 475.5 L 263 479 L 253.5 482.5 L 250 492 L 246.5 482.5 L 237 479 L 246.5 475.5 Z"/>
+    </g>
+    <!-- East & West Accent Beads -->
+    <circle cx="16" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.7)"/>
+    <circle cx="484" cy="250" r="3.5" fill="rgba(203, 213, 225, 0.7)"/>
+  
+
+  <g filter="url(#luxuryDepth)">
+    <!-- Letter F (Left) -->
+    <path d="
+      M 105 145 
+      L 215 145 
+      L 215 180 
+      L 202 180 
+      C 198 165, 188 160, 170 160 
+      L 156 160 
+      L 156 232 
+      L 192 232 
+      C 202 232, 206 228, 208 218 
+      L 214 218 
+      L 214 256 
+      L 208 256 
+      C 206 246, 202 242, 192 242 
+      L 156 242 
+      L 156 325 
+      C 156 342, 162 346, 178 348 
+      L 178 358 
+      L 98 358 
+      L 98 348 
+      C 114 346, 120 342, 120 325 
+      L 120 180 
+      C 120 163, 114 159, 98 157 
+      L 98 145 
+      Z" 
+      fill="url(#silverGrad)" 
+      stroke="#080E1C" 
+      stroke-width="1.2"/>
+
+    <!-- Central 8-Point Diamond Celestial Star with Delicate Rays -->
+    <g transform="translate(250, 250)">
+      <!-- Radiant Hairlines -->
+      <line x1="-28" y1="0" x2="-14" y2="0" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="14" y1="0" x2="28" y2="0" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="0" y1="-28" x2="0" y2="-14" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="0" y1="14" x2="0" y2="28" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Star Shape -->
+      <path d="
+        M 0 -22 
+        L 3.5 -6 
+        L 18 -4 
+        L 6 3.5 
+        L 10 18 
+        L 0 8 
+        L -10 18 
+        L -6 3.5 
+        L -18 -4 
+        L -3.5 -6 
+        Z" 
+        fill="#FFFFFF"/>
+      <circle cx="0" cy="0" r="2.5" fill="#080E1C"/>
+    </g>
+
+    <!-- Letter S (Right) -->
+    <path d="
+      M 390 186 
+      C 385 162, 368 145, 338 145 
+      C 310 145, 292 158, 292 178 
+      C 292 196, 308 208, 334 220 
+      C 366 234, 392 252, 392 286 
+      C 392 328, 358 358, 316 358 
+      C 281 358, 254 338, 246 310 
+      L 268 302 
+      C 274 324, 292 338, 318 338 
+      C 348 338, 368 318, 368 288 
+      C 368 264, 348 248, 318 234 
+      C 286 220, 268 202, 268 174 
+      C 268 142, 296 125, 334 125 
+      C 364 125, 384 138, 392 160 
+      Z" 
+      fill="url(#silverGrad)" 
+      stroke="#080E1C" 
+      stroke-width="1.2"/>
+  </g>
+</svg>

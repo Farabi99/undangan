@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Import Spreadsheet — Admin Undangan</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=<%= Date.now() %>">
+  <link rel="icon" type="image/svg+xml" href="/img/logo-fs-badge.svg?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+  <nav class="admin-nav">
+    <div class="admin-nav-brand">💍 Admin Undangan</div>
+    <div class="admin-nav-links">
+      <a href="/admin/guests">Daftar Tamu</a>
+      <a href="/admin/import" class="active">Import Spreadsheet</a>
+      <a href="/admin/rsvps">Rekap RSVP</a>
+      <a href="/admin/wishes">Moderasi Ucapan</a>
+      <a href="/" target="_blank">Lihat Web ↗</a>
+      <a href="/admin/logout" style="color: #FFA39E;">Keluar</a>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+    <div class="admin-card">
+      <h2 style="font-size: 1.25rem; margin-top: 0;">Upload File Daftar Tamu</h2>
+      <p style="font-size: 0.9rem; color: var(--admin-text-sub); margin-bottom: 1.5rem;">
+        Unggah file Excel (<code>.xlsx</code>) atau <code>.csv</code> berisi daftar tamu undangan Anda. Sistem akan memvalidasi data dan membuatkan URL unik secara otomatis.
+      </p>
+
+      <div style="background: #F9FAFB; border: 1px dashed var(--admin-border); border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem;">📥 Belum punya format tabel?</h4>
+        <p style="font-size: 0.82rem; color: var(--admin-text-sub); margin-bottom: 0.75rem;">
+          Unduh template resmi berikut, isi data tamu, lalu unggah kembali di form bawah ini:
+        </p>
+        <div style="display: flex; gap: 0.75rem;">
+          <a href="/admin/import/template?format=xlsx" class="btn-adm btn-adm-outline">Unduh Template Excel (.xlsx)</a>
+          <a href="/admin/import/template?format=csv" class="btn-adm btn-adm-outline">Unduh Template CSV</a>
+        </div>
+      </div>
+
+      <% if (error) { %>
+        <div style="background: #FFE7D9; color: #B72136; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1.25rem;">
+          <strong>Gagal:</strong> <%= error %>
+        </div>
+      <% } %>
+
+      <% if (!preview) { %>
+        <!-- Upload Form -->
+        <form action="/admin/import/preview" method="POST" enctype="multipart/form-data">
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Pilih File Spreadsheet</label>
+            <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="input-adm" style="width: 100%; max-width: 400px;">
+          </div>
+          <button type="submit" class="btn-adm btn-adm-primary" style="padding: 0.65rem 1.25rem;">
+            🔍 Proses &amp; Lihat Preview
+          </button>
+        </form>
+      <% } else { %>
+        <!-- Preview & Confirmation Step -->
+        <div style="border-top: 1px solid var(--admin-border); padding-top: 1.25rem; margin-top: 1rem;">
+          <div class="admin-header-row">
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem;">Preview Hasil Pembacaan File</h3>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--admin-text-sub);">
+                Periksa data sebelum disimpan. Baris yang memiliki kesalahan (error) akan dilewati.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span class="badge badge-success">✓ <%= preview.stats.valid %> Siap Disimpan</span>
+              <% if (preview.stats.duplicates > 0) { %>
+                <span class="badge badge-warning">⚠ <%= preview.stats.duplicates %> Duplikat</span>
+              <% } %>
+              <% if (preview.stats.errors > 0) { %>
+                <span class="badge badge-danger">✕ <%= preview.stats.errors %> Error</span>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="admin-table-wrap" style="max-height: 420px; overflow-y: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Baris</th>
+                  <th>Gelar</th>
+                  <th>Nama Tamu</th>
+                  <th>Pasangan</th>
+                  <th>Maks Pax</th>
+                  <th>No. HP</th>
+                  <th>Kategori</th>
+                  <th>Acara</th>
+                  <th>Catatan Validasi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% preview.rows.forEach(function(r) { %>
+                  <tr style="<%= r.errors.length ? 'background: #FFF1F0;' : r.duplicate ? 'background: #FFFBE6;' : '' %>">
+                    <td><%= r.line %></td>
+                    <td><%= r.title || '-' %></td>
+                    <td><strong><%= r.name || '(Kosong)' %></strong></td>
+                    <td><%= r.partner_name || (r.with_partner ? 'Ya' : 'Tidak') %></td>
+                    <td><%= r.max_pax %></td>
+                    <td><%= r.phone || '-' %></td>
+                    <td><%= r.grp || '-' %></td>
+                    <td>
+                      <% if (r.event_type === 'reception') { %>
+                        <span class="badge" style="background: #EBF3FF; color: #1A3159; border: 1px solid rgba(26,49,89,0.3);">🏛️ Syukuran</span>
+                      <% } else if (r.event_type === 'akad') { %>
+                        <span class="badge" style="background: #FAF0EE; color: #8E4F49; border: 1px solid rgba(201,138,134,0.45);">🌸 Akad</span>
+                      <% } else { %>
+                        <span class="badge badge-info">Keduanya</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (r.errors.length) { %>
+                        <span style="color: var(--admin-error); font-weight: 600; font-size: 0.8rem;">
+                          ✕ <%= r.errors.join(', ') %>
+                        </span>
+                      <% } else if (r.duplicate) { %>
+                        <span style="color: var(--admin-warn); font-size: 0.8rem;">
+                          ⚠ <%= r.warnings.join(', ') %>
+                        </span>
+                      <% } else { %>
+                        <span style="color: var(--admin-success); font-size: 0.8rem;">✓ Valid</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Actions -->
+          <div style="margin-top: 1.5rem;">
+            <form action="/admin/import/confirm" method="POST" id="formConfirmImport">
+              <input type="hidden" name="token" value="<%= token %>">
+              
+              <% if (preview.stats.duplicates > 0) { %>
+                <div style="background: #FFFBE6; border: 1px solid #FFE58F; border-radius: 6px; padding: 0.85rem 1.15rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #873800;">
+                  <div style="font-weight: 600; margin-bottom: 0.25rem;">⚠️ Ditemukan <%= preview.stats.duplicates %> baris terindikasi duplikat</div>
+                  <div>Secara default, sistem akan <strong>melewati baris duplikat</strong> untuk menjaga kerapian data tamu.</div>
+                  <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; margin-top: 0.65rem; font-weight: 500;">
+                    <input type="checkbox" name="include_duplicates" value="1" id="chkIncludeDupes">
+                    <span>Tetap masukkan data duplikat (sebagai tamu baru dengan URL berbeda)</span>
+                  </label>
+                </div>
+              <% } %>
+
+              <div style="display: flex; gap: 1rem; align-items: center;">
+                <button type="submit" class="btn-adm btn-adm-primary" id="btnSubmitImport" style="padding: 0.65rem 1.5rem;">
+                  ✓ Simpan <%= preview.stats.valid %> Tamu Baru ke Database
+                </button>
+                <a href="/admin/import" class="btn-adm btn-adm-outline">Batal &amp; Pilih File Lain</a>
+              </div>
+            </form>
+          </div>
+
+          <script>
+            var chk = document.getElementById('chkIncludeDupes');
+            var btn = document.getElementById('btnSubmitImport');
+            if (chk && btn) {
+              var validCount = <%= preview.stats.valid %>;
+              var totalWithDupes = <%= preview.stats.valid + preview.stats.duplicates %>;
+              chk.addEventListener('change', function () {
+                if (chk.checked) {
+                  btn.textContent = '✓ Simpan ' + totalWithDupes + ' Tamu ke Database (Termasuk Duplikat)';
+                } else {
+                  btn.textContent = '✓ Simpan ' + validCount + ' Tamu Baru ke Database';
+                }
+              });
+            }
+          </script>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+
+</body>
+</html>

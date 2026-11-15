@@ -1,0 +1,233 @@
+{
+  "_readme": "Edit this file with your real wedding details, then restart the server. Text in {id, en} pairs is shown according to the ID/EN toggle.",
+  "site": {
+    "title": "The Wedding of Farabi & Syifa",
+    "description": {
+      "id": "Dengan penuh sukacita, kami mengundang Anda ke pernikahan Farabi & Syifa.",
+      "en": "With great joy, we invite you to the wedding of Farabi & Syifa."
+    },
+    "ogImage": "/img/logo-fs-badge.png",
+    "themeColor": "#7E836C"
+  },
+  "couple": {
+    "short": "Farabi & Syifa",
+    "initials": [
+      "F",
+      "S"
+    ],
+    "hashtag": "",
+    "bride": {
+      "name": "Syifa Hasanah",
+      "nickname": "Syifa",
+      "parents": {
+        "id": "Putri dari Bapak Harmiyanto<br>& Ibu Darnel Ismawaty",
+        "en": "Daughter of Mr. Harmiyanto<br>& Mrs. Darnel Ismawaty"
+      },
+      "photo": "/img/couple/syifa-now.webp",
+      "photoNow": "/img/couple/syifa-now.webp",
+      "photoChild": "/img/couple/syifa-child.webp",
+      "photoChildFull": "/img/couple/syifa-child-full.jpg",
+      "photoReal": "/img/couple/syifa-fotobiru.png"
+    },
+    "groom": {
+      "name": "Daeng Muhammad Yusuf Aqsha Alfarabi",
+      "nickname": "Farabi",
+      "parents": {
+        "id": "Putra dari Bapak Daeng Achmad Suaidi<br>& Ibu Mas'ad Fachir",
+        "en": "Son of Mr. Daeng Achmad Suaidi<br>& Mrs. Mas'ad Fachir"
+      },
+      "photo": "/img/couple/farabi-now.webp",
+      "photoNow": "/img/couple/farabi-now.webp",
+      "photoChild": "/img/couple/farabi-child.webp",
+      "photoChildFull": "/img/couple/farabi-child-full.jpg",
+      "photoReal": "/img/couple/farabi-fotobiru.png"
+    }
+  },
+  "quote": {
+    "text": {
+      "id": "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan dari jenismu sendiri, agar kamu merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.",
+      "en": "And among His signs is that He created for you mates from among yourselves, that you may find tranquility in them; and He placed between you affection and mercy."
+    },
+    "source": "QS. Ar-Rum: 21"
+  },
+  "timezoneLabel": "WIB",
+  "events": [
+    {
+      "key": "akad",
+      "start": "2026-12-05T12:30:00+07:00",
+      "end": "2026-12-05T15:00:00+07:00",
+      "venue": "Masjid Agung At-Tin",
+      "address": "Jl. Taman Mini I No.3, Pinang Ranti, Kec. Makasar, Jakarta Timur 13560",
+      "mapsUrl": "https://maps.google.com/?q=Masjid+Agung+At-Tin+Jakarta+Timur",
+      "note": {
+        "id": "Janji suci yang disaksikan keluarga, dalam suasana hangat dan penuh doa.",
+        "en": "A sacred vow witnessed by family, in a warm atmosphere full of prayers."
+      }
+    },
+    {
+      "key": "resepsi",
+      "start": "2026-12-26T10:00:00+07:00",
+      "end": "2026-12-26T13:00:00+07:00",
+      "venue": "Smamda Tower Surabaya",
+      "address": "Jl. Pucang Anom No. 91, Kertajaya, Kec. Gubeng, Kota Surabaya, Jawa Timur 60282",
+      "mapsUrl": "https://maps.google.com/?q=Smamda+Tower+SMA+Muhammadiyah+2+Surabaya",
+      "note": {
+        "id": "Syukuran dan doa bersama keluarga serta sahabat terkasih.",
+        "en": "A celebration of gratitude and prayers with family and dear friends."
+      }
+    }
+  ],
+  "story": [
+    {
+      "chapter": {
+        "id": "Bab I",
+        "en": "Chapter I"
+      },
+      "year": "2017–2020",
+      "photo": "/img/story/chapter-1.webp",
+      "title": {
+        "id": "Di Mana Semua Bermula",
+        "en": "Where It Began"
+      },
+      "body": {
+        "id": "Kami pertama kali bertemu saat menjadi mahasiswa baru, berada di fakultas yang sama namun dengan jurusan berbeda. Bola basket menjadi ketertarikan bersama kami, dan tanpa direncanakan, kami sering kali berada di lapangan yang sama. Ada momen-momen kebaikan kecil di sepanjang perjalanan itu, mulai dari berbagi makanan dan minuman hingga saling bertukar kabar saat Syifa pertama kali bepergian sendiri ke luar negeri. Kala itu, kami hanyalah dua wajah yang saling mengenal, tanpa pernah menyangka bahwa jalan kami kelak akan bermuara bersama.",
+        "en": "We first met as freshmen, sharing the same faculty but studying different majors. Basketball was our common interest, and somehow, we would occasionally find ourselves at the same court. There were little moments of kindness along the way, from sharing meals and drinks to exchanging messages during Syifa's first solo trip abroad. Back then, we were simply two familiar faces, with no particular reason to think our paths would lead anywhere."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab II",
+        "en": "Chapter II"
+      },
+      "year": "2020–2024",
+      "photo": "/img/story/chapter-2.webp",
+      "title": {
+        "id": "Jalan yang Berbeda",
+        "en": "Different Paths"
+      },
+      "body": {
+        "id": "Kehidupan membawa kami ke arah yang berbeda, hingga perlahan kami benar-benar kehilangan kontak. Pada tahun 2021, Syifa sempat menyapa dan berharap bisa bertemu sebelum berangkat studi ke luar negeri, namun kesempatan itu belum terwujud. Tahun-tahun berlalu, kami masing-masing melewati pengalaman hidup sendiri, tumbuh dan bertransformasi seiring berjalannya waktu. Barangkali, tanpa kami sadari, kami sedang dibentuk menjadi pribadi yang siap untuk bertemu kembali dalam cara yang berbeda.",
+        "en": "Life took us in different directions, and eventually, we completely lost touch. In 2021, Syifa reached out, hoping to meet before leaving to study abroad, but it never happened. Years passed, and we each went through our own experiences, growing and changing along the way. Perhaps, without knowing it, we were becoming people who could meet each other differently."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab III",
+        "en": "Chapter III"
+      },
+      "year": {
+        "id": "Juni 2024",
+        "en": "June 2024"
+      },
+      "photo": "/img/story/chapter-3.webp",
+      "title": {
+        "id": "Pertemuan Tak Terduga",
+        "en": "An Unexpected Reunion"
+      },
+      "body": {
+        "id": "Semua bermula dari kunjungan spontan setelah jam kerja Syifa selesai. Ada sedikit rasa canggung dan gugup, namun yang terutama, rasanya menyenangkan melihat Farabi dalam keadaan baik. Pada bulan itu, kami mulai sering bertemu kembali, bertukar kabar sambil makan bersama, bahkan mencoba ice skating berdua. Kami belum menjadi pasangan, hanya dua orang yang saling mengenal kembali. Di tengah perjalanan itu, sebuah percakapan mendalam membuat Syifa merasa dimengerti dengan cara yang sudah lama tak ia rasakan. Itu adalah keterikatan yang tak disangka, dan barangkali, awal dari sesuatu yang baru.",
+        "en": "It started with a spontaneous visit after Syifa's working hours. There was a little awkwardness and nervousness, but mostly, it was good to see that Farabi was doing well. That month, we found ourselves meeting again, catching up over meals and even trying ice skating together. We were not a couple yet, just two people getting to know each other again. Somewhere along the way, a personal conversation made Syifa feel understood in a way she hadn't experienced for a long time. It was an unexpected connection, and perhaps the beginning of something new."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab IV",
+        "en": "Chapter IV"
+      },
+      "year": {
+        "id": "Agustus 2024",
+        "en": "August 2024"
+      },
+      "photo": "/img/story/chapter-4.webp",
+      "title": {
+        "id": "Memberi Kesempatan",
+        "en": "Giving Us a Chance"
+      },
+      "body": {
+        "id": "Kembali ke kota tempat kami pertama kali bertemu, Bandung, kami memutuskan untuk memberi kesempatan pada cerita ini. Tak satu pun dari kami yang merasa sepenuhnya siap. Kami memiliki kekhawatiran, tantangan, dan ketidakpastian masing-masing, namun kami melihat sesuatu yang begitu berharga untuk diperjuangkan dalam diri satu sama lain. Sahabat-sahabat terdekat kami sungguh terkejut—karena saat kuliah kami tidak pernah dekat, bahkan tidak berada dalam radar satu sama lain. Namun entah bagaimana, di sinilah kami, memilih untuk melangkah dan melihat ke mana takdir akan membawa kami.",
+        "en": "Back in the city where we first met, Bandung, we decided to give this a chance. Neither of us felt entirely ready. We had our own fears, challenges, and uncertainties, but we saw something worth exploring in each other. Our closest friends were genuinely surprised. After all, we had never been particularly close at university, nor were we even on each other's radar. Yet, somehow, here we were, choosing to see where this could take us."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab V",
+        "en": "Chapter V"
+      },
+      "year": {
+        "id": "Akhir 2024 – Awal 2025",
+        "en": "End 2024 – Early 2025"
+      },
+      "photo": "/img/story/chapter-5.webp",
+      "title": {
+        "id": "Mengenal Keluarga",
+        "en": "Meeting Each Other's Families"
+      },
+      "body": {
+        "id": "Dimulai dari Syifa yang bertemu dengan keluarga Farabi, disusul Farabi yang mengenal keluarga Syifa lebih dekat. Langkah-langkah ini sederhana namun begitu bermakna, saat kami perlahan mengenal orang-orang yang paling berharga bagi satu sama lain.",
+        "en": "It began with Syifa meeting Farabi's family, followed by Farabi getting to know Syifa's family. These were simple but meaningful steps, as we slowly became acquainted with the people who matter most to each other."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab VI",
+        "en": "Chapter VI"
+      },
+      "year": {
+        "id": "Juli 2026",
+        "en": "July 2026"
+      },
+      "photo": "/img/story/chapter-6.webp",
+      "title": {
+        "id": "Mendekatkan Jarak",
+        "en": "Closing the Distance"
+      },
+      "body": {
+        "id": "Setelah bertahun-tahun menjalani hubungan jarak jauh antara Jakarta dan Surabaya, Farabi memutuskan untuk pindah ke Jakarta. Ini adalah babak baru yang membawa tantangannya sendiri, dan Syifa bangga melihatnya berani mengambil langkah besar tersebut demi apa yang dicita-citakan. Berada lebih dekat memberi kami lebih banyak kesempatan untuk bertemu, berbincang, saling memahami lebih dalam, dan berbagi harapan tentang masa depan yang ingin kami bangun bersama.",
+        "en": "After years of navigating a long-distance relationship between Jakarta and Surabaya, Farabi decided to move to Jakarta. It was a new chapter that came with its own challenges, and Syifa was proud to see him take that step and find his way towards what he wanted. Being closer also gave us more chances to meet, talk, understand each other better, and share our thoughts about the future we hoped to build."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab VII",
+        "en": "Chapter VII"
+      },
+      "year": {
+        "id": "September 2026",
+        "en": "September 2026"
+      },
+      "photo": "/img/story/chapter-7.webp",
+      "title": {
+        "id": "Melangkah Lebih Jauh",
+        "en": "Taking the Next Step"
+      },
+      "body": {
+        "id": "Saat Farabi datang bersama sang ibunda, kami mulai membicarakan langkah berikutnya. Keluarga Syifa menyambut mereka dengan penuh kehangatan, dan setelah terhubung dengan seluruh anggota keluarga—termasuk sang ayah melalui panggilan telepon—kami merasakan keyakinan yang sama: inilah saatnya untuk melangkah maju. Tidak ada acara perayaan yang megah, hanyalah perbincangan hangat, saling memahami, dan awal dari persiapan menuju hari bahagia kami.",
+        "en": "When Farabi came with his mother, we began talking about the next step. Syifa's family welcomed them warmly, and after connecting with the rest of the family, including her father over a call, we found ourselves sharing the same feeling: it was time to move forward. There was no grand gathering, just a warm conversation, a shared understanding, and the beginning of plans for what came next."
+      }
+    },
+    {
+      "chapter": {
+        "id": "Bab VIII",
+        "en": "Chapter VIII"
+      },
+      "year": {
+        "id": "Akad Nikah",
+        "en": "Our Akad"
+      },
+      "photo": "/img/story/chapter-8.webp",
+      "title": {
+        "id": "Dan Akhirnya, Pulang",
+        "en": "And Finally, Home"
+      },
+      "body": {
+        "id": "Setelah bertahun-tahun berlalu, jarak yang terbentang, dan liku tak terduga, kini kami siap mengikrarkan janji suci di hadapan Allah. Kami berdoa semoga pernikahan ini mendekatkan kami menjadi insan yang diridai-Nya, membukakan pintu rahmat yang berlimpah, dan menuntun kami membangun keluarga yang sakinah, mawaddah, wa rahmah.\n\nDan akhirnya, kami menemukan jalan pulang ke satu sama lain. Farabi memiliki Syifa sebagai tempat pulang, dan Syifa memiliki Farabi sebagai tempat pulang. Ke mana pun hidup membawa langkah kami, semoga kami senantiasa menjadi rumah bagi satu sama lain.",
+        "en": "After all the years, the distance, and the unexpected turns, we are ready to make our promise before Allah. We pray that this marriage brings us closer to becoming the people Allah wants us to be, opens our lives to more of His rahmat, and guides us in building a family filled with sakinah, mawaddah, and rahmah.\n\nAnd finally, we have found our way home to each other. Farabi has Syifa to come home to, and Syifa has Farabi to come home to. Wherever life takes us, may we always be each other's home."
+      }
+    }
+  ],
+  "rsvp": {
+    "deadline": "2026-11-28",
+    "receptionDeadline": "2026-12-19",
+    "maxPaxDefault": 2
+  }
+}

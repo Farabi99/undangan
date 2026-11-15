@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title><%= t('notFound.title') %> — <%= content.site.title %></title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="<%= content.site.themeColor %>">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .not-found-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      background: var(--color-sage);
+      color: var(--color-white);
+    }
+    .not-found-card {
+      background: var(--color-cream);
+      color: var(--color-text-dark);
+      border-radius: var(--radius-md);
+      padding: 3rem 2rem;
+      max-width: 440px;
+      box-shadow: var(--shadow-lg);
+    }
+    .not-found-code {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      color: var(--color-olive);
+      margin-bottom: 0.5rem;
+    }
+    .not-found-heading {
+      font-family: var(--font-serif);
+      font-size: 1.85rem;
+      margin-bottom: 1rem;
+    }
+    .not-found-desc {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="not-found-wrapper">
+    <div class="not-found-card">
+      <p class="not-found-code">404</p>
+      <h1 class="not-found-heading"><%= t('notFound.title') %></h1>
+      <p class="not-found-desc"><%= t('notFound.body') %></p>
+      <a href="/" class="btn-primary" style="margin: 0 auto; display: inline-flex;">
+        Beranda
+      </a>
+    </div>
+  </div>
+</body>
+</html>

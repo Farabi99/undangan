@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="metalSheen" x1="20%" y1="10%" x2="80%" y2="90%">
+        <stop offset="0%" stop-color="#FFFFFF" />
+        <stop offset="30%" stop-color="#FFFDF5" />
+        <stop offset="65%" stop-color="#F8ECCB" />
+        <stop offset="100%" stop-color="#E5C882" />
+       </linearGradient>
+    <filter id="subtleDrop" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#000000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <circle cx="250" cy="250" r="248" fill="#7E836C"/>
+
+  <!-- Single Elegant Hairline Ring (Exact Reference Style: byaisyahluthfi) -->
+  <circle cx="250" cy="250" r="188" fill="none" stroke="rgba(255, 255, 255, 0.9)" stroke-width="1.8" filter="url(#subtleDrop)"/>
+
+  <!-- Haute-Couture Monogram F & S: Perfect Layered Weave -->
+  <g filter="url(#subtleDrop)">
+    
+    <!-- 1. F's Middle Crossbar (Behind S) -->
+    <path d="
+      M 208 240 
+      L 256 240 
+      L 256 248 
+      L 208 248 
+      Z" 
+      fill="#FFFFFF" 
+    />
+
+    <!-- 2. LETTER S (Flows in front of middle crossbar, behind vertical stem and top arm) -->
+    <path d="
+      M 324 190
+      C 324 182, 329 175, 327 166
+      C 324 153, 308 141, 280 141
+      C 246 141, 218 156, 218 182
+      C 218 205, 238 221, 266 234
+      C 304 252, 332 274, 332 312
+      C 332 350, 298 368, 252 368
+      C 208 368, 178 346, 170 316
+      L 188 310
+      C 195 334, 218 353, 252 353
+      C 286 353, 312 336, 312 312
+      C 312 284, 288 266, 252 248
+      C 216 230, 198 208, 198 182
+      C 198 147, 234 126, 280 126
+      C 316 126, 338 145, 342 176
+      C 342 186, 336 193, 324 190
+      Z"
+      fill="url(#metalSheen)"
+    />
+
+    <!-- 3. F's Vertical Stem & Top Horizontal Arm (Crisp, solid white in front of S) -->
+    <!-- Vertical Stem with Classical Bracketed Top & Bottom Serifs -->
+    <path d="
+      M 172 144 
+      L 222 144 
+      L 222 152 
+      C 214 152, 208 155, 208 164 
+      L 208 334 
+      C 208 343, 214 346, 222 346 
+      L 222 354 
+      L 172 354 
+      L 172 346 
+      C 180 346, 186 343, 186 334 
+      L 186 164 
+      C 186 155, 180 152, 172 152 
+      Z" 
+      fill="#FFFFFF" 
+    />
+
+    <!-- Top Horizontal Arm of F with Vertical Bracketed Terminal -->
+    <path d="
+      M 208 144 
+      L 298 144 
+      L 298 170 
+      L 291 170 
+      C 288 158, 282 153, 265 153 
+      L 208 153 
+      Z" 
+      fill="#FFFFFF" 
+    />
+
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+services:
+  undangan:
+    build: .
+    container_name: wedding-undangan
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - SESSION_SECRET=${SESSION_SECRET:-wedding_secret_key_change_me_in_prod}
+      - DATA_DIR=/app/data
+      - GMAIL_USER=${GMAIL_USER:-}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD:-}
+      - NOTIFICATION_EMAIL=${NOTIFICATION_EMAIL:-}
+    volumes:
+      - wedding_data:/app/data
+
+volumes:
+  wedding_data:
+    driver: local

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rekap RSVP — Admin Undangan</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=<%= Date.now() %>">
+  <link rel="icon" type="image/svg+xml" href="/img/logo-fs-badge.svg?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+  <nav class="admin-nav">
+    <div class="admin-nav-brand">💍 Admin Undangan</div>
+    <div class="admin-nav-links">
+      <a href="/admin/guests">Daftar Tamu</a>
+      <a href="/admin/import">Import Spreadsheet</a>
+      <a href="/admin/rsvps" class="active">Rekap RSVP</a>
+      <a href="/admin/wishes">Moderasi Ucapan</a>
+      <div class="export-dropdown-wrap">
+        <button type="button" class="btn-adm btn-adm-outline" onclick="toggleExportMenu(event)">📥 Ekspor Data ▾</button>
+        <div id="exportMenu" class="export-menu-dropdown">
+          <a href="/admin/export?format=xlsx" class="export-menu-item">📊 Format Excel (.xlsx)</a>
+          <a href="/admin/export?format=csv" class="export-menu-item">📄 Format CSV (.csv)</a>
+        </div>
+      </div>
+      <a href="/" target="_blank">Lihat Web ↗</a>
+      <a href="/admin/logout" style="color: #FFA39E;">Keluar</a>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+
+    <!-- KPI Summary Grid -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total Konfirmasi Masuk</div>
+        <div class="admin-stat-value"><%= summary.total || 0 %></div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Hadir</div>
+        <div class="admin-stat-value" style="color: var(--admin-success);"><%= summary.attendingCount || 0 %></div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Tidak Hadir</div>
+        <div class="admin-stat-value" style="color: var(--admin-error);"><%= summary.absentCount || 0 %></div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total Pax Diperkirakan</div>
+        <div class="admin-stat-value" style="color: #6F7425;"><%= summary.totalPax || 0 %></div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-header-row">
+        <div>
+          <h2 style="font-size: 1.15rem; margin: 0;">Semua Jawaban RSVP (<%= rsvps.length %>)</h2>
+          <p style="font-size: 0.8rem; color: var(--admin-text-sub); margin: 0.2rem 0 0;">
+            Data konfirmasi kehadiran yang diisi tamu secara online atau diinput manual oleh admin.
+          </p>
+        </div>
+
+        <!-- Client-side quick filter -->
+        <div class="filter-bar">
+          <input type="text" id="rsvpSearch" placeholder="Cari nama atau doa..." class="input-adm" style="min-width: 200px;" onkeyup="filterRsvpTable()">
+          <select id="rsvpStatusFilter" class="input-adm" onchange="filterRsvpTable()">
+            <option value="">Semua Status</option>
+            <option value="hadir">Hadir Saja</option>
+            <option value="tidak">Tidak Hadir Saja</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="rsvpTable">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Nama Tamu</th>
+              <th>Kategori</th>
+              <th>Kehadiran</th>
+              <th>Jumlah Pax</th>
+              <th>Doa &amp; Ucapan</th>
+              <th>Pesan Suara (Privat)</th>
+              <th style="text-align: right;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (rsvps.length === 0) { %>
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--admin-text-sub); padding: 3rem 1rem;">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">💌</div>
+                  <p style="margin: 0; font-size: 0.95rem;">Belum ada konfirmasi kehadiran yang masuk.</p>
+                </td>
+              </tr>
+            <% } %>
+
+            <% rsvps.forEach(function(r) { 
+               const rsvpJson = JSON.stringify({
+                 id: r.id,
+                 guest_id: r.guest_id,
+                 name: (r.title ? r.title + ' ' : '') + r.name,
+                 attending: r.attending,
+                 pax: r.pax,
+                 wish: r.wish || '',
+                 phone: r.phone || ''
+               });
+            %>
+              <tr class="rsvp-row" data-name="<%= (r.name || '').toLowerCase() %>" data-wish="<%= (r.wish || '').toLowerCase() %>" data-status="<%= r.attending === 1 ? 'hadir' : 'tidak' %>">
+                <td style="white-space: nowrap; font-size: 0.78rem; color: var(--admin-text-sub);">
+                  <%= r.created_at %>
+                </td>
+                <td>
+                  <strong><%= r.title ? r.title + ' ' : '' %><%= r.name %></strong>
+                  <% if (r.phone) { %>
+                    <span style="font-size: 0.75rem; color: var(--admin-text-sub); display: block;">📱 <%= r.phone %></span>
+                  <% } %>
+                </td>
+                <td>
+                  <%= r.grp || '-' %>
+                </td>
+                <td>
+                  <% if (r.attending === 1) { %>
+                    <span class="badge badge-success">✓ Hadir</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">✗ Tidak Hadir</span>
+                  <% } %>
+                </td>
+                <td>
+                  <strong><%= r.pax %></strong> orang
+                </td>
+                <td style="max-width: 320px; font-size: 0.85rem; color: #444;">
+                  <%= r.wish || '—' %>
+                </td>
+                <td style="white-space: nowrap;">
+                  <% if (r.voice_file) { %>
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <audio controls preload="none" style="height: 32px; width: 170px;">
+                        <source src="/api/voice-notes/<%= r.slug %>" type="<%= r.voice_mime || 'audio/webm' %>">
+                      </audio>
+                      <a href="/api/voice-notes/<%= r.slug %>?download=1" class="btn-adm btn-adm-outline" title="Download Audio" style="padding: 0.25rem 0.5rem; text-decoration: none; font-size: 0.85rem;">⬇️</a>
+                    </div>
+                    <% if (r.voice_duration) { %>
+                      <span style="font-size: 0.72rem; color: var(--admin-text-sub); display: block; margin-top: 2px;">Durasi: <%= r.voice_duration %> dtk</span>
+                    <% } %>
+                  <% } else { %>
+                    <span style="color: #94a3b8; font-size: 0.8rem;">—</span>
+                  <% } %>
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                  <!-- Edit RSVP modal -->
+                  <button type="button" class="btn-adm btn-adm-outline" onclick='openEditRsvpModal(<%- rsvpJson %>)' title="Ubah Jawaban RSVP">
+                    ✏️ Edit
+                  </button>
+
+                  <!-- WhatsApp thank you launcher -->
+                  <% if (r.phone) { 
+                     const waReply = encodeURIComponent('Halo ' + (r.title ? r.title + ' ' : '') + r.name + ', terima kasih banyak atas konfirmasi kehadirannya dan doa restunya untuk pernikahan kami!');
+                  %>
+                    <a href="https://wa.me/<%= r.phone.replace(/[^0-9]/g, '') %>?text=<%= waReply %>" target="_blank" class="btn-adm btn-adm-wa" title="Kirim Ucapan Terima Kasih via WhatsApp">
+                      💬
+                    </a>
+                  <% } %>
+
+                  <!-- Delete / Reset RSVP -->
+                  <form action="/admin/rsvps/<%= r.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Hapus konfirmasi RSVP ini?')">
+                    <button type="submit" class="btn-adm btn-adm-danger" title="Hapus RSVP (Reset status tamu)">✕</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit RSVP -->
+  <div id="editRsvpModal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box" style="max-width: 440px;">
+      <div class="admin-modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem;">✏️ Edit RSVP Tamu</h3>
+        <button type="button" class="btn-close-modal" onclick="closeEditRsvpModal()">✕</button>
+      </div>
+      <form id="editRsvpForm" method="POST" action="">
+        <input type="hidden" name="return_to" value="rsvps">
+        <div class="admin-modal-body">
+          <p style="margin: 0 0 1rem; font-size: 0.88rem; color: var(--admin-text-sub);">
+            Perbarui data kehadiran untuk:
+            <strong id="editRsvpGuestName" style="color: var(--admin-text); display: block; font-size: 1rem; margin-top: 0.2rem;"></strong>
+          </p>
+
+          <div style="margin-bottom: 1rem;">
+            <label class="form-micro-label">Status Kehadiran:</label>
+            <div style="display: flex; gap: 1rem; margin-top: 0.35rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="attending" value="1" id="editRsvpYes" onchange="toggleEditPax(true)">
+                <span class="badge badge-success">✓ Hadir</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="radio" name="attending" value="0" id="editRsvpNo" onchange="toggleEditPax(false)">
+                <span class="badge badge-danger">✗ Tidak Hadir</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="editPaxWrap" style="margin-bottom: 1rem;">
+            <label class="form-micro-label">Jumlah Orang Hadir (Pax):</label>
+            <input type="number" id="editPaxInput" name="pax" min="1" max="10" value="1" class="input-adm" style="width: 100%;">
+          </div>
+
+          <div>
+            <label class="form-micro-label">Catatan / Doa Ucapan:</label>
+            <textarea id="editWishInput" name="wish" class="input-adm" rows="3" style="width: 100%; box-sizing: border-box;"></textarea>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-adm btn-adm-outline" onclick="closeEditRsvpModal()">Batal</button>
+          <button type="submit" class="btn-adm btn-adm-primary">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleExportMenu(e) {
+      e.stopPropagation();
+      var m = document.getElementById('exportMenu');
+      m.classList.toggle('show');
+    }
+    document.addEventListener('click', function() {
+      var m = document.getElementById('exportMenu');
+      if (m) m.classList.remove('show');
+    });
+
+    function filterRsvpTable() {
+      var q = (document.getElementById('rsvpSearch').value || '').toLowerCase();
+      var st = document.getElementById('rsvpStatusFilter').value;
+      var rows = document.querySelectorAll('.rsvp-row');
+
+      rows.forEach(function(row) {
+        var name = row.getAttribute('data-name') || '';
+        var wish = row.getAttribute('data-wish') || '';
+        var status = row.getAttribute('data-status') || '';
+
+        var matchQ = !q || name.indexOf(q) !== -1 || wish.indexOf(q) !== -1;
+        var matchSt = !st || status === st;
+
+        row.style.display = (matchQ && matchSt) ? '' : 'none';
+      });
+    }
+
+    function openEditRsvpModal(r) {
+      document.getElementById('editRsvpForm').action = '/admin/guests/' + r.guest_id + '/rsvp';
+      document.getElementById('editRsvpGuestName').textContent = r.name;
+      if (r.attending === 1) {
+        document.getElementById('editRsvpYes').checked = true;
+        document.getElementById('editPaxWrap').style.display = 'block';
+        document.getElementById('editPaxInput').value = r.pax || 1;
+      } else {
+        document.getElementById('editRsvpNo').checked = true;
+        document.getElementById('editPaxWrap').style.display = 'none';
+        document.getElementById('editPaxInput').value = 0;
+      }
+      document.getElementById('editWishInput').value = r.wish || '';
+      document.getElementById('editRsvpModal').style.display = 'flex';
+    }
+
+    function toggleEditPax(isYes) {
+      document.getElementById('editPaxWrap').style.display = isYes ? 'block' : 'none';
+    }
+
+    function closeEditRsvpModal() {
+      document.getElementById('editRsvpModal').style.display = 'none';
+    }
+
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('admin-modal-backdrop')) {
+        e.target.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

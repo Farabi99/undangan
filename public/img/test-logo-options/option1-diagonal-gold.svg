@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <filter id="monogramGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <linearGradient id="sGradSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="35%" stop-color="#F1F5F9"/>
+      <stop offset="70%" stop-color="#CBD5E1"/>
+      <stop offset="100%" stop-color="#94A3B8"/>
+    </linearGradient>
+    <linearGradient id="sGradGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF7"/>
+      <stop offset="35%" stop-color="#EEDCB0"/>
+      <stop offset="100%" stop-color="#C5A850"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Luxury Ring Cartouche -->
+  <circle cx="250" cy="250" r="234" fill="none" stroke="rgba(255, 255, 255, 0.9)" stroke-width="2.2" filter="url(#monogramGlow)"/>
+  <circle cx="250" cy="250" r="224" fill="none" stroke="rgba(212, 185, 110, 0.75)" stroke-width="1.2" stroke-dasharray="3.5 4.5"/>
+
+  <!-- North/South Diamond Stars -->
+  <g fill="rgba(255, 255, 255, 0.9)" filter="url(#monogramGlow)">
+    <path d="M 250 8 L 253.5 17 L 262 20.5 L 253.5 24 L 250 33 L 246.5 24 L 238 20.5 L 246.5 17 Z"/>
+    <path d="M 250 467 L 253.5 476 L 262 479.5 L 253.5 483 L 250 492 L 246.5 483 L 238 479.5 L 246.5 476 Z"/>
+  </g>
+  <circle cx="16" cy="250" r="3.5" fill="rgba(212, 185, 110, 0.75)"/>
+  <circle cx="484" cy="250" r="3.5" fill="rgba(212, 185, 110, 0.75)"/>
+
+  <!-- MONOGRAM GLYPHS -->
+  <g filter="url(#monogramGlow)">
+
+    <!-- LETTER F (Crisp Roman Serif, Left Center: stem at x=175..205) -->
+    <path id="stemF" d="
+      M 145 115 
+      L 295 115 
+      L 295 155 
+      L 278 155 
+      C 275 138, 265 132, 240 132 
+      L 210 132 
+      L 210 230 
+      L 262 230 
+      C 275 230, 280 225, 282 215 
+      L 292 215 
+      L 292 262 
+      L 282 262 
+      C 280 250, 275 246, 262 246 
+      L 210 246 
+      L 210 348 
+      C 210 368, 218 373, 240 375 
+      L 240 388 
+      L 135 388 
+      L 135 375 
+      C 158 373, 166 368, 166 348 
+      L 166 155 
+      C 166 135, 158 130, 135 128 
+      L 135 115 
+      Z" 
+      fill="#FFFFFF"/>
+
+    <!-- Knockout gap around S (so S cuts cleanly through F's crossbar with 3D depth) -->
+    <path d="
+      M 345 180 
+      C 345 142, 318 122, 280 122 
+      C 240 122, 222 142, 222 168 
+      C 222 195, 244 212, 280 230 
+      C 328 254, 358 278, 358 322 
+      C 358 368, 318 395, 265 395 
+      C 222 395, 190 372, 180 335 
+      L 206 326 
+      C 214 354, 235 372, 268 372 
+      C 308 372, 332 350, 332 320 
+      C 332 288, 308 268, 268 248 
+      C 222 224, 196 202, 196 166 
+      C 196 128, 232 104, 280 104 
+      C 320 104, 348 122, 360 155 
+      Z"
+      fill="none" 
+      stroke="#525A45" 
+      stroke-width="9" 
+      stroke-linejoin="round"/>
+
+    <!-- LETTER S (Sensual Didone Curves, Right Center: spine at x=280..310) -->
+    <path id="glyphS" d="
+      M 345 180 
+      C 345 142, 318 122, 280 122 
+      C 240 122, 222 142, 222 168 
+      C 222 195, 244 212, 280 230 
+      C 328 254, 358 278, 358 322 
+      C 358 368, 318 395, 265 395 
+      C 222 395, 190 372, 180 335 
+      L 206 326 
+      C 214 354, 235 372, 268 372 
+      C 308 372, 332 350, 332 320 
+      C 332 288, 308 268, 268 248 
+      C 222 224, 196 202, 196 166 
+      C 196 128, 232 104, 280 104 
+      C 320 104, 348 122, 360 155 
+      Z" 
+      fill="url(#sGradGold)" 
+      stroke="#525A45" 
+      stroke-width="1"/>
+
+    <!-- Distinct Teardrop Ball Finials on S -->
+    <circle cx="356" cy="166" r="8" fill="#FFFFFF" stroke="#525A45" stroke-width="1"/>
+    <circle cx="192" cy="340" r="8" fill="url(#sGradGold)" stroke="#525A45" stroke-width="1"/>
+
+  </g>
+</svg>

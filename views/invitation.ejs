@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>" class="<%= theme === 'reception' ? 'theme-reception' : '' %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title><%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %></title>
+  <meta name="description" content="<%= t('site.description') %>">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="<%= theme === 'reception' ? '#0E1B33' : '#7E836C' %>">
+
+  <!-- Favicons & Touch Icons (Cache-busted for instant browser tab update) -->
+  <link rel="icon" type="image/x-icon" href="<%= theme === 'reception' ? '/favicon-reception.ico?v=' + Date.now() : '/favicon.ico?v=' + Date.now() %>">
+  <link rel="icon" type="image/svg+xml" href="<%= theme === 'reception' ? '/img/logo-fs-badge-silver.svg?v=' + Date.now() : '/img/logo-fs-badge.svg?v=' + Date.now() %>">
+  <link rel="icon" type="image/png" sizes="32x32" href="<%= theme === 'reception' ? '/img/favicon-reception-32x32.png?v=' + Date.now() : '/img/favicon-32x32.png?v=' + Date.now() %>">
+  <link rel="icon" type="image/png" sizes="16x16" href="<%= theme === 'reception' ? '/img/favicon-reception-16x16.png?v=' + Date.now() : '/img/favicon-16x16.png?v=' + Date.now() %>">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=<%= Date.now() %>">
+
+  <!-- Open Graph for WhatsApp & Social preview -->
+  <meta property="og:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %>">
+  <meta property="og:description" content="<%= t('site.description') %>">
+  <meta property="og:image" content="<%= theme === 'reception' ? '/img/og-reception.jpg' : '/img/og.jpg' %>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %>">
+  <meta name="twitter:description" content="<%= t('site.description') %>">
+  <meta name="twitter:image" content="<%= theme === 'reception' ? '/img/og-reception.jpg' : '/img/og.jpg' %>">
+
+  <!-- Google Fonts: Cinzel, Cormorant Garamond, EB Garamond, Libre Baskerville, Inter, Pinyon Script -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/style.css?v=<%= Date.now() %>">
+</head>
+<body class="<%= theme === 'reception' ? 'theme-reception' : '' %>">
+
+  <!-- Floating Top-Right Controls (Language Switch) -->
+  <div class="top-controls" id="topControls">
+    <button type="button" class="btn-top-control btn-lang" id="btnLang" aria-label="<%= t('lang.switchLabel') %>">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      <span><%= t('lang.switch') %></span>
+    </button>
+  </div>
+
+  <!-- PROLOGUE: The Cover / Curtain Overlay Screen with F & S Monogram Emblem -->
+  <div class="cover-screen" id="coverScreen">
+    <% if (theme === 'reception') { %>
+      <div class="cover-pinstripes" aria-hidden="true"></div>
+      <%- include('partials/twinkling-stars') %>
+    <% } else { %>
+      <div class="cover-pattern" aria-hidden="true"></div>
+    <% } %>
+
+    <div class="cover-hero">
+      <!-- Center Emblem: Intertwined F & S Monogram Seal -->
+      <div class="cover-emblem-container">
+        <div class="monogram-emblem-frame">
+          <div class="monogram-emblem-halo" aria-hidden="true"></div>
+          <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=' + Date.now() : '/img/logo-fs.svg?v=' + Date.now() %>" alt="Farabi & Syifa Monogram" class="monogram-emblem-svg">
+        </div>
+      </div>
+
+      <header class="cover-header">
+        <p class="cover-eyebrow"><%= theme === 'reception' ? t('cover.weddingReception') : t('cover.weddingOf') %></p>
+        <h1 class="cover-names"><%= content.couple.short %></h1>
+      </header>
+    </div>
+
+    <footer class="cover-footer">
+      <p class="cover-salutation"><%= t('cover.greeting') %></p>
+      <p class="cover-guest-name">
+        <% if (guest) { %>
+          <%= guest.title ? guest.title + ' ' : '' %><%= guest.name %>
+          <% if (guest.with_partner) { %>
+            <br><span class="guest-partner"><%= guest.partner_name ? '& ' + guest.partner_name : t('cover.partner') %></span>
+          <% } %>
+        <% } else { %>
+          <%= t('cover.genericGuest') %>
+        <% } %>
+      </p>
+
+      <button type="button" class="btn-open-curtain" id="btnOpenCover">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        <span><%= t('cover.open') %></span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- Main Site Architecture (Desktop Split-Screen / Mobile Fullscreen) -->
+  <div class="site-wrapper" id="siteWrapper">
+
+    <!-- Desktop Aside (65% width showcase) -->
+    <aside class="desktop-aside" aria-hidden="true">
+      <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+      <div class="desktop-aside-inner">
+        <div class="desktop-logo-frame">
+          <div class="desktop-logo-halo" aria-hidden="true"></div>
+          <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=' + Date.now() : '/img/logo-fs.svg?v=' + Date.now() %>" alt="<%= content.couple.short %> Monogram" class="desktop-logo-img">
+        </div>
+        <p class="desktop-eyebrow"><%= theme === 'reception' ? t('cover.weddingReception') : t('cover.weddingOf') %></p>
+        <h1 class="desktop-title"><%= content.couple.short %></h1>
+        <p class="desktop-date"><%= theme === 'reception' ? t('event.resepsi.date') : t('event.akad.date') %></p>
+      </div>
+    </aside>
+
+    <!-- Main Scrolling Column (35% on desktop, 100% on phone) -->
+    <main class="invitation-main" id="invitationMain">
+
+      <!-- ====================================================================
+           SLIDE 2: WELCOME & PASTORAL MEADOW (Sage Canvas #7E836C)
+           Pop-up House anchored at the BOTTOM END of the section
+           ==================================================================== -->
+      <section class="section section-welcome" id="welcomeSection">
+        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+        <!-- 25 Wind-Oscillated Botanical Layers -->
+        <%- include('partials/waving-botanicals') %>
+
+        <!-- Pop-Up House Anchored at the BOTTOM END of Section -->
+        <div class="welcome-cottage welcome-house-bottom" id="welcomeCottage" aria-hidden="true">
+          <img src="<%= theme === 'reception' ? '/img/rumah-joglo-silver.webp?v=' + Date.now() : '/img/rumah-joglo.webp?v=' + Date.now() %>" alt="Traditional Indonesian House" class="welcome-cottage-img" onerror="this.src='<%= theme === 'reception' ? '/img/rumah-joglo-silver.png' : '/img/rumah-joglo.png' %>'">
+        </div>
+
+        <!-- Welcome Letter Parchment Card -->
+        <div class="welcome-parchment-card" id="welcomeCard">
+          <!-- Monogram Crest Emblem on Parchment -->
+          <div class="welcome-card-emblem-wrap">
+            <div class="welcome-card-emblem-frame">
+              <img src="<%= theme === 'reception' ? '/img/logo-fs-badge-silver.svg?v=' + Date.now() : '/img/logo-fs-badge.svg?v=' + Date.now() %>" alt="<%= content.couple.short %> Monogram" class="welcome-card-emblem-img">
+            </div>
+          </div>
+          <div class="welcome-card-body">
+            <h2 class="welcome-title"><%= theme === 'reception' ? t('welcome.receptionTitle') : t('welcome.title') %></h2>
+            <p class="welcome-text"><%= theme === 'reception' ? t('welcome.receptionIntro1') : t('welcome.intro1') %></p>
+            <p class="welcome-couple-highlight"><%= content.couple.short %></p>
+            <p class="welcome-text"><%= theme === 'reception' ? t('welcome.receptionIntro2') : t('welcome.intro2') %></p>
+
+            <div class="welcome-scroll-cue">
+              <span><%= t('welcome.scroll') %></span>
+              <div class="scroll-arrow-anim">↓</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flowy Wave Divider: Welcome to Couple -->
+      <div class="flowy-divider divider-welcome-to-couple" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+          <path class="wave-ambient" d="M0,60 C260,60 420,32 600,32 C780,32 920,68 1100,68 C1260,68 1360,42 1440,42 L1440,100 L0,100 Z"></path>
+          <path class="wave-back" d="M0,48 C200,48 380,24 540,24 C700,24 860,62 1020,62 C1180,62 1320,35 1440,35 L1440,100 L0,100 Z"></path>
+          <path class="wave-front" d="M0,32 C240,32 360,65 520,65 C680,65 820,28 1000,28 C1180,28 1320,48 1440,48 L1440,100 L0,100 Z"></path>
+          <path class="wave-crest" d="M0,32 C240,32 360,65 520,65 C680,65 820,28 1000,28 C1180,28 1320,48 1440,48" fill="none" stroke-width="1.5"></path>
+        </svg>
+      </div>
+
+      <!-- ====================================================================
+           SLIDE 3: MEET THE COUPLE
+           ==================================================================== -->
+      <section class="section section-couple" id="coupleSection">
+        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+        <div class="section-header reveal-on-scroll">
+          <p class="section-eyebrow"><%= t('couple.headline') %></p>
+          <h2 class="section-title"><%= content.couple.short %></h2>
+        </div>
+
+        <!-- Couple Cards with Alternating Directional Reveals -->
+        <div class="couple-profiles-wrap">
+          <!-- Bride Profile -->
+          <div class="couple-profile-row bride-row reveal-on-scroll reveal-left">
+            <div class="couple-avatar-wrap auto-cycle" role="button" tabindex="0" data-role="bride" title="<%= lang === 'id' ? 'Ketuk untuk mengganti foto' : 'Tap to switch photo' %>" aria-label="<%= content.couple.bride.name %>">
+              <img src="<%= content.couple.bride.photoNow %>" alt="<%= content.couple.bride.name %>" class="couple-avatar avatar-now is-active" loading="lazy">
+              <img src="<%= content.couple.bride.photoChild %>" alt="<%= content.couple.bride.name %>" class="couple-avatar avatar-child" loading="lazy">
+            </div>
+            <div class="couple-info-card">
+              <span class="couple-role-pill"><%= t('couple.bride') %></span>
+              <h3 class="couple-full-name"><%= content.couple.bride.name %></h3>
+              <p class="couple-parents"><%- t('bride.parents') %></p>
+            </div>
+          </div>
+
+          <div class="couple-intertwine-amp" aria-hidden="true">&amp;</div>
+
+          <!-- Groom Profile -->
+          <div class="couple-profile-row groom-row reveal-on-scroll reveal-right">
+            <div class="couple-avatar-wrap auto-cycle" role="button" tabindex="0" data-role="groom" title="<%= lang === 'id' ? 'Ketuk untuk mengganti foto' : 'Tap to switch photo' %>" aria-label="<%= content.couple.groom.name %>">
+              <img src="<%= content.couple.groom.photoNow %>" alt="<%= content.couple.groom.name %>" class="couple-avatar avatar-now is-active" loading="lazy">
+              <img src="<%= content.couple.groom.photoChild %>" alt="<%= content.couple.groom.name %>" class="couple-avatar avatar-child" loading="lazy">
+            </div>
+            <div class="couple-info-card">
+              <span class="couple-role-pill"><%= t('couple.groom') %></span>
+              <h3 class="couple-full-name"><%= content.couple.groom.name %></h3>
+              <p class="couple-parents"><%- t('groom.parents') %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Holy Verse Quote Card (Contained Floral Frame) -->
+        <div class="quote-rococo-box reveal-on-scroll">
+          <% if (theme !== 'reception') { %>
+            <img src="/img/flower-corner.png" alt="" class="quote-corner-flower flower-top-right" aria-hidden="true">
+            <img src="/img/flower-corner.png" alt="" class="quote-corner-flower flower-bottom-left" aria-hidden="true">
+          <% } %>
+          <div class="quote-rococo-inner">
+            <p class="quote-text">“<%= t('quote.text') %>”</p>
+            <div class="quote-divider-line" aria-hidden="true"></div>
+            <p class="quote-attribution">— <%= content.quote.source %></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flowy Wave Divider: Couple to Event -->
+      <div class="flowy-divider divider-couple-to-event" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+          <path class="wave-ambient" d="M0,50 C240,50 400,72 580,72 C760,72 900,36 1080,36 C1240,36 1350,56 1440,56 L1440,100 L0,100 Z"></path>
+          <path class="wave-back" d="M0,38 C220,38 380,64 560,64 C740,64 880,26 1060,26 C1220,26 1340,46 1440,46 L1440,100 L0,100 Z"></path>
+          <path class="wave-front" d="M0,45 C200,45 360,22 540,22 C720,22 860,58 1040,58 C1200,58 1320,34 1440,34 L1440,100 L0,100 Z"></path>
+          <path class="wave-crest" d="M0,45 C200,45 360,22 540,22 C720,22 860,58 1040,58 C1200,58 1320,34 1440,34" fill="none" stroke-width="1.5"></path>
+        </svg>
+      </div>
+
+      <!-- ====================================================================
+           SLIDE 4: THE WEDDING DAY & LOGISTICS (Nocturnal Forest Green #2A3A20)
+           ==================================================================== -->
+      <section class="section section-wedding-day" id="eventSection" style="<%= theme === 'reception' ? '' : 'background-image: url(\'/img/slide-4-background.webp\');' %>">
+        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+        <div class="section-header-gold reveal-on-scroll">
+          <p class="gold-eyebrow"><%= t('day.headline') %></p>
+          <p class="gold-tagline">“<%= t('day.tagline') %>”</p>
+        </div>
+
+        <!-- Ceremonial Cards with Frosted Glassmorphism -->
+        <div class="event-cards-stack">
+          <% 
+            const displayEvents = (content.events || []).filter(function(ev) {
+              return theme === 'reception' ? ev.key === 'resepsi' : ev.key === 'akad';
+            });
+            displayEvents.forEach(function(ev) { 
+          %>
+            <div class="event-frosted-card reveal-on-scroll">
+              <div class="card-gold-header">
+                <span class="event-pill-gold"><%= t('day.' + ev.key) %></span>
+                <span class="event-sub-gold"><%= t('day.' + ev.key + 'Sub') %></span>
+              </div>
+
+              <div class="event-row">
+                <span class="event-icon-gold">📅</span>
+                <span class="event-text-primary"><%= t('event.' + ev.key + '.date') %></span>
+              </div>
+              <div class="event-row">
+                <span class="event-icon-gold">⏰</span>
+                <span class="event-text-secondary"><%= t('event.' + ev.key + '.time') %></span>
+              </div>
+              <div class="event-row">
+                <span class="event-icon-gold">📍</span>
+                <div class="event-venue-block">
+                  <div class="venue-title"><%= ev.venue %></div>
+                  <div class="venue-address"><%= ev.address %></div>
+                </div>
+              </div>
+
+              <% if (t('event.' + ev.key + '.note')) { %>
+                <p class="event-sacred-note">“<%= t('event.' + ev.key + '.note') %>”</p>
+              <% } %>
+
+              <div class="event-buttons">
+                <a href="<%= ev.mapsUrl || 'https://maps.google.com/?q=' + encodeURIComponent(ev.venue + ' ' + ev.address) %>" target="_blank" rel="noopener noreferrer" class="btn-gold-outline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span><%= t('day.openMaps') %></span>
+                </a>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+
+        <!-- Save the Date Countdown -->
+        <div class="countdown-container reveal-on-scroll">
+          <p class="countdown-eyebrow"><%= t('day.countdown') %></p>
+
+          <div class="countdown-grid">
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdDays">00</span>
+              <span class="countdown-label"><%= t('day.days') %></span>
+            </div>
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdHours">00</span>
+              <span class="countdown-label"><%= t('day.hours') %></span>
+            </div>
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdMinutes">00</span>
+              <span class="countdown-label"><%= t('day.minutes') %></span>
+            </div>
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdSeconds">00</span>
+              <span class="countdown-label"><%= t('day.seconds') %></span>
+            </div>
+          </div>
+
+          <!-- Add to Calendar Button -->
+          <div class="calendar-actions">
+            <a href="/calendar.ics?theme=<%= theme === 'reception' ? 'reception' : 'akad' %>" class="btn-white-glass">
+              <span>📅 <%= t('day.addCalendar') %></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flowy Wave Divider: Event to Story -->
+      <div class="flowy-divider divider-event-to-story" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+          <path class="wave-ambient" d="M0,58 C260,58 420,28 620,28 C800,28 940,66 1120,66 C1260,66 1360,44 1440,44 L1440,100 L0,100 Z"></path>
+          <path class="wave-back" d="M0,44 C220,44 400,20 580,20 C760,20 900,58 1080,58 C1240,58 1340,36 1440,36 L1440,100 L0,100 Z"></path>
+          <path class="wave-front" d="M0,28 C220,28 380,62 560,62 C740,62 880,26 1060,26 C1220,26 1340,48 1440,48 L1440,100 L0,100 Z"></path>
+          <path class="wave-crest" d="M0,28 C220,28 380,62 560,62 C740,62 880,26 1060,26 C1220,26 1340,48 1440,48" fill="none" stroke-width="1.5"></path>
+        </svg>
+      </div>
+
+      <!-- ====================================================================
+           SLIDE 5: ROAD TO US
+           ==================================================================== -->
+      <section class="section section-story" id="storySection">
+        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+        <div class="section-header reveal-on-scroll">
+          <p class="section-eyebrow"><%= t('story.eyebrow') %></p>
+          <h2 class="section-title"><%= t('story.title') %></h2>
+          <p class="section-subtitle"><%= t('story.subtitle') %></p>
+        </div>
+
+        <!-- Tilted Polaroid Chapters Timeline -->
+        <div class="polaroid-timeline">
+          <% 
+            const storyPhotos = [
+              '/img/frame.jpg',
+              '/img/arch.jpg',
+              '/img/welcome.jpg',
+              '/img/reception.jpg',
+              '/img/rumah-joglo.jpg',
+              '/img/arch.jpg',
+              '/img/frame.jpg',
+              '/img/cameo-couple-fs.jpg'
+            ];
+            const storyAngles = [5.0, -4.5, 5.5, -4.0, 4.5, -5.0, 5.0, -4.5];
+            (content.story || []).forEach(function(item, idx) { 
+              const isEven = idx % 2 === 0;
+              const angle = storyAngles[idx % storyAngles.length];
+              const photo = item.photo || storyPhotos[idx % storyPhotos.length];
+              const chapterLabel = typeof item.chapter === 'object' ? (item.chapter[lang] || item.chapter.en || item.chapter.id) : item.chapter;
+              const yearLabel = typeof item.year === 'object' ? (item.year[lang] || item.year.en || item.year.id) : item.year;
+              const titleLabel = typeof item.title === 'object' ? (item.title[lang] || item.title.en || item.title.id) : item.title;
+              const rawBody = typeof item.body === 'object' ? (item.body[lang] || item.body.en || item.body.id) : (item.body || '');
+              const bodyHtml = rawBody.split('\n\n').map(p => '<p class="story-chapter-paragraph">' + p.trim() + '</p>').join('');
+          %>
+            <div class="polaroid-row <%= isEven ? 'photo-right' : 'photo-left' %> reveal-on-scroll">
+              <!-- Text Narrative Block -->
+              <div class="polaroid-text-block">
+                <div class="story-badge-row">
+                  <span class="story-chapter-pill"><%= chapterLabel %></span>
+                  <span class="story-year-pill"><%= yearLabel %></span>
+                </div>
+                <h3 class="story-chapter-title"><%= titleLabel %></h3>
+                <div class="story-hairline"></div>
+                <div class="story-chapter-body"><%- bodyHtml %></div>
+              </div>
+
+              <!-- Organic Tilted Polaroid Photo Card -->
+              <div class="polaroid-card-wrap" style="--polaroid-angle: <%= angle %>deg;">
+                <div class="polaroid-card">
+                  <div class="polaroid-photo-frame">
+                    <picture>
+                      <source srcset="<%= photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp') %>" type="image/webp">
+                      <img src="<%= photo %>" alt="<%= titleLabel %>" loading="lazy" class="polaroid-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
+                    </picture>
+                  </div>
+                  <p class="polaroid-caption">“<%= titleLabel %>”</p>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+
+      <!-- Flowy Wave Divider: Story to RSVP -->
+      <div class="flowy-divider divider-story-to-rsvp" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+          <path class="wave-ambient" d="M0,52 C240,52 400,74 600,74 C780,74 920,34 1100,34 C1260,34 1360,54 1440,54 L1440,100 L0,100 Z"></path>
+          <path class="wave-back" d="M0,40 C200,40 380,62 560,62 C740,62 880,24 1060,24 C1220,24 1340,44 1440,44 L1440,100 L0,100 Z"></path>
+          <path class="wave-front" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32 L1440,100 L0,100 Z"></path>
+          <path class="wave-crest" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32" fill="none" stroke-width="1.5"></path>
+        </svg>
+      </div>
+
+      <!-- ====================================================================
+           SLIDE 6: RSVP & WALL OF WISHES (Antique Cream #F4F0E4)
+           ==================================================================== -->
+      <section class="section section-rsvp" id="rsvpSection">
+        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+        <div class="section-header reveal-on-scroll">
+          <p class="section-eyebrow"><%= t('rsvp.eyebrow') %></p>
+          <h2 class="section-title"><%= t('rsvp.title') %></h2>
+          <p class="section-subtitle"><%= t('rsvp.subtitle') %></p>
+        </div>
+
+        <% if (existingRsvp) { %>
+          <!-- Existing RSVP Confirmation Card -->
+          <div class="rsvp-frosted-glass reveal-on-scroll">
+            <div class="rsvp-check-icon">✓</div>
+            <h3 class="rsvp-thanks-title"><%= t('rsvp.thanks') %></h3>
+            <p class="rsvp-thanks-subtitle"><%= existingRsvp.attending ? t('rsvp.thanksYes') : t('rsvp.thanksNo') %></p>
+            <div class="rsvp-summary-box">
+              <p><strong><%= t('rsvp.name') %>:</strong> <%= guest ? guest.name : '' %></p>
+              <p><strong><%= t('rsvp.attendance') %>:</strong> <%= existingRsvp.attending ? ('✓ ' + t('rsvp.yes') + ' (' + existingRsvp.pax + ' ' + (lang === 'en' ? (existingRsvp.pax > 1 ? 'guests' : 'guest') : 'orang') + ')') : ('✗ ' + t('rsvp.no')) %></p>
+              <% if (existingRsvp.wish) { %>
+                <p class="rsvp-summary-wish"><strong><%= t('rsvp.wish') %>:</strong> <em>“<%= existingRsvp.wish %>”</em></p>
+              <% } %>
+              <% if (existingRsvp.voice_file) { %>
+                <div class="rsvp-summary-voice">
+                  <div class="voice-badge-tag">🔒 <%= t('voice.privateBadge') %></div>
+                  <div class="luxury-audio-player" data-player="audioExisting">
+                    <audio preload="none">
+                      <source src="/api/voice-notes/<%= guest ? guest.slug : '' %>" type="<%= existingRsvp.voice_mime || 'audio/webm' %>">
+                    </audio>
+                    <button type="button" class="lap-btn-play" aria-label="<%= t('audio.playRecording') %>" title="<%= t('audio.play') %>">
+                      <svg class="lap-icon-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                        <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                      </svg>
+                      <svg class="lap-icon-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="display:none;">
+                        <rect x="6" y="4" width="4" height="16" rx="1.5"></rect>
+                        <rect x="14" y="4" width="4" height="16" rx="1.5"></rect>
+                      </svg>
+                    </button>
+                    <div class="lap-timeline">
+                      <div class="lap-track" role="slider" aria-label="Progress suara" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                        <div class="lap-fill"></div>
+                        <div class="lap-head"></div>
+                      </div>
+                      <div class="lap-meta">
+                        <span class="lap-time-curr">0:00</span>
+                        <span class="lap-sep">/</span>
+                        <span class="lap-time-total">0:00</span>
+                      </div>
+                    </div>
+                    <button type="button" class="lap-btn-mute" aria-label="<%= t('audio.mute') %>" title="<%= t('audio.volume') %>">
+                      <svg class="lap-icon-vol-on" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                      </svg>
+                      <svg class="lap-icon-vol-off" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <line x1="23" y1="9" x2="17" y2="15"></line>
+                        <line x1="17" y1="9" x2="23" y2="15"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        <% } else if (guest) { %>
+          <!-- Interactive RSVP Form with Frosted Glass -->
+          <div class="rsvp-frosted-glass reveal-on-scroll" id="rsvpCard">
+            <form id="formRsvp">
+              <input type="hidden" name="guestSlug" value="<%= guest ? guest.slug : '' %>">
+              <div class="form-group">
+                <label class="form-label"><%= t('rsvp.name') %></label>
+                <div class="form-control-guest">
+                  <%= guest.title ? guest.title + ' ' : '' %><%= guest.name %>
+                  <% if (guest.with_partner) { %>
+                    <span class="guest-partner-tag">(<%= guest.partner_name ? guest.partner_name : t('cover.partner') %>)</span>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label"><%= t('rsvp.attendance') %></label>
+                <div class="attendance-pills">
+                  <label class="pill-radio-wrap">
+                    <input type="radio" name="attending" value="1" required>
+                    <span class="pill-btn pill-yes"><%= t('rsvp.yes') %></span>
+                  </label>
+                  <label class="pill-radio-wrap">
+                    <input type="radio" name="attending" value="0" required>
+                    <span class="pill-btn pill-no"><%= t('rsvp.no') %></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Pax Stepper (Appears when attending) -->
+              <div class="form-group" id="paxGroup" style="display: none;">
+                <label class="form-label">
+                  <%= t('rsvp.pax') %>
+                  <span class="stepper-max-note">(<%= t('rsvp.paxMax') %> <%= guest.max_pax %>)</span>
+                </label>
+                <div class="stepper-capsule">
+                  <button type="button" class="stepper-action" id="btnDecPax" aria-label="<%= t('rsvp.decrease') %>">−</button>
+                  <span class="stepper-number" id="stepperVal">1</span>
+                  <input type="hidden" id="stepperInput" name="pax" value="1">
+                  <button type="button" class="stepper-action" id="btnIncPax" aria-label="<%= t('rsvp.increase') %>">+</button>
+                </div>
+              </div>
+
+              <!-- Wishes Textarea -->
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label class="form-label" for="wishText"><%= t('rsvp.wish') %></label>
+                  <span class="char-count-pill"><span id="wishCharCount">0</span>/1000</span>
+                </div>
+                <textarea class="form-textarea-glass" id="wishText" name="wish" placeholder="<%= t('rsvp.wishPlaceholder') %>" maxlength="1000"></textarea>
+              </div>
+
+              <!-- Private Voice Note Recording Card -->
+              <div class="voice-recorder-card" id="voiceRecorderCard">
+                <div class="voice-card-header">
+                  <span class="voice-mic-badge">🎙️</span>
+                  <div class="voice-card-text">
+                    <div class="voice-card-title"><%= t('voice.title') %></div>
+                    <div class="voice-card-desc"><%= t('voice.privacyDesc') %></div>
+                  </div>
+                </div>
+
+                <!-- Idle State: Ready to record -->
+                <div class="voice-state voice-state-idle" id="voiceStateIdle">
+                  <button type="button" class="btn-voice-trigger" id="btnStartRecord">
+                    <span class="voice-record-dot"></span>
+                    <span><%= t('voice.startRecord') %></span>
+                  </button>
+                  <span class="voice-max-pill"><%= t('voice.maxTime') %></span>
+                </div>
+
+                <!-- Active Recording State -->
+                <div class="voice-state voice-state-recording" id="voiceStateRecording" style="display: none;">
+                  <div class="recording-meta-row">
+                    <div class="recording-pulse-tag">
+                      <span class="pulse-live-circle"></span>
+                      <span class="pulse-live-text">REC</span>
+                    </div>
+                    <div class="recording-timer-capsule">
+                      <span id="recordingTimer">00:00</span> / 01:00
+                    </div>
+                  </div>
+                  <div class="soundwave-anim-bar" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <button type="button" class="btn-voice-stop" id="btnStopRecord">
+                    <span>⏹️ <%= t('voice.stopRecord') %></span>
+                  </button>
+                </div>
+
+                <!-- Preview State: Recorded & ready to review -->
+                <div class="voice-state voice-state-preview" id="voiceStatePreview" style="display: none;">
+                  <div class="voice-preview-box">
+                    <div class="luxury-audio-player" data-player="audioPreview">
+                      <audio id="audioPreview" preload="metadata"></audio>
+                      <button type="button" class="lap-btn-play" aria-label="<%= t('audio.playRecording') %>" title="<%= t('audio.play') %>">
+                        <svg class="lap-icon-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                          <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                        </svg>
+                        <svg class="lap-icon-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="display:none;">
+                          <rect x="6" y="4" width="4" height="16" rx="1.5"></rect>
+                          <rect x="14" y="4" width="4" height="16" rx="1.5"></rect>
+                        </svg>
+                      </button>
+                      <div class="lap-timeline">
+                        <div class="lap-track" role="slider" aria-label="Progress suara" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                          <div class="lap-fill"></div>
+                          <div class="lap-head"></div>
+                        </div>
+                        <div class="lap-meta">
+                          <span class="lap-time-curr">0:00</span>
+                          <span class="lap-sep">/</span>
+                          <span class="lap-time-total">0:00</span>
+                        </div>
+                      </div>
+                      <button type="button" class="lap-btn-mute" aria-label="<%= t('audio.mute') %>" title="<%= t('audio.volume') %>">
+                        <svg class="lap-icon-vol-on" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                        <svg class="lap-icon-vol-off" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                          <line x1="23" y1="9" x2="17" y2="15"></line>
+                          <line x1="17" y1="9" x2="23" y2="15"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="voice-preview-actions">
+                    <button type="button" class="btn-voice-rerecord" id="btnResetRecord">
+                      <span>🗑️ <%= t('voice.reRecord') %></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-rsvp-submit">
+                <span><%= t('rsvp.submit') %></span>
+              </button>
+
+              <p class="rsvp-deadline-text">
+                <%= t('rsvp.deadline') %> <strong><%= theme === 'reception' ? (t('rsvp.receptionDeadlineDate') || t('rsvp.deadlineDate')) : t('rsvp.deadlineDate') %></strong>
+              </p>
+            </form>
+          </div>
+
+          <!-- AJAX Post-Submission Success Card -->
+          <div class="rsvp-frosted-glass reveal-on-scroll" id="rsvpCompleted" style="display: none;">
+            <div class="rsvp-check-icon">✓</div>
+            <h3 class="rsvp-thanks-title"><%= t('rsvp.thanks') %></h3>
+            <p id="rsvpThanksMsg" class="rsvp-thanks-subtitle"></p>
+            <div class="rsvp-summary-box">
+              <p><strong><%= t('rsvp.name') %>:</strong> <%= guest.name %></p>
+              <p><strong><%= t('rsvp.attendance') %>:</strong> <span id="rsvpYourPax"></span></p>
+              <div id="rsvpVoiceSentWrap" style="display: none;" class="rsvp-summary-voice">
+                <div class="voice-badge-tag">🔒 <%= t('voice.privateBadge') %></div>
+                <div class="luxury-audio-player" data-player="audioSentPreview">
+                  <audio id="audioSentPreview" preload="metadata"></audio>
+                  <button type="button" class="lap-btn-play" aria-label="<%= t('audio.playRecording') %>" title="<%= t('audio.play') %>">
+                    <svg class="lap-icon-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                    </svg>
+                    <svg class="lap-icon-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="display:none;">
+                      <rect x="6" y="4" width="4" height="16" rx="1.5"></rect>
+                      <rect x="14" y="4" width="4" height="16" rx="1.5"></rect>
+                    </svg>
+                  </button>
+                  <div class="lap-timeline">
+                    <div class="lap-track" role="slider" aria-label="Progress suara" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                      <div class="lap-fill"></div>
+                      <div class="lap-head"></div>
+                    </div>
+                    <div class="lap-meta">
+                      <span class="lap-time-curr">0:00</span>
+                      <span class="lap-sep">/</span>
+                      <span class="lap-time-total">0:00</span>
+                    </div>
+                  </div>
+                  <button type="button" class="lap-btn-mute" aria-label="<%= t('audio.mute') %>" title="<%= t('audio.volume') %>">
+                    <svg class="lap-icon-vol-on" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                    <svg class="lap-icon-vol-off" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                      <line x1="23" y1="9" x2="17" y2="15"></line>
+                      <line x1="17" y1="9" x2="23" y2="15"></line>
+                    </svg>
+                  </button>
+                </div>
+                <p class="voice-sent-note"><%= t('voice.sentBadge') %></p>
+              </div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="rsvp-frosted-glass reveal-on-scroll">
+            <p class="rsvp-generic-note"><%= t('rsvp.genericNote') %></p>
+          </div>
+        <% } %>
+
+        <!-- Wall of Love (Doa & Ucapan) -->
+        <div class="wall-of-wishes-wrap reveal-on-scroll">
+          <h3 class="wishes-heading"><%= t('wishes.title') %></h3>
+          <p class="wishes-subheading"><%= t('wishes.subtitle') %></p>
+
+          <div class="wishes-container" id="wishesContainer"></div>
+          <p id="wishesLoading" class="wishes-status-text"><%= t('wishes.loading') %></p>
+          <p id="wishesEmpty" class="wishes-status-text" style="display: none;"><%= t('wishes.empty') %></p>
+
+          <button type="button" class="btn-wishes-more" id="btnMoreWishes" style="display: none;">
+            <%= t('wishes.more') %>
+          </button>
+        </div>
+      </section>
+
+      <!-- Flowy Wave Divider: RSVP to Closing -->
+      <div class="flowy-divider divider-rsvp-to-closing" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+          <path class="wave-ambient" d="M0,56 C260,56 420,30 600,30 C780,30 940,68 1120,68 C1260,68 1360,46 1440,46 L1440,100 L0,100 Z"></path>
+          <path class="wave-back" d="M0,46 C220,46 380,22 560,22 C740,22 880,58 1060,58 C1220,58 1340,36 1440,36 L1440,100 L0,100 Z"></path>
+          <path class="wave-front" d="M0,32 C240,32 360,64 540,64 C720,64 880,28 1060,28 C1220,28 1340,48 1440,48 L1440,100 L0,100 Z"></path>
+          <path class="wave-crest" d="M0,32 C240,32 360,64 540,64 C720,64 880,28 1060,28 C1220,28 1340,48 1440,48" fill="none" stroke-width="1.5"></path>
+        </svg>
+      </div>
+
+      <!-- ====================================================================
+           SLIDE 7: EPILOGUE & CLOSING
+           ==================================================================== -->
+      <footer class="section section-closing" id="closingSection">
+        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+        <div class="closing-inner reveal-on-scroll">
+          <p class="closing-script"><%= t('closing.thanks') %></p>
+          <p class="closing-message"><%= t('closing.message') %></p>
+
+          <!-- Intertwined F & S Monogram Seal -->
+          <div class="closing-monogram-frame">
+            <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=' + Date.now() : '/img/logo-fs.svg?v=' + Date.now() %>" alt="Monogram Emblem" class="closing-monogram-img">
+          </div>
+
+          <p class="closing-salutation"><%= t('closing.from') %></p>
+          <p class="closing-names"><%= content.couple.short %></p>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Reusable Modal (for error & confirmation dialogs) -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-dialog">
+      <h3 class="modal-title" id="modalTitle"></h3>
+      <p class="modal-body" id="modalBody"></p>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ====================================================================
+       BACKGROUND MUSIC ENGINE & FLOATING LUXURY DISC CONTROLLER
+       ==================================================================== -->
+  <audio id="bgmAudio" loop preload="auto">
+    <source src="<%= theme === 'reception' ? '/audio/syukuran.mp3?v=5' : '/audio/akad.mp3?v=5' %>" type="audio/mpeg">
+  </audio>
+
+  <aside class="music-floating-widget" id="musicFloatingWidget" aria-label="Audio Controls">
+    <button type="button" class="btn-music-disc is-paused" id="btnMusicToggle" aria-label="<%= t('audio.musicToggle') %>" title="<%= t('audio.musicToggle') %>">
+      <div class="music-disc-halo" aria-hidden="true"></div>
+      <div class="music-disc-body" aria-hidden="true">
+        <div class="music-disc-groove groove-1"></div>
+        <div class="music-disc-groove groove-2"></div>
+        <div class="music-disc-center">
+          <svg class="music-icon-note" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+          </svg>
+          <svg class="music-icon-muted" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="display: none;">
+            <path d="M4.27 3L3 4.27l9 9v.28c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4v-1.73l4.73 4.73c-.45.33-.97.58-1.55.72l1.62 1.62c.93-.34 1.75-.86 2.43-1.53l2.45 2.45L21 20.73 4.27 3zM14 7h4V3h-6v5.18l2 2V7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="music-sound-eq" aria-hidden="true">
+        <span class="eq-bar eq-bar-1"></span>
+        <span class="eq-bar eq-bar-2"></span>
+        <span class="eq-bar eq-bar-3"></span>
+      </div>
+    </button>
+  </aside>
+
+  <!-- Initial State Injection -->
+  <script>
+    window.__INIT_LANG = <%- JSON.stringify(lang) %>;
+    window.__I18N_DICT = <%- JSON.stringify(dict) %>;
+    window.__COUNTDOWN_TARGET = <%- JSON.stringify(countdownTarget) %>;
+    window.__GUEST_SLUG = <%- JSON.stringify(guest ? guest.slug : '') %>;
+    window.__MAX_PAX = <%- JSON.stringify(guest ? guest.max_pax : 2) %>;
+  </script>
+  <script src="/js/app.js?v=<%= Date.now() %>"></script>
+</body>
+</html>
