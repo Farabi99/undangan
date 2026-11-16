@@ -619,6 +619,28 @@ button {
   stroke: rgba(255, 255, 255, 0.55);
 }
 
+/* 3B. Direct Transition: Wedding Day (Deep Sage #525A45) -> RSVP (Cream #F4F0E4) */
+.divider-event-to-rsvp {
+  background-color: #525A45;
+}
+
+.divider-event-to-rsvp .wave-ambient {
+  fill: #F2E3E0;
+}
+
+.divider-event-to-rsvp .wave-back {
+  fill: #ECE2DA;
+}
+
+.divider-event-to-rsvp .wave-front {
+  fill: var(--color-cream);
+}
+
+.divider-event-to-rsvp .wave-crest {
+  stroke: rgba(201, 138, 134, 0.55);
+  filter: drop-shadow(0 0 3px rgba(201, 138, 134, 0.25));
+}
+
 /* 4. Story (Warm Linen #F5F0E8) -> RSVP (Cream #F4F0E4) */
 .divider-story-to-rsvp {
   background-color: var(--color-linen);
@@ -3231,6 +3253,7 @@ body.theme-reception .flowy-divider .wave-crest {
 body.theme-reception .divider-welcome-to-couple,
 body.theme-reception .divider-couple-to-event,
 body.theme-reception .divider-event-to-story,
+body.theme-reception .divider-event-to-rsvp,
 body.theme-reception .divider-story-to-rsvp,
 body.theme-reception .divider-rsvp-to-closing {
   background-color: #080E1C !important;

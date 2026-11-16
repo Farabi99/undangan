@@ -441,8 +441,14 @@
         </div>
 
         <div style="margin-top: 0.85rem;">
-          <label class="form-micro-label">Pratinjau &amp; Kustomisasi Pesan:</label>
-          <textarea id="waMessageText" class="input-adm" rows="7" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; line-height: 1.5;"></textarea>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+            <label class="form-micro-label" style="margin: 0;">Pratinjau &amp; Kustomisasi Pesan:</label>
+            <label style="font-size: 0.78rem; color: var(--admin-text-sub); display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="checkbox" id="waIncludeStoryCheckbox" onchange="toggleWaStory(this.checked)">
+              Sertakan Bagian Kisah Kami (<code>?story=1</code>)
+            </label>
+          </div>
+          <textarea id="waMessageText" class="input-adm" rows="10" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; line-height: 1.5;"></textarea>
         </div>
       </div>
       <div class="admin-modal-footer">
@@ -669,16 +675,30 @@
     }
 
     // WhatsApp Modal Logic
+    var currentWaType = 'formal';
+    var waIncludeStory = false;
+
+    function toggleWaStory(checked) {
+      waIncludeStory = checked;
+      generateWaText(currentWaType);
+    }
+
     function openWaModal(g) {
       currentGuestForWa = g;
       document.getElementById('waModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name;
       document.getElementById('waModalPhone').textContent = g.phone || 'Belum diisi';
       document.getElementById('waModalUrl').textContent = g.fullUrl;
 
+      // Reset story toggle checkbox to unchecked by default
+      waIncludeStory = false;
+      var cb = document.getElementById('waIncludeStoryCheckbox');
+      if (cb) cb.checked = false;
+
       // Set default template (formal)
       var tabs = document.querySelectorAll('.wa-template-tabs .tab-btn');
       tabs.forEach(function(t) { t.classList.remove('active'); });
       tabs[0].classList.add('active');
+      currentWaType = 'formal';
       generateWaText('formal');
 
       document.getElementById('waModal').style.display = 'flex';
@@ -688,41 +708,99 @@
       var tabs = document.querySelectorAll('.wa-template-tabs .tab-btn');
       tabs.forEach(function(t) { t.classList.remove('active'); });
       btn.classList.add('active');
+      currentWaType = type;
       generateWaText(type);
     }
 
     function generateWaText(type) {
       if (!currentGuestForWa) return;
+      currentWaType = type || 'formal';
       var g = currentGuestForWa;
       var salutation = g.title ? g.title + ' ' : '';
       var recipientName = salutation + g.name + (g.with_partner ? ' & Pasangan' : '');
       var isRec = g.event_type === 'reception';
+      var isAkad = g.event_type === 'akad';
+
+      var finalUrl = g.fullUrl;
+      if (waIncludeStory) {
+        finalUrl += (finalUrl.indexOf('?') === -1 ? '?story=1' : '&story=1');
+      }
+
       var text = '';
 
       if (type === 'formal') {
-        text = "Kepada Yth. " + recipientName + ",\n\n" +
-          "Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri hari bahagia pernikahan kami.\n\n" +
-          "Informasi lengkap acara dan konfirmasi kehadiran dapat diakses melalui tautan undangan berikut:\n" +
-          g.fullUrl + "\n\n" +
-          "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\n" +
-          "Salam hangat,\n" +
-          "<%= couple.short %>";
+        var eventDetails = '';
+        if (isRec) {
+          eventDetails = "🗓️ *Hari/Tanggal:* Sabtu, 26 Desember 2026\n" +
+                         "⏰ *Waktu:* 10.00 – 13.00 WIB\n" +
+                         "📍 *Tempat:* Smamda Tower Surabaya\n" +
+                         "   Jl. Pucang Anom No. 91, Kertajaya, Surabaya";
+        } else if (isAkad) {
+          eventDetails = "🗓️ *Hari/Tanggal:* Sabtu, 5 Desember 2026\n" +
+                         "⏰ *Waktu:* 12.30 – 15.00 WIB\n" +
+                         "📍 *Tempat:* Masjid Agung At-Tin\n" +
+                         "   Jl. Taman Mini I No. 3, Jakarta Timur";
+        } else {
+          eventDetails = "💍 *Akad Nikah:* Sabtu, 5 Des 2026 (Masjid Agung At-Tin, Jakarta)\n" +
+                         "🥂 *Syukuran:* Sabtu, 26 Des 2026 (Smamda Tower, Surabaya)";
+        }
+
+        var eventName = isRec ? 'Syukuran Pernikahan' : isAkad ? 'Akad Nikah' : 'Pernikahan';
+
+        text = "Assalamu’alaikum Warahmatullahi Wabarakatuh\n\n" +
+          "Kepada Yth.\n" +
+          "*" + recipientName + "*\n\n" +
+          "Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara " + eventName + " kami:\n\n" +
+          "💍 *<%= couple.short %>*\n" +
+          "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
+          eventDetails + "\n\n" +
+          "💌 *Tautan Undangan Digital:*\n" +
+          finalUrl + "\n\n" +
+          "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi kami berdua.\n\n" +
+          "Mengingat situasi dan keterbatasan jarak, mohon maaf perihal undangan hanya dapat kami sampaikan melalui pesan digital ini.\n\n" +
+          "Atas perhatian dan doa restunya, kami ucapkan terima kasih yang sebesar-besarnya.\n\n" +
+          "Wassalamu’alaikum Warahmatullahi Wabarakatuh\n\n" +
+          "Hormat kami yang berbahagia,\n" +
+          "*<%= couple.short %>*\n" +
+          "Beserta segenap keluarga besar";
+
       } else if (type === 'casual') {
-        text = "Halo " + g.name + "! 👋\n\n" +
-          "Alhamdulillah, dengan penuh rasa syukur kami ingin mengundang kamu untuk hadir di hari bahagia pernikahan kami: <%= couple.short %>.\n\n" +
-          "Untuk detail acara dan RSVP kehadiran, silakan buka tautan berikut ya:\n" +
-          g.fullUrl + "\n\n" +
-          "Kehadiran dan doa restu darimu sangat berarti bagi kami. Sampai jumpa di hari bahagia kami!\n\n" +
-          "Warm regards,\n" +
-          "<%= couple.short %>";
+        var eventSchedule = isRec 
+          ? "Sabtu, 26 Desember 2026 di Smamda Tower Surabaya" 
+          : isAkad 
+          ? "Sabtu, 5 Desember 2026 di Masjid Agung At-Tin Jakarta" 
+          : "Akad (5 Des di Jakarta) & Syukuran (26 Des di Surabaya)";
+
+        text = "Assalamu’alaikum / Halo *" + g.name + "*! 👋✨\n\n" +
+          "Alhamdulillah, dengan penuh rasa syukur kami ingin berbagi kabar bahagia dan mengundang kamu untuk hadir di hari pernikahan kami:\n\n" +
+          "💍 *<%= couple.short %>*\n" +
+          "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
+          "🗓️ *Waktu & Lokasi:*\n" +
+          eventSchedule + "\n\n" +
+          "Untuk detail lengkap susunan acara, peta lokasi, dan konfirmasi kehadiran (RSVP), silakan buka tautan undangan berikut ya:\n" +
+          "🔗 " + finalUrl + "\n\n" +
+          "Kehadiran dan doa restu darimu akan sangat melengkapi kebahagiaan kami. Sampai jumpa di hari bahagia kami! 🤍\n\n" +
+          "Salam hangat,\n" +
+          "*<%= couple.short %>*";
+
       } else if (type === 'english') {
-        text = "Dear " + recipientName + ",\n\n" +
-          "Together with our families, we joyfully invite you to celebrate our wedding: <%= couple.short %>.\n\n" +
-          "Please find the event details and kindly confirm your RSVP via the following link:\n" +
-          g.fullUrl + "\n\n" +
-          "Your presence and blessings will make our special day even more meaningful.\n\n" +
-          "Warm regards,\n" +
-          "<%= couple.short %>";
+        var eventScheduleEn = isRec 
+          ? "Saturday, December 26, 2026 at Smamda Tower Surabaya" 
+          : isAkad 
+          ? "Saturday, December 5, 2026 at At-Tin Grand Mosque, Jakarta" 
+          : "Wedding Ceremony (Dec 5, Jakarta) & Reception (Dec 26, Surabaya)";
+
+        text = "Dear *" + recipientName + "*,\n\n" +
+          "Together with our families, with joyful hearts we invite you to celebrate our wedding:\n\n" +
+          "✨ *<%= couple.short %>* ✨\n" +
+          "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
+          "📅 *Event Details:*\n" +
+          eventScheduleEn + "\n\n" +
+          "Please find the complete event schedule, venue map, and kindly confirm your attendance (RSVP) via the link below:\n" +
+          "🔗 " + finalUrl + "\n\n" +
+          "Your warm presence, prayers, and blessings would mean the world to us.\n\n" +
+          "Warmest regards,\n" +
+          "*<%= couple.short %>* & Family";
       }
 
       var textarea = document.getElementById('waMessageText');

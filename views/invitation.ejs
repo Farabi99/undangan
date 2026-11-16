@@ -322,89 +322,101 @@
         </div>
       </section>
 
-      <!-- Flowy Wave Divider: Event to Story -->
-      <div class="flowy-divider divider-event-to-story" aria-hidden="true">
-        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
-          <path class="wave-ambient" d="M0,58 C260,58 420,28 620,28 C800,28 940,66 1120,66 C1260,66 1360,44 1440,44 L1440,100 L0,100 Z"></path>
-          <path class="wave-back" d="M0,44 C220,44 400,20 580,20 C760,20 900,58 1080,58 C1240,58 1340,36 1440,36 L1440,100 L0,100 Z"></path>
-          <path class="wave-front" d="M0,28 C220,28 380,62 560,62 C740,62 880,26 1060,26 C1220,26 1340,48 1440,48 L1440,100 L0,100 Z"></path>
-          <path class="wave-crest" d="M0,28 C220,28 380,62 560,62 C740,62 880,26 1060,26 C1220,26 1340,48 1440,48" fill="none" stroke-width="1.5"></path>
-        </svg>
-      </div>
-
-      <!-- ====================================================================
-           SLIDE 5: ROAD TO US
-           ==================================================================== -->
-      <section class="section section-story" id="storySection">
-        <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
-        <div class="section-header reveal-on-scroll">
-          <p class="section-eyebrow"><%= t('story.eyebrow') %></p>
-          <h2 class="section-title"><%= t('story.title') %></h2>
-          <p class="section-subtitle"><%= t('story.subtitle') %></p>
+      <% if (typeof showStory !== 'undefined' && showStory) { %>
+        <!-- Flowy Wave Divider: Event to Story -->
+        <div class="flowy-divider divider-event-to-story" aria-hidden="true">
+          <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+            <path class="wave-ambient" d="M0,58 C260,58 420,28 620,28 C800,28 940,66 1120,66 C1260,66 1360,44 1440,44 L1440,100 L0,100 Z"></path>
+            <path class="wave-back" d="M0,44 C220,44 400,20 580,20 C760,20 900,58 1080,58 C1240,58 1340,36 1440,36 L1440,100 L0,100 Z"></path>
+            <path class="wave-front" d="M0,28 C220,28 380,62 560,62 C740,62 880,26 1060,26 C1220,26 1340,48 1440,48 L1440,100 L0,100 Z"></path>
+            <path class="wave-crest" d="M0,28 C220,28 380,62 560,62 C740,62 880,26 1060,26 C1220,26 1340,48 1440,48" fill="none" stroke-width="1.5"></path>
+          </svg>
         </div>
 
-        <!-- Tilted Polaroid Chapters Timeline -->
-        <div class="polaroid-timeline">
-          <% 
-            const storyPhotos = [
-              '/img/frame.jpg',
-              '/img/arch.jpg',
-              '/img/welcome.jpg',
-              '/img/reception.jpg',
-              '/img/rumah-joglo.jpg',
-              '/img/arch.jpg',
-              '/img/frame.jpg',
-              '/img/cameo-couple-fs.jpg'
-            ];
-            const storyAngles = [5.0, -4.5, 5.5, -4.0, 4.5, -5.0, 5.0, -4.5];
-            (content.story || []).forEach(function(item, idx) { 
-              const isEven = idx % 2 === 0;
-              const angle = storyAngles[idx % storyAngles.length];
-              const photo = item.photo || storyPhotos[idx % storyPhotos.length];
-              const chapterLabel = typeof item.chapter === 'object' ? (item.chapter[lang] || item.chapter.en || item.chapter.id) : item.chapter;
-              const yearLabel = typeof item.year === 'object' ? (item.year[lang] || item.year.en || item.year.id) : item.year;
-              const titleLabel = typeof item.title === 'object' ? (item.title[lang] || item.title.en || item.title.id) : item.title;
-              const rawBody = typeof item.body === 'object' ? (item.body[lang] || item.body.en || item.body.id) : (item.body || '');
-              const bodyHtml = rawBody.split('\n\n').map(p => '<p class="story-chapter-paragraph">' + p.trim() + '</p>').join('');
-          %>
-            <div class="polaroid-row <%= isEven ? 'photo-right' : 'photo-left' %> reveal-on-scroll">
-              <!-- Text Narrative Block -->
-              <div class="polaroid-text-block">
-                <div class="story-badge-row">
-                  <span class="story-chapter-pill"><%= chapterLabel %></span>
-                  <span class="story-year-pill"><%= yearLabel %></span>
-                </div>
-                <h3 class="story-chapter-title"><%= titleLabel %></h3>
-                <div class="story-hairline"></div>
-                <div class="story-chapter-body"><%- bodyHtml %></div>
-              </div>
+        <!-- ====================================================================
+             SLIDE 5: ROAD TO US
+             ==================================================================== -->
+        <section class="section section-story" id="storySection">
+          <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+          <div class="section-header reveal-on-scroll">
+            <p class="section-eyebrow"><%= t('story.eyebrow') %></p>
+            <h2 class="section-title"><%= t('story.title') %></h2>
+            <p class="section-subtitle"><%= t('story.subtitle') %></p>
+          </div>
 
-              <!-- Organic Tilted Polaroid Photo Card -->
-              <div class="polaroid-card-wrap" style="--polaroid-angle: <%= angle %>deg;">
-                <div class="polaroid-card">
-                  <div class="polaroid-photo-frame">
-                    <picture>
-                      <source srcset="<%= photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp') %>" type="image/webp">
-                      <img src="<%= photo %>" alt="<%= titleLabel %>" loading="lazy" class="polaroid-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
-                    </picture>
+          <!-- Tilted Polaroid Chapters Timeline -->
+          <div class="polaroid-timeline">
+            <% 
+              const storyPhotos = [
+                '/img/frame.jpg',
+                '/img/arch.jpg',
+                '/img/welcome.jpg',
+                '/img/reception.jpg',
+                '/img/rumah-joglo.jpg',
+                '/img/arch.jpg',
+                '/img/frame.jpg',
+                '/img/cameo-couple-fs.jpg'
+              ];
+              const storyAngles = [5.0, -4.5, 5.5, -4.0, 4.5, -5.0, 5.0, -4.5];
+              (content.story || []).forEach(function(item, idx) { 
+                const isEven = idx % 2 === 0;
+                const angle = storyAngles[idx % storyAngles.length];
+                const photo = item.photo || storyPhotos[idx % storyPhotos.length];
+                const chapterLabel = typeof item.chapter === 'object' ? (item.chapter[lang] || item.chapter.en || item.chapter.id) : item.chapter;
+                const yearLabel = typeof item.year === 'object' ? (item.year[lang] || item.year.en || item.year.id) : item.year;
+                const titleLabel = typeof item.title === 'object' ? (item.title[lang] || item.title.en || item.title.id) : item.title;
+                const rawBody = typeof item.body === 'object' ? (item.body[lang] || item.body.en || item.body.id) : (item.body || '');
+                const bodyHtml = rawBody.split('\n\n').map(p => '<p class="story-chapter-paragraph">' + p.trim() + '</p>').join('');
+            %>
+              <div class="polaroid-row <%= isEven ? 'photo-right' : 'photo-left' %> reveal-on-scroll">
+                <!-- Text Narrative Block -->
+                <div class="polaroid-text-block">
+                  <div class="story-badge-row">
+                    <span class="story-chapter-pill"><%= chapterLabel %></span>
+                    <span class="story-year-pill"><%= yearLabel %></span>
                   </div>
-                  <p class="polaroid-caption">“<%= titleLabel %>”</p>
+                  <h3 class="story-chapter-title"><%= titleLabel %></h3>
+                  <div class="story-hairline"></div>
+                  <div class="story-chapter-body"><%- bodyHtml %></div>
+                </div>
+
+                <!-- Organic Tilted Polaroid Photo Card -->
+                <div class="polaroid-card-wrap" style="--polaroid-angle: <%= angle %>deg;">
+                  <div class="polaroid-card">
+                    <div class="polaroid-photo-frame">
+                      <picture>
+                        <source srcset="<%= photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp') %>" type="image/webp">
+                        <img src="<%= photo %>" alt="<%= titleLabel %>" loading="lazy" class="polaroid-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
+                      </picture>
+                    </div>
+                    <p class="polaroid-caption">“<%= titleLabel %>”</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          <% }); %>
-        </div>
-      </section>
+            <% }); %>
+          </div>
+        </section>
 
-      <!-- Flowy Wave Divider: Story to RSVP -->
-      <div class="flowy-divider divider-story-to-rsvp" aria-hidden="true">
-        <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
-          <path class="wave-ambient" d="M0,52 C240,52 400,74 600,74 C780,74 920,34 1100,34 C1260,34 1360,54 1440,54 L1440,100 L0,100 Z"></path>
-          <path class="wave-back" d="M0,40 C200,40 380,62 560,62 C740,62 880,24 1060,24 C1220,24 1340,44 1440,44 L1440,100 L0,100 Z"></path>
-          <path class="wave-front" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32 L1440,100 L0,100 Z"></path>
-          <path class="wave-crest" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32" fill="none" stroke-width="1.5"></path>
-        </svg>
-      </div>
+        <!-- Flowy Wave Divider: Story to RSVP -->
+        <div class="flowy-divider divider-story-to-rsvp" aria-hidden="true">
+          <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+            <path class="wave-ambient" d="M0,52 C240,52 400,74 600,74 C780,74 920,34 1100,34 C1260,34 1360,54 1440,54 L1440,100 L0,100 Z"></path>
+            <path class="wave-back" d="M0,40 C200,40 380,62 560,62 C740,62 880,24 1060,24 C1220,24 1340,44 1440,44 L1440,100 L0,100 Z"></path>
+            <path class="wave-front" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32 L1440,100 L0,100 Z"></path>
+            <path class="wave-crest" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32" fill="none" stroke-width="1.5"></path>
+          </svg>
+        </div>
+      <% } else { %>
+        <!-- Direct Flowy Wave Divider: Event to RSVP (When Kisah Kami is omitted) -->
+        <div class="flowy-divider divider-event-to-rsvp" aria-hidden="true">
+          <svg viewBox="0 0 1440 100" fill="none" preserveAspectRatio="none">
+            <path class="wave-ambient" d="M0,52 C240,52 400,74 600,74 C780,74 920,34 1100,34 C1260,34 1360,54 1440,54 L1440,100 L0,100 Z"></path>
+            <path class="wave-back" d="M0,40 C200,40 380,62 560,62 C740,62 880,24 1060,24 C1220,24 1340,44 1440,44 L1440,100 L0,100 Z"></path>
+            <path class="wave-front" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32 L1440,100 L0,100 Z"></path>
+            <path class="wave-crest" d="M0,42 C220,42 360,20 540,20 C720,20 880,58 1060,58 C1220,58 1340,32 1440,32" fill="none" stroke-width="1.5"></path>
+          </svg>
+        </div>
+      <% } %>
 
       <!-- ====================================================================
            SLIDE 6: RSVP & WALL OF WISHES (Antique Cream #F4F0E4)

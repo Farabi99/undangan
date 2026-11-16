@@ -395,9 +395,9 @@ router.get('/export', (req, res) => {
     const url = `${baseUrl}/${isReception ? 'syukuran/' : ''}${g.slug}`;
     const rsvpStatus = g.attending === 1 ? 'Hadir' : g.attending === 0 ? 'Tidak Hadir' : 'Belum Konfirmasi';
     const eventLabel = isReception ? 'Syukuran (Navy & Silver)' : g.event_type === 'akad' ? 'Akad (Dusty Rose)' : 'Keduanya';
-    const waText = isReception
-      ? `Halo ${g.title ? g.title + ' ' : ''}${g.name}, kami mengundang Anda ke acara Syukuran Pernikahan kami: ${url}`
-      : `Halo ${g.title ? g.title + ' ' : ''}${g.name}, kami mengundang Anda untuk merayakan hari bahagia pernikahan kami: ${url}`;
+    const recipientName = `${g.title ? g.title + ' ' : ''}${g.name}${g.with_partner ? ' & Pasangan' : ''}`;
+    const eventName = isReception ? 'Syukuran Pernikahan' : g.event_type === 'akad' ? 'Akad Nikah' : 'Pernikahan';
+    const waText = `Assalamu’alaikum Wr. Wb. Kepada Yth. ${recipientName}, tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara ${eventName} Farabi & Syifa: ${url}`;
     return [
       g.id,
       g.title || '',

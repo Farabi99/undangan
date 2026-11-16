@@ -74,6 +74,13 @@ function getLang(req) {
   return 'id';
 }
 
+// Helper to determine whether Kisah Kami / Story section is shown
+function getShowStory(req) {
+  if (req.query.story === '1' || req.query.story === 'true') return true;
+  if (req.query.story === '0' || req.query.story === 'false' || req.query.nostory === '1') return false;
+  return content.showStory !== undefined ? content.showStory : false;
+}
+
 function translator(lang) {
   const d = content.dict[lang] || content.dict.id;
   return function (key) {
@@ -321,7 +328,8 @@ router.get('/', (req, res) => {
     dict: content.dict,
     countdownTarget: cdTarget,
     guest: null,
-    existingRsvp: null
+    existingRsvp: null,
+    showStory: getShowStory(req)
   });
 });
 
@@ -341,7 +349,8 @@ router.get('/syukuran', (req, res) => {
     dict: content.dict,
     countdownTarget: content.receptionCountdownTarget,
     guest: null,
-    existingRsvp: null
+    existingRsvp: null,
+    showStory: getShowStory(req)
   });
 });
 
@@ -419,7 +428,8 @@ function renderGuestInvitation(req, res, forcedTheme) {
     dict: content.dict,
     countdownTarget: cdTarget,
     guest,
-    existingRsvp
+    existingRsvp,
+    showStory: getShowStory(req)
   });
 }
 
