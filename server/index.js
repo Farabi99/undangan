@@ -33,12 +33,16 @@ if (fs.existsSync(envPath)) {
 }
 
 const express = require('express');
+const compression = require('compression');
 const publicRoutes = require('./routes/public');
 const adminRoutes = require('./routes/admin');
 const content = require('./lib/content');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Enable gzip/deflate response compression
+app.use(compression());
 
 // Security & header settings
 app.disable('x-powered-by');
@@ -59,7 +63,8 @@ app.use(express.json());
 
 // Static assets
 app.use(express.static(path.join(__dirname, '..', 'public'), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0
+  maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
+  etag: true
 }));
 
 // Mount Routes

@@ -8,12 +8,12 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="<%= theme === 'reception' ? '#0E1B33' : '#7E836C' %>">
 
-  <!-- Favicons & Touch Icons (Cache-busted for instant browser tab update) -->
-  <link rel="icon" type="image/x-icon" href="<%= theme === 'reception' ? '/favicon-reception.ico?v=' + Date.now() : '/favicon.ico?v=' + Date.now() %>">
-  <link rel="icon" type="image/svg+xml" href="<%= theme === 'reception' ? '/img/logo-fs-badge-silver.svg?v=' + Date.now() : '/img/logo-fs-badge.svg?v=' + Date.now() %>">
-  <link rel="icon" type="image/png" sizes="32x32" href="<%= theme === 'reception' ? '/img/favicon-reception-32x32.png?v=' + Date.now() : '/img/favicon-32x32.png?v=' + Date.now() %>">
-  <link rel="icon" type="image/png" sizes="16x16" href="<%= theme === 'reception' ? '/img/favicon-reception-16x16.png?v=' + Date.now() : '/img/favicon-16x16.png?v=' + Date.now() %>">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=<%= Date.now() %>">
+  <!-- Favicons & Touch Icons -->
+  <link rel="icon" type="image/x-icon" href="<%= theme === 'reception' ? '/favicon-reception.ico?v=1.1.0' : '/favicon.ico?v=1.1.0' %>">
+  <link rel="icon" type="image/svg+xml" href="<%= theme === 'reception' ? '/img/logo-fs-badge-silver.svg?v=1.1.0' : '/img/logo-fs-badge.svg?v=1.1.0' %>">
+  <link rel="icon" type="image/png" sizes="32x32" href="<%= theme === 'reception' ? '/img/favicon-reception-32x32.png?v=1.1.0' : '/img/favicon-32x32.png?v=1.1.0' %>">
+  <link rel="icon" type="image/png" sizes="16x16" href="<%= theme === 'reception' ? '/img/favicon-reception-16x16.png?v=1.1.0' : '/img/favicon-16x16.png?v=1.1.0' %>">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=1.1.0">
 
   <!-- Open Graph for WhatsApp & Social preview -->
   <meta property="og:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %>">
@@ -30,12 +30,16 @@
   <meta name="twitter:description" content="<%= t('site.description') %>">
   <meta name="twitter:image" content="<%= theme === 'reception' ? '/img/og-reception.jpg' : '/img/og.jpg' %>">
 
-  <!-- Google Fonts: Cinzel, Cormorant Garamond, EB Garamond, Libre Baskerville, Inter, Pinyon Script -->
+  <!-- Preload Critical Above-The-Fold Assets -->
+  <link rel="preload" as="image" href="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/sage-batik-cloud.webp' %>">
+  <link rel="preload" as="image" href="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/logo-fs.svg?v=1.1.0' %>">
+
+  <!-- Google Fonts: Preconnect & Optimized Weight Loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/css/style.css?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/style.css?v=1.1.0">
 </head>
 <body class="<%= theme === 'reception' ? 'theme-reception' : '' %>">
 
@@ -65,7 +69,7 @@
       <div class="cover-emblem-container">
         <div class="monogram-emblem-frame">
           <div class="monogram-emblem-halo" aria-hidden="true"></div>
-          <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=' + Date.now() : '/img/logo-fs.svg?v=' + Date.now() %>" alt="Farabi & Syifa Monogram" class="monogram-emblem-svg">
+          <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/logo-fs.svg?v=1.1.0' %>" alt="Farabi & Syifa Monogram" class="monogram-emblem-svg">
         </div>
       </div>
 
@@ -107,7 +111,7 @@
       <div class="desktop-aside-inner">
         <div class="desktop-logo-frame">
           <div class="desktop-logo-halo" aria-hidden="true"></div>
-          <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=' + Date.now() : '/img/logo-fs.svg?v=' + Date.now() %>" alt="<%= content.couple.short %> Monogram" class="desktop-logo-img">
+          <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/logo-fs.svg?v=1.1.0' %>" alt="<%= content.couple.short %> Monogram" class="desktop-logo-img">
         </div>
         <p class="desktop-eyebrow"><%= theme === 'reception' ? t('cover.weddingReception') : t('cover.weddingOf') %></p>
         <h1 class="desktop-title"><%= content.couple.short %></h1>
@@ -129,7 +133,7 @@
 
         <!-- Pop-Up House Anchored at the BOTTOM END of Section -->
         <div class="welcome-cottage welcome-house-bottom" id="welcomeCottage" aria-hidden="true">
-          <img src="<%= theme === 'reception' ? '/img/rumah-joglo-silver.webp?v=' + Date.now() : '/img/rumah-joglo.webp?v=' + Date.now() %>" alt="Traditional Indonesian House" class="welcome-cottage-img" onerror="this.src='<%= theme === 'reception' ? '/img/rumah-joglo-silver.png' : '/img/rumah-joglo.png' %>'">
+          <img src="<%= theme === 'reception' ? '/img/rumah-joglo-silver.webp?v=1.1.0' : '/img/rumah-joglo.webp?v=1.1.0' %>" alt="Traditional Indonesian House" class="welcome-cottage-img" onerror="this.src='<%= theme === 'reception' ? '/img/rumah-joglo-silver.png' : '/img/rumah-joglo.png' %>'">
         </div>
 
         <!-- Welcome Letter Parchment Card -->
@@ -137,7 +141,7 @@
           <!-- Monogram Crest Emblem on Parchment -->
           <div class="welcome-card-emblem-wrap">
             <div class="welcome-card-emblem-frame">
-              <img src="<%= theme === 'reception' ? '/img/logo-fs-badge-silver.svg?v=' + Date.now() : '/img/logo-fs-badge.svg?v=' + Date.now() %>" alt="<%= content.couple.short %> Monogram" class="welcome-card-emblem-img">
+              <img src="<%= theme === 'reception' ? '/img/logo-fs-badge-silver.svg?v=1.1.0' : '/img/logo-fs-badge.svg?v=1.1.0' %>" alt="<%= content.couple.short %> Monogram" class="welcome-card-emblem-img">
             </div>
           </div>
           <div class="welcome-card-body">
@@ -706,7 +710,7 @@
 
           <!-- Intertwined F & S Monogram Seal -->
           <div class="closing-monogram-frame">
-            <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=' + Date.now() : '/img/logo-fs.svg?v=' + Date.now() %>" alt="Monogram Emblem" class="closing-monogram-img">
+            <img src="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/logo-fs.svg?v=1.1.0' %>" alt="Monogram Emblem" class="closing-monogram-img">
           </div>
 
           <p class="closing-salutation"><%= t('closing.from') %></p>
@@ -732,7 +736,7 @@
   <!-- ====================================================================
        BACKGROUND MUSIC ENGINE & FLOATING LUXURY DISC CONTROLLER
        ==================================================================== -->
-  <audio id="bgmAudio" loop preload="auto">
+  <audio id="bgmAudio" loop preload="none">
     <source src="<%= theme === 'reception' ? '/audio/syukuran.mp3?v=5' : '/audio/akad.mp3?v=5' %>" type="audio/mpeg">
   </audio>
 
@@ -767,6 +771,6 @@
     window.__GUEST_SLUG = <%- JSON.stringify(guest ? guest.slug : '') %>;
     window.__MAX_PAX = <%- JSON.stringify(guest ? guest.max_pax : 2) %>;
   </script>
-  <script src="/js/app.js?v=<%= Date.now() %>"></script>
+  <script src="/js/app.js?v=1.1.0" defer></script>
 </body>
 </html>
