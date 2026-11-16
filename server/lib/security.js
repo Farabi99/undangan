@@ -30,7 +30,7 @@ function parseCookies(req) {
 
 // Changing ADMIN_PASSWORD or SESSION_SECRET logs every admin out.
 const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || '').trim().replace(/^["']|["']$/g, '');
 const SESSION_HOURS = 12;
 const COOKIE = 'undangan_admin';
 
@@ -45,8 +45,9 @@ function safeEqual(a, b) {
 function checkPassword(input) {
   if (!ADMIN_PASSWORD) return false;
   // compare hashes so length differences don't leak through timing
+  const cleanInput = String(input || '').trim().replace(/^["']|["']$/g, '');
   const h = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
-  return safeEqual(h(input), h(ADMIN_PASSWORD));
+  return safeEqual(h(cleanInput), h(ADMIN_PASSWORD));
 }
 
 function setSession(req, res) {

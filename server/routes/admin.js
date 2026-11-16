@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const QRCode = require('qrcode');
 const XLSX = require('xlsx');
-const { db, tx } = require('../db');
+const { db, getSetting, setSetting, tx } = require('../db');
 const content = require('../lib/content');
 const { uniqueSlug, isValidSlug, slugify, RESERVED } = require('../lib/slug');
 const { cleanText, toInt, normalizePhone, yes, clamp } = require('../lib/validate');
@@ -122,6 +122,9 @@ router.get('/guests', (req, res) => {
     LEFT JOIN rsvps r ON g.id = r.guest_id
   `).get();
 
+  const currentStoryVal = getSetting('show_story', content.showStory ? '1' : '0');
+  const showStory = currentStoryVal === '1';
+
   res.render('admin/guests', {
     guests,
     groups,
@@ -134,8 +137,23 @@ router.get('/guests', (req, res) => {
     error: req.query.error || null,
     host: req.get('host'),
     protocol: req.protocol,
-    couple: content.couple
+    couple: content.couple,
+    showStory,
+    storySettingValue: currentStoryVal
   });
+});
+
+// Toggle Global Kisah Kami Setting (Code 0 or 1)
+router.post('/settings/story', sameOrigin, (req, res) => {
+  let newVal;
+  if (req.body && req.body.value !== undefined) {
+    newVal = (req.body.value === '1' || req.body.value === 1 || req.body.value === true || req.body.value === 'true') ? '1' : '0';
+  } else {
+    const cur = getSetting('show_story', content.showStory ? '1' : '0');
+    newVal = cur === '1' ? '0' : '1';
+  }
+  setSetting('show_story', newVal);
+  res.json({ ok: true, showStory: newVal === '1', value: newVal });
 });
 
 // Add Single Guest POST

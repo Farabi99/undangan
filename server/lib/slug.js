@@ -2,7 +2,7 @@
 const { db } = require('../db');
 
 // Paths used by the app itself; a guest can never get these as a slug.
-const RESERVED = new Set(['admin', 'api', 'css', 'js', 'img', 'fonts', 'calendar.ics', 'favicon.ico', 'robots.txt', 'health', 'resepsi', 'syukuran']);
+const RESERVED = new Set(['admin', 'api', 'css', 'js', 'img', 'fonts', 'calendar.ics', 'favicon.ico', 'robots.txt', 'health', 'resepsi', 'syukuran', '0', '1']);
 
 // Honorifics are stored in the separate `title` column, so strip them from the slug.
 const TITLE_RE = /^((bpk|bapak|pak|ibu|bu|mr|mrs|ms|miss|sdr|sdri|saudara|saudari|dr|drs|dra|ir|hj|h|prof|kak|mas|mbak|tn|ny|nn)\.?\s+)+/i;

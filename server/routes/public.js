@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const multer = require('multer');
-const { db } = require('../db');
+const { db, getSetting } = require('../db');
 const content = require('../lib/content');
 const { hasLinkOrCode, cleanText, toInt, clamp } = require('../lib/validate');
 const { rateLimit } = require('../lib/security');
@@ -74,11 +74,25 @@ function getLang(req) {
   return 'id';
 }
 
-// Helper to determine whether Kisah Kami / Story section is shown
-function getShowStory(req) {
-  if (req.query.story === '1' || req.query.story === 'true') return true;
-  if (req.query.story === '0' || req.query.story === 'false' || req.query.nostory === '1') return false;
+// Helper to check global Kisah Kami setting from SQLite database (with fallback to content.json)
+function getGlobalShowStory() {
+  const val = getSetting('show_story', null);
+  if (val !== null && val !== undefined) {
+    return String(val) === '1' || String(val) === 'true';
+  }
   return content.showStory !== undefined ? content.showStory : false;
+}
+
+// Helper to determine whether Kisah Kami / Story section is shown (supports number codes 0 and 1 via ?story= or ?s=)
+function getShowStory(req) {
+  const q = req.query.story !== undefined ? req.query.story : req.query.s;
+  if (q !== undefined) {
+    const s = String(q).trim().toLowerCase();
+    if (s === '1' || s === 'true') return true;
+    if (s === '0' || s === 'false') return false;
+  }
+  if (req.query.nostory === '1') return false;
+  return getGlobalShowStory();
 }
 
 function translator(lang) {
@@ -184,7 +198,7 @@ router.post('/api/rsvp', rsvpLimiter, handleRsvpUpload, (req, res) => {
       const parts = refUrl.pathname.split('/').filter(Boolean);
       if (parts.length > 0) {
         const lastPart = parts[parts.length - 1];
-        if (lastPart !== 'resepsi' && lastPart !== 'syukuran' && lastPart !== 'admin') {
+        if (lastPart !== 'resepsi' && lastPart !== 'syukuran' && lastPart !== 'admin' && lastPart !== '0' && lastPart !== '1') {
           guestSlug = lastPart;
         }
       }
@@ -309,16 +323,12 @@ router.get('/api/voice-notes/:guestSlug', (req, res) => {
   res.sendFile(filePath);
 });
 
-// Root: Generic invitation preview or query-based guest link
-router.get('/', (req, res) => {
-  const querySlug = req.query.to || req.query.guest || req.query.slug;
-  if (querySlug) {
-    req.params.slug = querySlug;
-    return renderGuestInvitation(req, res, null);
-  }
+// Helper for generic invitation preview
+function renderGenericInvitation(req, res, forcedTheme, forcedStory) {
   const lang = getLang(req);
-  const theme = req.query.theme === 'reception' ? 'reception' : 'akad';
+  const theme = forcedTheme || (req.query.theme === 'reception' ? 'reception' : 'akad');
   const cdTarget = theme === 'reception' ? content.receptionCountdownTarget : content.countdownTarget;
+  const showStory = forcedStory !== undefined ? forcedStory : getShowStory(req);
 
   res.render('invitation', {
     lang,
@@ -329,37 +339,53 @@ router.get('/', (req, res) => {
     countdownTarget: cdTarget,
     guest: null,
     existingRsvp: null,
-    showStory: getShowStory(req)
+    showStory
   });
+}
+
+// Explicit path routes for Kisah Kami toggle:
+// 1. Generic Akad: /0 (no story) and /1 (with story)
+router.get('/0', (req, res) => renderGenericInvitation(req, res, null, false));
+router.get('/1', (req, res) => renderGenericInvitation(req, res, null, true));
+
+// 2. Guest Akad: /0/:slug (no story) and /1/:slug (with story)
+router.get('/0/:slug', (req, res) => renderGuestInvitation(req, res, null, false));
+router.get('/1/:slug', (req, res) => renderGuestInvitation(req, res, null, true));
+
+// 3. Syukuran Generic: /syukuran/0 (no story) and /syukuran/1 (with story)
+router.get('/syukuran/0', (req, res) => renderGenericInvitation(req, res, 'reception', false));
+router.get('/syukuran/1', (req, res) => renderGenericInvitation(req, res, 'reception', true));
+
+// 4. Syukuran Guest: /syukuran/0/:slug (no story) and /syukuran/1/:slug (with story)
+router.get('/syukuran/0/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', false));
+router.get('/syukuran/1/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', true));
+
+// 5. Root: Standard generic preview or query-based guest link
+router.get('/', (req, res) => {
+  const querySlug = req.query.to || req.query.guest || req.query.slug;
+  if (querySlug) {
+    req.params.slug = querySlug;
+    return renderGuestInvitation(req, res, null);
+  }
+  return renderGenericInvitation(req, res, null);
 });
 
-// Dedicated Syukuran Generic Preview or query-based guest link: /syukuran
+// 6. Dedicated Syukuran Generic Preview: /syukuran
 router.get('/syukuran', (req, res) => {
   const querySlug = req.query.to || req.query.guest || req.query.slug;
   if (querySlug) {
     req.params.slug = querySlug;
     return renderGuestInvitation(req, res, 'reception');
   }
-  const lang = getLang(req);
-  res.render('invitation', {
-    lang,
-    theme: 'reception',
-    t: translator(lang),
-    content,
-    dict: content.dict,
-    countdownTarget: content.receptionCountdownTarget,
-    guest: null,
-    existingRsvp: null,
-    showStory: getShowStory(req)
-  });
+  return renderGenericInvitation(req, res, 'reception');
 });
 
-// Dedicated Syukuran Guest URL: /syukuran/:slug
+// 7. Dedicated Syukuran Guest URL: /syukuran/:slug
 router.get('/syukuran/:slug', (req, res) => {
   renderGuestInvitation(req, res, 'reception');
 });
 
-// Legacy /resepsi backwards compatibility redirects: /resepsi -> /syukuran
+// 8. Legacy /resepsi backwards compatibility redirects: /resepsi -> /syukuran
 router.get('/resepsi', (req, res) => {
   const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
   res.redirect(301, '/syukuran' + query);
@@ -370,12 +396,12 @@ router.get('/resepsi/:slug', (req, res) => {
   res.redirect(301, '/syukuran/' + encodeURIComponent(req.params.slug) + query);
 });
 
-// Guest specific link: /:slug
+// 9. Standard Guest specific link: /:slug
 router.get('/:slug', (req, res) => {
   renderGuestInvitation(req, res, null);
 });
 
-function renderGuestInvitation(req, res, forcedTheme) {
+function renderGuestInvitation(req, res, forcedTheme, forcedStory) {
   const slug = String(req.params.slug || '').trim().toLowerCase();
   const lang = getLang(req);
   const t = translator(lang);
@@ -416,9 +442,8 @@ function renderGuestInvitation(req, res, forcedTheme) {
   }
 
   const cdTarget = theme === 'reception' ? content.receptionCountdownTarget : content.countdownTarget;
-
-  // Fetch existing RSVP if any
   const existingRsvp = db.prepare('SELECT * FROM rsvps WHERE guest_id = ?').get(guest.id);
+  const showStory = forcedStory !== undefined ? forcedStory : getShowStory(req);
 
   res.render('invitation', {
     lang,
@@ -429,7 +454,7 @@ function renderGuestInvitation(req, res, forcedTheme) {
     countdownTarget: cdTarget,
     guest,
     existingRsvp,
-    showStory: getShowStory(req)
+    showStory
   });
 }
 

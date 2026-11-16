@@ -55,6 +55,27 @@
       </div>
     <% } %>
 
+    <!-- Quick Feature Control: Kisah Kami (Kode 0 / 1) -->
+    <div class="admin-feature-card">
+      <div class="admin-feature-info">
+        <div class="admin-feature-badge-row">
+          <span style="font-size: 1.25rem;">📖</span>
+          <h3 class="admin-feature-title">Bagian "Kisah Kami" (Love Story Timeline)</h3>
+          <span id="storyStatusBadge" class="badge-code <%= showStory ? 'badge-code-active' : 'badge-code-inactive' %>">
+            Kode: <%= showStory ? '1 (Aktif di Web)' : '0 (Nonaktif di Web)' %>
+          </span>
+        </div>
+        <p class="admin-feature-desc">
+          Atur status default bagian <em>"Kisah Kami"</em> untuk seluruh website undangan (Akad &amp; Syukuran). Anda juga bisa memaksa tampilan per-tamu melalui parameter URL: <code>?story=1</code> (muncul) atau <code>?story=0</code> (sembunyi).
+        </p>
+      </div>
+      <div class="admin-feature-action">
+        <button type="button" id="btnToggleStory" class="btn-adm <%= showStory ? 'btn-adm-outline-danger' : 'btn-adm-primary' %>" onclick="toggleGlobalStory()">
+          <%= showStory ? '⏸️ Matikan Kisah Kami (Set ke 0)' : '▶️ Aktifkan Kisah Kami (Set ke 1)' %>
+        </button>
+      </div>
+    </div>
+
     <!-- Interactive Metrics & Quick Filters -->
     <div class="admin-stats-grid">
       <a href="/admin/guests" class="admin-stat-card <%= !status ? 'stat-active' : '' %>" title="Tampilkan semua tamu">
@@ -230,7 +251,11 @@
             <% guests.forEach(function(g) { 
                const isReception = g.event_type === 'reception';
                const path = isReception ? 'syukuran/' + g.slug : g.slug;
+               const path0 = isReception ? 'syukuran/0/' + g.slug : '0/' + g.slug;
+               const path1 = isReception ? 'syukuran/1/' + g.slug : '1/' + g.slug;
                const fullUrl = protocol + '://' + host + '/' + path;
+               const fullUrl0 = protocol + '://' + host + '/' + path0;
+               const fullUrl1 = protocol + '://' + host + '/' + path1;
                const guestJson = JSON.stringify({
                  id: g.id,
                  slug: g.slug,
@@ -245,7 +270,9 @@
                  attending: g.attending,
                  pax: g.pax,
                  wish: g.wish || '',
-                 fullUrl: fullUrl
+                 fullUrl: fullUrl,
+                 fullUrl0: fullUrl0,
+                 fullUrl1: fullUrl1
                });
             %>
               <tr id="row-<%= g.id %>">
@@ -297,9 +324,13 @@
                   <% } %>
                 </td>
                 <td>
-                  <a href="/<%= path %>" target="_blank" style="text-decoration: none;">
+                  <a href="/<%= path %>" target="_blank" style="text-decoration: none;" title="Buka tautan standar (default)">
                     <code style="font-size: 0.78rem; background: #eee; padding: 2px 6px; border-radius: 4px; color: #333;">/<%= path %></code>
                   </a>
+                  <div style="margin-top: 4px; font-size: 0.72rem; display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                    <a href="/<%= path0 %>" target="_blank" style="color: #C62828; text-decoration: none;" title="Buka tanpa Kisah Kami (/0/)"><code style="font-size:0.7rem; padding: 1px 5px; background:#FFEBEE; border:1px solid #FFCDD2; border-radius:3px;">/0/ (Tanpa Kisah)</code></a>
+                    <a href="/<%= path1 %>" target="_blank" style="color: #2E7D32; text-decoration: none;" title="Buka dengan Kisah Kami (/1/)"><code style="font-size:0.7rem; padding: 1px 5px; background:#E8F5E9; border:1px solid #C8E6C9; border-radius:3px;">/1/ (Ada Kisah)</code></a>
+                  </div>
                 </td>
                 <td style="text-align: right; white-space: nowrap;">
                   <!-- WhatsApp Modal Trigger -->
@@ -440,14 +471,24 @@
           <button type="button" class="tab-btn" onclick="switchWaTemplate('english', this)">🌐 English</button>
         </div>
 
-        <div style="margin-top: 0.85rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
-            <label class="form-micro-label" style="margin: 0;">Pratinjau &amp; Kustomisasi Pesan:</label>
-            <label style="font-size: 0.78rem; color: var(--admin-text-sub); display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
-              <input type="checkbox" id="waIncludeStoryCheckbox" onchange="toggleWaStory(this.checked)">
-              Sertakan Bagian Kisah Kami (<code>?story=1</code>)
-            </label>
+        <!-- Mode Tautan Kisah Kami: Jalur /0/ atau /1/ atau Standar -->
+        <div style="margin-top: 0.85rem; background: #F8FAF9; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid #E1E8E5;">
+          <label class="form-micro-label" style="margin-bottom: 0.4rem; display: block;">Format Tautan Bagian "Kisah Kami":</label>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="tab-btn active" id="btnStoryModeDefault" onclick="setWaStoryMode('default', this)" title="Mengikuti pengaturan default admin">
+              ⚙️ Default Admin
+            </button>
+            <button type="button" class="tab-btn" id="btnStoryMode0" onclick="setWaStoryMode('0', this)" title="Gunakan URL jalur /0/:slug (Tanpa Kisah Kami)">
+              🚫 Tanpa Kisah Kami (/0/)
+            </button>
+            <button type="button" class="tab-btn" id="btnStoryMode1" onclick="setWaStoryMode('1', this)" title="Gunakan URL jalur /1/:slug (Dengan Kisah Kami)">
+              📖 Dengan Kisah Kami (/1/)
+            </button>
           </div>
+        </div>
+
+        <div style="margin-top: 0.85rem;">
+          <label class="form-micro-label" style="display: block; margin-bottom: 0.35rem;">Pratinjau &amp; Kustomisasi Pesan WhatsApp:</label>
           <textarea id="waMessageText" class="input-adm" rows="10" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; line-height: 1.5;"></textarea>
         </div>
       </div>
@@ -674,12 +715,53 @@
       document.getElementById('rsvpModal').style.display = 'none';
     }
 
+    // Quick Feature Control: Toggle Global Kisah Kami (Code 0 or 1)
+    function toggleGlobalStory() {
+      var btn = document.getElementById('btnToggleStory');
+      if (!btn) return;
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan...';
+
+      fetch('/admin/settings/story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        btn.disabled = false;
+        if (data.ok) {
+          var isShown = data.showStory;
+          var badge = document.getElementById('storyStatusBadge');
+          if (badge) {
+            badge.className = 'badge-code ' + (isShown ? 'badge-code-active' : 'badge-code-inactive');
+            badge.innerHTML = 'Kode: ' + (isShown ? '1 (Aktif di Web)' : '0 (Nonaktif di Web)');
+          }
+          btn.className = 'btn-adm ' + (isShown ? 'btn-adm-outline-danger' : 'btn-adm-primary');
+          btn.innerHTML = isShown ? '⏸️ Matikan Kisah Kami (Set ke 0)' : '▶️ Aktifkan Kisah Kami (Set ke 1)';
+          showToast('✓ Pengaturan disimpan! Bagian Kisah Kami sekarang: ' + (isShown ? 'Aktif (Kode 1)' : 'Nonaktif (Kode 0)'));
+        } else {
+          showToast('⚠️ Gagal menyimpan pengaturan.');
+        }
+      })
+      .catch(function(err) {
+        btn.disabled = false;
+        showToast('⚠️ Error: ' + err.message);
+      });
+    }
+
     // WhatsApp Modal Logic
     var currentWaType = 'formal';
-    var waIncludeStory = false;
+    var waStoryMode = 'default'; // 'default', '0', '1'
 
-    function toggleWaStory(checked) {
-      waIncludeStory = checked;
+    function setWaStoryMode(mode, btn) {
+      waStoryMode = mode;
+      var buttons = ['btnStoryModeDefault', 'btnStoryMode0', 'btnStoryMode1'];
+      buttons.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      if (btn) btn.classList.add('active');
       generateWaText(currentWaType);
     }
 
@@ -689,10 +771,15 @@
       document.getElementById('waModalPhone').textContent = g.phone || 'Belum diisi';
       document.getElementById('waModalUrl').textContent = g.fullUrl;
 
-      // Reset story toggle checkbox to unchecked by default
-      waIncludeStory = false;
-      var cb = document.getElementById('waIncludeStoryCheckbox');
-      if (cb) cb.checked = false;
+      // Reset story mode to default
+      waStoryMode = 'default';
+      var buttons = ['btnStoryModeDefault', 'btnStoryMode0', 'btnStoryMode1'];
+      buttons.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      var defBtn = document.getElementById('btnStoryModeDefault');
+      if (defBtn) defBtn.classList.add('active');
 
       // Set default template (formal)
       var tabs = document.querySelectorAll('.wa-template-tabs .tab-btn');
@@ -722,9 +809,14 @@
       var isAkad = g.event_type === 'akad';
 
       var finalUrl = g.fullUrl;
-      if (waIncludeStory) {
-        finalUrl += (finalUrl.indexOf('?') === -1 ? '?story=1' : '&story=1');
+      if (waStoryMode === '1') {
+        finalUrl = g.fullUrl1 || (window.location.origin + (isRec ? '/syukuran/1/' : '/1/') + g.slug);
+      } else if (waStoryMode === '0') {
+        finalUrl = g.fullUrl0 || (window.location.origin + (isRec ? '/syukuran/0/' : '/0/') + g.slug);
       }
+
+      var urlEl = document.getElementById('waModalUrl');
+      if (urlEl) urlEl.textContent = finalUrl;
 
       var text = '';
 
@@ -788,7 +880,7 @@
           ? "Saturday, December 26, 2026 at Smamda Tower Surabaya" 
           : isAkad 
           ? "Saturday, December 5, 2026 at At-Tin Grand Mosque, Jakarta" 
-          : "Wedding Ceremony (Dec 5, Jakarta) & Reception (Dec 26, Surabaya)";
+          : "Aqd an-Nikāḥ (Dec 5, Jakarta) & Reception (Dec 26, Surabaya)";
 
         text = "Dear *" + recipientName + "*,\n\n" +
           "Together with our families, with joyful hearts we invite you to celebrate our wedding:\n\n" +
