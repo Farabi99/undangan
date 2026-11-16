@@ -567,7 +567,16 @@ button {
 /* Base Akad Theme Flowy Dividers (Sage, Cream & Soft Petal Rose) */
 /* 1. Welcome (#7E836C) -> Couple (#F4F0E4) */
 .divider-welcome-to-couple {
-  background-color: var(--color-sage);
+  background-color: transparent !important;
+  margin-top: -36px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .divider-welcome-to-couple {
+    margin-top: -46px;
+  }
 }
 
 .divider-welcome-to-couple .wave-ambient {
@@ -588,57 +597,103 @@ button {
   stroke: rgba(212, 163, 150, 0.7);
 }
 
-/* 2. Couple (#F4F0E4) -> Wedding Day (Deep Sage #525A45) */
-.divider-couple-to-event {
-  background-color: var(--color-cream);
+/* 2. Couple (#F4F0E4) -> Wedding Day (Deep Sage #525A45) - AKAD ONLY */
+body:not(.theme-reception) .divider-couple-to-event {
+  height: 84px;
+  background: linear-gradient(to bottom, var(--color-cream) 0%, #EDE7D8 55%, #E5DEC9 100%);
 }
 
-.divider-couple-to-event .wave-ambient,
-.divider-couple-to-event .wave-back,
-.divider-couple-to-event .wave-front {
+@media (min-width: 768px) {
+  body:not(.theme-reception) .divider-couple-to-event {
+    height: 98px;
+  }
+}
+
+body:not(.theme-reception) .divider-couple-to-event .wave-ambient {
+  fill: #A4AF97;
+  opacity: 0.38;
+}
+
+body:not(.theme-reception) .divider-couple-to-event .wave-back {
+  fill: #737E67;
+  opacity: 0.72;
+}
+
+body:not(.theme-reception) .divider-couple-to-event .wave-front {
   fill: #525A45;
+  opacity: 1;
 }
 
-.divider-couple-to-event .wave-crest {
-  stroke: rgba(196, 169, 78, 0.45);
-  filter: drop-shadow(0 0 3px rgba(196, 169, 78, 0.35));
+body:not(.theme-reception) .divider-couple-to-event .wave-crest {
+  stroke: rgba(196, 169, 78, 0.65);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 1px 4px rgba(196, 169, 78, 0.38));
 }
 
-/* 3. Wedding Day (Deep Sage #525A45) -> Story (Warm Linen #F5F0E8) */
-.divider-event-to-story {
-  background-color: #525A45;
+/* 3. Wedding Day (Deep Sage #525A45) -> Story (Warm Linen #F5F0E8) - AKAD ONLY */
+body:not(.theme-reception) .divider-event-to-story {
+  height: 84px;
+  background: linear-gradient(to bottom, #525A45 0%, #58624B 100%);
 }
 
-.divider-event-to-story .wave-ambient,
-.divider-event-to-story .wave-back,
-.divider-event-to-story .wave-front {
+@media (min-width: 768px) {
+  body:not(.theme-reception) .divider-event-to-story {
+    height: 98px;
+  }
+}
+
+body:not(.theme-reception) .divider-event-to-story .wave-ambient {
+  fill: #768169;
+  opacity: 0.65;
+}
+
+body:not(.theme-reception) .divider-event-to-story .wave-back {
+  fill: #D8D4C8;
+  opacity: 0.75;
+}
+
+body:not(.theme-reception) .divider-event-to-story .wave-front {
   fill: var(--color-linen);
+  opacity: 1;
 }
 
-.divider-event-to-story .wave-crest {
-  stroke: rgba(255, 255, 255, 0.55);
+body:not(.theme-reception) .divider-event-to-story .wave-crest {
+  stroke: rgba(196, 169, 78, 0.60);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 1px 4px rgba(196, 169, 78, 0.35));
 }
 
-/* 3B. Direct Transition: Wedding Day (Deep Sage #525A45) -> RSVP (Cream #F4F0E4) */
-.divider-event-to-rsvp {
-  background-color: #525A45;
+/* 3B. Direct Transition: Wedding Day (Deep Sage #525A45) -> RSVP (Cream #F4F0E4) - AKAD ONLY */
+body:not(.theme-reception) .divider-event-to-rsvp {
+  height: 84px;
+  background: linear-gradient(to bottom, #525A45 0%, #58624B 100%);
 }
 
-.divider-event-to-rsvp .wave-ambient {
-  fill: #F2E3E0;
+@media (min-width: 768px) {
+  body:not(.theme-reception) .divider-event-to-rsvp {
+    height: 98px;
+  }
 }
 
-.divider-event-to-rsvp .wave-back {
-  fill: #ECE2DA;
+body:not(.theme-reception) .divider-event-to-rsvp .wave-ambient {
+  fill: #768169;
+  opacity: 0.65;
 }
 
-.divider-event-to-rsvp .wave-front {
+body:not(.theme-reception) .divider-event-to-rsvp .wave-back {
+  fill: #DDD7CB;
+  opacity: 0.75;
+}
+
+body:not(.theme-reception) .divider-event-to-rsvp .wave-front {
   fill: var(--color-cream);
+  opacity: 1;
 }
 
-.divider-event-to-rsvp .wave-crest {
-  stroke: rgba(201, 138, 134, 0.55);
-  filter: drop-shadow(0 0 3px rgba(201, 138, 134, 0.25));
+body:not(.theme-reception) .divider-event-to-rsvp .wave-crest {
+  stroke: rgba(196, 169, 78, 0.60);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 1px 4px rgba(196, 169, 78, 0.35));
 }
 
 /* 4. Story (Warm Linen #F5F0E8) -> RSVP (Cream #F4F0E4) */
@@ -776,9 +831,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.25rem 3rem;
+  padding: 4rem 1.25rem 3.5rem;
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .welcome-cottage {
@@ -813,10 +869,23 @@ body.stage-unlocked .welcome-cottage.welcome-house-bottom {
 /* Waving Botanical Layers */
 .waving-botanical-layer {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -46px;
   pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
+  z-index: 12;
+  overflow: visible;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 50px), rgba(0, 0, 0, 0.75) calc(100% - 25px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 50px), rgba(0, 0, 0, 0.75) calc(100% - 25px), transparent 100%);
+}
+
+@media (min-width: 768px) {
+  .waving-botanical-layer {
+    bottom: -56px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 60px), rgba(0, 0, 0, 0.75) calc(100% - 30px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 60px), rgba(0, 0, 0, 0.75) calc(100% - 30px), transparent 100%);
+  }
 }
 
 .waving-item {
@@ -915,7 +984,7 @@ body.stage-unlocked .waving-item {
 /* Welcome Parchment Card */
 .welcome-parchment-card {
   position: relative;
-  z-index: 3;
+  z-index: 15;
   width: 100%;
   max-width: 440px;
   background: linear-gradient(175deg, #FFFDFB 0%, #FAF0EE 48%, #F7E8E4 100%);
@@ -1314,7 +1383,7 @@ body.stage-unlocked .welcome-parchment-card {
    ========================================================================== */
 .section-wedding-day {
   background-color: #525A45;
-  background-image: radial-gradient(ellipse at 50% 15%, #636C56 0%, #525A45 55%, #434B37 100%);
+  background-image: radial-gradient(ellipse 90% 70% at 50% 30%, #636C56 0%, #525A45 65%, #525A45 100%);
   background-size: cover;
   background-position: center;
   color: var(--color-white);
@@ -2963,6 +3032,13 @@ body.theme-reception .section-couple {
   background-color: #080E1C !important;
   background-image: radial-gradient(ellipse 75% 42% at 50% 50%, rgba(22, 42, 80, 0.35) 0%, transparent 85%) !important;
   color: #FFFFFF !important;
+  padding-top: calc(3.5rem + 56px) !important;
+}
+
+@media (min-width: 768px) {
+  body.theme-reception .section-couple {
+    padding-top: calc(3.5rem + 68px) !important;
+  }
 }
 
 body.theme-reception .section-couple .section-eyebrow {
@@ -3250,13 +3326,28 @@ body.theme-reception .flowy-divider .wave-crest {
   filter: drop-shadow(0 0 5px rgba(226, 232, 240, 0.4)) !important;
 }
 
-body.theme-reception .divider-welcome-to-couple,
+body.theme-reception .divider-welcome-to-couple {
+  display: none !important;
+}
+
 body.theme-reception .divider-couple-to-event,
 body.theme-reception .divider-event-to-story,
 body.theme-reception .divider-event-to-rsvp,
 body.theme-reception .divider-story-to-rsvp,
 body.theme-reception .divider-rsvp-to-closing {
-  background-color: #080E1C !important;
+  height: 58px !important;
+  background: #080E1C !important;
+  background-image: none !important;
+}
+
+@media (min-width: 768px) {
+  body.theme-reception .divider-couple-to-event,
+  body.theme-reception .divider-event-to-story,
+  body.theme-reception .divider-event-to-rsvp,
+  body.theme-reception .divider-story-to-rsvp,
+  body.theme-reception .divider-rsvp-to-closing {
+    height: 70px !important;
+  }
 }
 
 /* 7. Slide 6: RSVP in Deep Navy Starry Night & Silver */

@@ -238,6 +238,12 @@
         }
       }
     });
+
+    // Auto-open if query param ?open=1 is present (for instant review & test)
+    if (window.location.search.includes('open=1')) {
+      coverScreen.classList.add('opened');
+      document.body.classList.add('stage-unlocked');
+    }
   }
 
   // Language Switcher - restarts naturally from the cover screen in the selected language
