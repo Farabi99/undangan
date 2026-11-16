@@ -1,17 +1,22 @@
 {
-  "name": "undangan",
+  "name": "undangan-farabi-syifa",
   "version": "1.0.0",
-  "description": "",
+  "description": "Digital Wedding & Syukuran Invitation for Farabi & Syifa",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "images": "node scripts/build-images.js",
-    "logos": "node scripts/generate-final-logos.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "images": "node scripts/build-images.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "wedding",
+    "invitation",
+    "undangan-digital",
+    "express",
+    "nodejs"
+  ],
+  "author": "Daeng Muhammad Yusuf Aqsha Alfarabi",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

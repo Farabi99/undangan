@@ -410,7 +410,7 @@ router.get('/export', (req, res) => {
   const header = ['ID', 'Gelar', 'Nama Tamu', 'Acara', 'Pasangan?', 'Nama Pasangan', 'Maks Pax', 'No. HP', 'Kategori', 'Tautan Undangan', 'Status RSVP', 'Jumlah Hadir', 'Doa/Ucapan', 'Pesan WhatsApp'];
   const rows = guests.map((g) => {
     const isReception = g.event_type === 'reception';
-    const url = `${baseUrl}/${isReception ? 'syukuran/' : ''}${g.slug}`;
+    const url = `${baseUrl}/${g.slug}`;
     const rsvpStatus = g.attending === 1 ? 'Hadir' : g.attending === 0 ? 'Tidak Hadir' : 'Belum Konfirmasi';
     const eventLabel = isReception ? 'Syukuran (Navy & Silver)' : g.event_type === 'akad' ? 'Akad (Dusty Rose)' : 'Keduanya';
     const recipientName = `${g.title ? g.title + ' ' : ''}${g.name}${g.with_partner ? ' & Pasangan' : ''}`;

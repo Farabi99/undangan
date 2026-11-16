@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title><%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %></title>
+  <title><%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= theme === 'reception' ? 'Syukuran Pernikahan ' + content.couple.short : content.site.title %></title>
   <meta name="description" content="<%= t('site.description') %>">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="<%= theme === 'reception' ? '#0E1B33' : '#7E836C' %>">
@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=1.1.0">
 
   <!-- Open Graph for WhatsApp & Social preview -->
-  <meta property="og:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %>">
+  <meta property="og:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= theme === 'reception' ? 'Syukuran Pernikahan ' + content.couple.short : content.site.title %>">
   <meta property="og:description" content="<%= t('site.description') %>">
   <meta property="og:image" content="<%= theme === 'reception' ? '/img/og-reception.jpg' : '/img/og.jpg' %>">
   <meta property="og:image:width" content="1200">
@@ -26,7 +26,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= content.site.title %>">
+  <meta name="twitter:title" content="<%= guest ? (guest.title ? guest.title + ' ' : '') + guest.name + ' — ' : '' %><%= theme === 'reception' ? 'Syukuran Pernikahan ' + content.couple.short : content.site.title %>">
   <meta name="twitter:description" content="<%= t('site.description') %>">
   <meta name="twitter:image" content="<%= theme === 'reception' ? '/img/og-reception.jpg' : '/img/og.jpg' %>">
 

@@ -1,10 +1,10 @@
 {
   "_readme": "Edit this file with your real wedding details, then restart the server. Text in {id, en} pairs is shown according to the ID/EN toggle.",
   "site": {
-    "title": "The Wedding of Farabi & Syifa",
+    "title": "The ʿAqd al-Nikāḥ of Farabi & Syifa",
     "description": {
-      "id": "Dengan penuh sukacita, kami mengundang Anda ke pernikahan Farabi & Syifa.",
-      "en": "With great joy, we invite you to the wedding of Farabi & Syifa."
+      "id": "Dengan penuh sukacita, kami mengundang Anda ke akad nikah Farabi & Syifa.",
+      "en": "With great joy, we invite you to the ʿAqd al-Nikāḥ of Farabi & Syifa."
     },
     "ogImage": "/img/logo-fs-badge.png",
     "themeColor": "#7E836C"

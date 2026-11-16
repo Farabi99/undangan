@@ -348,15 +348,18 @@ function renderGenericInvitation(req, res, forcedTheme, forcedStory) {
 router.get('/0', (req, res) => renderGenericInvitation(req, res, null, false));
 router.get('/1', (req, res) => renderGenericInvitation(req, res, null, true));
 
-// 2. Guest Akad: /0/:slug (no story) and /1/:slug (with story)
-router.get('/0/:slug', (req, res) => renderGuestInvitation(req, res, null, false));
-router.get('/1/:slug', (req, res) => renderGuestInvitation(req, res, null, true));
-
-// 3. Syukuran Generic: /syukuran/0 (no story) and /syukuran/1 (with story)
+// 2. Generic Syukuran: /0/syukuran, /1/syukuran, /syukuran/0, /syukuran/1
+router.get('/0/syukuran', (req, res) => renderGenericInvitation(req, res, 'reception', false));
+router.get('/1/syukuran', (req, res) => renderGenericInvitation(req, res, 'reception', true));
 router.get('/syukuran/0', (req, res) => renderGenericInvitation(req, res, 'reception', false));
 router.get('/syukuran/1', (req, res) => renderGenericInvitation(req, res, 'reception', true));
 
-// 4. Syukuran Guest: /syukuran/0/:slug (no story) and /syukuran/1/:slug (with story)
+// 3. Guest routes with Kisah Kami toggle: /0/:slug (no story) and /1/:slug (with story)
+// (Works uniformly for Akad, Syukuran, or both based on guest's event_type)
+router.get('/0/:slug', (req, res) => renderGuestInvitation(req, res, null, false));
+router.get('/1/:slug', (req, res) => renderGuestInvitation(req, res, null, true));
+
+// 4. Backwards compatibility for legacy /syukuran/ paths:
 router.get('/syukuran/0/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', false));
 router.get('/syukuran/1/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', true));
 

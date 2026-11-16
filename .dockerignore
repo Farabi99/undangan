@@ -9,3 +9,4 @@ data/*.db*
 data/voice-notes/*
 scripts/test-*
 *.log
+Screenshot*

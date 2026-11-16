@@ -250,9 +250,9 @@
 
             <% guests.forEach(function(g) { 
                const isReception = g.event_type === 'reception';
-               const path = isReception ? 'syukuran/' + g.slug : g.slug;
-               const path0 = isReception ? 'syukuran/0/' + g.slug : '0/' + g.slug;
-               const path1 = isReception ? 'syukuran/1/' + g.slug : '1/' + g.slug;
+               const path = g.slug;
+               const path0 = '0/' + g.slug;
+               const path1 = '1/' + g.slug;
                const fullUrl = protocol + '://' + host + '/' + path;
                const fullUrl0 = protocol + '://' + host + '/' + path0;
                const fullUrl1 = protocol + '://' + host + '/' + path1;
@@ -656,10 +656,9 @@
     }
 
     function updateEditSlugPrefix() {
-      var et = document.getElementById('editEventType');
       var prefix = document.getElementById('editSlugPrefix');
-      if (prefix && et) {
-        prefix.textContent = et.value === 'reception' ? '/syukuran/' : '/';
+      if (prefix) {
+        prefix.textContent = '/';
       }
     }
 
@@ -810,9 +809,9 @@
 
       var finalUrl = g.fullUrl;
       if (waStoryMode === '1') {
-        finalUrl = g.fullUrl1 || (window.location.origin + (isRec ? '/syukuran/1/' : '/1/') + g.slug);
+        finalUrl = g.fullUrl1 || (window.location.origin + '/1/' + g.slug);
       } else if (waStoryMode === '0') {
-        finalUrl = g.fullUrl0 || (window.location.origin + (isRec ? '/syukuran/0/' : '/0/') + g.slug);
+        finalUrl = g.fullUrl0 || (window.location.origin + '/0/' + g.slug);
       }
 
       var urlEl = document.getElementById('waModalUrl');
@@ -863,8 +862,9 @@
           ? "Sabtu, 5 Desember 2026 di Masjid Agung At-Tin Jakarta" 
           : "Akad (5 Des di Jakarta) & Syukuran (26 Des di Surabaya)";
 
+        var eventDayName = isRec ? "hari syukuran pernikahan kami" : isAkad ? "hari akad nikah kami" : "hari bahagia kami";
         text = "Assalamu’alaikum / Halo *" + g.name + "*! 👋✨\n\n" +
-          "Alhamdulillah, dengan penuh rasa syukur kami ingin berbagi kabar bahagia dan mengundang kamu untuk hadir di hari pernikahan kami:\n\n" +
+          "Alhamdulillah, dengan penuh rasa syukur kami ingin berbagi kabar bahagia dan mengundang kamu untuk hadir di " + eventDayName + ":\n\n" +
           "💍 *<%= couple.short %>*\n" +
           "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
           "🗓️ *Waktu & Lokasi:*\n" +
@@ -880,10 +880,12 @@
           ? "Saturday, December 26, 2026 at Smamda Tower Surabaya" 
           : isAkad 
           ? "Saturday, December 5, 2026 at At-Tin Grand Mosque, Jakarta" 
-          : "Aqd an-Nikāḥ (Dec 5, Jakarta) & Reception (Dec 26, Surabaya)";
+          : "ʿAqd al-Nikāḥ (Dec 5, Jakarta) & Reception (Dec 26, Surabaya)";
+
+        var eventTitleEn = isRec ? "our wedding syukuran" : isAkad ? "the ʿAqd al-Nikāḥ of" : "our wedding";
 
         text = "Dear *" + recipientName + "*,\n\n" +
-          "Together with our families, with joyful hearts we invite you to celebrate our wedding:\n\n" +
+          "Together with our families, with joyful hearts we invite you to celebrate " + eventTitleEn + ":\n\n" +
           "✨ *<%= couple.short %>* ✨\n" +
           "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
           "📅 *Event Details:*\n" +
