@@ -31,7 +31,10 @@
   <meta name="twitter:image" content="<%= theme === 'reception' ? '/img/og-reception.jpg' : '/img/og.jpg' %>">
 
   <!-- Preload Critical Above-The-Fold Assets -->
-  <link rel="preload" as="image" href="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/sage-batik-cloud.webp' %>">
+  <% if (theme !== 'reception') { %>
+    <link rel="preload" as="image" href="/img/motif-border-top.webp">
+    <link rel="preload" as="image" href="/img/motif-border-bottom.webp">
+  <% } %>
   <link rel="preload" as="image" href="<%= theme === 'reception' ? '/img/logo-fs-silver.svg?v=1.1.0' : '/img/logo-fs.svg?v=1.1.0' %>">
 
   <!-- Google Fonts: Preconnect & Optimized Weight Loading -->
@@ -61,7 +64,9 @@
       <div class="cover-pinstripes" aria-hidden="true"></div>
       <%- include('partials/twinkling-stars') %>
     <% } else { %>
-      <div class="cover-pattern" aria-hidden="true"></div>
+      <div class="cover-pattern" aria-hidden="true">
+        <%- include('partials/cover-motifs') %>
+      </div>
     <% } %>
 
     <div class="cover-hero">
@@ -107,7 +112,13 @@
 
     <!-- Desktop Aside (65% width showcase) -->
     <aside class="desktop-aside" aria-hidden="true">
-      <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+      <% if (theme === 'reception') { %>
+        <%- include('partials/twinkling-stars') %>
+      <% } else { %>
+        <div class="desktop-aside-pattern" aria-hidden="true">
+          <%- include('partials/cover-motifs') %>
+        </div>
+      <% } %>
       <div class="desktop-aside-inner">
         <div class="desktop-logo-frame">
           <div class="desktop-logo-halo" aria-hidden="true"></div>

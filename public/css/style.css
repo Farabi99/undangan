@@ -148,10 +148,7 @@ button {
     flex: 1;
     height: 100vh;
     background-color: var(--color-sage);
-    background-image: url('/img/sage-batik-cloud.webp');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    background-image: none;
     color: var(--color-white);
     padding: 2.5rem;
     position: relative;
@@ -168,7 +165,8 @@ button {
   .desktop-aside-inner {
     max-width: 520px;
     width: 100%;
-    z-index: 1;
+    position: relative;
+    z-index: 2;
   }
 
   .desktop-eyebrow {
@@ -309,11 +307,60 @@ button {
   position: absolute;
   inset: 0;
   background-color: var(--color-sage);
-  background-image: url('/img/sage-batik-cloud.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
   pointer-events: none;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   ARCHITECTURAL NUSANTARA MOTIF FRAME (COVER & ASIDE)
+   Top/Bottom Continuous Borders (Image 1) & 4 Vertical Lattice Pillars (Image 2)
+   ========================================================================== */
+.cover-motif-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.desktop-aside-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.motif-border {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: clamp(65px, 9.5vh, 125px);
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.motif-border-top {
+  top: 0;
+  background-image: url('/img/motif-border-top.webp');
+  background-position: top left;
+}
+
+.motif-border-bottom {
+  bottom: 0;
+  background-image: url('/img/motif-border-bottom.webp');
+  background-position: bottom left;
+}
+
+@media (max-width: 480px) {
+  .motif-border {
+    height: clamp(52px, 8vh, 85px);
+  }
 }
 
 .cover-pinstripes {
