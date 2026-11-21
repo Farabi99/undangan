@@ -1,8 +1,11 @@
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const QRCode = require('qrcode');
 const XLSX = require('xlsx');
+const archiver = require('archiver');
 const { db, getSetting, setSetting, tx } = require('../db');
 const content = require('../lib/content');
 const { uniqueSlug, isValidSlug, slugify, RESERVED } = require('../lib/slug');
@@ -16,6 +19,65 @@ const {
   sameOrigin,
   hasAdminPassword
 } = require('../lib/security');
+
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', '..', 'data');
+const VOICE_DIR = path.join(DATA_DIR, 'voice-notes');
+
+function getZipArchive(options) {
+  if (typeof archiver === 'function') return archiver('zip', options);
+  if (archiver && archiver.ZipArchive) return new archiver.ZipArchive(options);
+  if (archiver && archiver.default && typeof archiver.default === 'function') return archiver.default('zip', options);
+  throw new Error('Archiver module format not recognized');
+}
+
+function serveRecordingsZip(res, rows, zipFilename) {
+  const archive = getZipArchive({ zlib: { level: 9 } });
+
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="${zipFilename}"`);
+
+  archive.on('error', (err) => {
+    console.error('[Recordings ZIP] Archive error:', err);
+    if (!res.headersSent) {
+      res.status(500).send('Gagal membuat file ZIP rekaman.');
+    }
+  });
+
+  archive.pipe(res);
+
+  let manifestText = `=======================================================\n` +
+    `DAFTAR REKAMAN PESAN SUARA TAMU — FARABI & SYIFA\n` +
+    `Waktu Ekspor: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB\n` +
+    `Total Rekaman: ${rows.length}\n` +
+    `=======================================================\n\n`;
+
+  let index = 1;
+  for (const r of rows) {
+    const filePath = path.join(VOICE_DIR, r.voice_file);
+    if (fs.existsSync(filePath)) {
+      const ext = (r.voice_mime && r.voice_mime.includes('mp4')) ? 'mp4' : 'webm';
+      const safeName = (r.name || 'tamu').trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
+      const padIdx = String(index).padStart(2, '0');
+      const inZipFilename = `${padIdx}_${safeName}_${r.slug || 'guest'}.${ext}`;
+
+      archive.file(filePath, { name: inZipFilename });
+
+      manifestText += `[${padIdx}] ${r.name}\n` +
+        `  - File: ${inZipFilename}\n` +
+        `  - Kehadiran: ${r.attending === 1 ? 'Hadir' : 'Tidak Hadir'}\n` +
+        `  - Durasi: ${r.voice_duration || 0} detik\n` +
+        `  - Kategori / Grup: ${r.grp || '-'}\n` +
+        `  - Waktu Rekam: ${r.created_at || '-'}\n` +
+        (r.wish ? `  - Pesan Tertulis: "${r.wish}"\n` : '') +
+        `\n`;
+
+      index++;
+    }
+  }
+
+  archive.append(manifestText, { name: 'DAFTAR_REKAMAN.txt' });
+  archive.finalize();
+}
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -527,6 +589,222 @@ router.post('/wishes/:id/toggle', sameOrigin, (req, res) => {
   const id = toInt(req.params.id, 0);
   db.prepare('UPDATE rsvps SET is_hidden = CASE WHEN is_hidden = 1 THEN 0 ELSE 1 END WHERE id = ?').run(id);
   res.redirect('/admin/wishes');
+});
+
+// Guest Voice Notes / Recordings Dashboard
+router.get('/recordings', (req, res) => {
+  const rows = db.prepare(`
+    SELECT 
+      r.id AS rsvp_id,
+      r.guest_id,
+      r.attending,
+      r.pax,
+      r.wish,
+      r.voice_file,
+      r.voice_mime,
+      r.voice_duration,
+      r.created_at AS recorded_at,
+      g.slug,
+      g.title,
+      g.name,
+      g.with_partner,
+      g.partner_name,
+      g.phone,
+      g.grp,
+      g.event_type
+    FROM rsvps r
+    JOIN guests g ON r.guest_id = g.id
+    WHERE r.voice_file IS NOT NULL AND r.voice_file != ''
+    ORDER BY r.created_at DESC
+  `).all();
+
+  let totalDurationSeconds = 0;
+  let totalSizeBytes = 0;
+  let attendingCount = 0;
+  let declinedCount = 0;
+
+  const recordings = rows.map((r) => {
+    const filePath = path.join(VOICE_DIR, r.voice_file);
+    const fileExists = fs.existsSync(filePath);
+    let sizeBytes = 0;
+    if (fileExists) {
+      try {
+        sizeBytes = fs.statSync(filePath).size;
+      } catch (e) {
+        sizeBytes = 0;
+      }
+    }
+
+    const durSec = r.voice_duration || 0;
+    totalDurationSeconds += durSec;
+    totalSizeBytes += sizeBytes;
+    if (r.attending === 1) attendingCount++;
+    else declinedCount++;
+
+    const mins = Math.floor(durSec / 60);
+    const secs = durSec % 60;
+    const durationFormatted = durSec > 0 ? `${mins}:${secs < 10 ? '0' : ''}${secs}` : '0:00';
+
+    let sizeFormatted = '0 KB';
+    if (sizeBytes >= 1024 * 1024) {
+      sizeFormatted = (sizeBytes / (1024 * 1024)).toFixed(1) + ' MB';
+    } else if (sizeBytes > 0) {
+      sizeFormatted = Math.round(sizeBytes / 1024) + ' KB';
+    }
+
+    return {
+      ...r,
+      fileExists,
+      sizeBytes,
+      sizeFormatted,
+      durationFormatted
+    };
+  });
+
+  let totalDurationFormatted = '0 detik';
+  if (totalDurationSeconds >= 60) {
+    const tm = Math.floor(totalDurationSeconds / 60);
+    const ts = totalDurationSeconds % 60;
+    totalDurationFormatted = `${tm}m ${ts}s`;
+  } else if (totalDurationSeconds > 0) {
+    totalDurationFormatted = `${totalDurationSeconds} detik`;
+  }
+
+  let totalSizeFormatted = '0 KB';
+  if (totalSizeBytes >= 1024 * 1024) {
+    totalSizeFormatted = (totalSizeBytes / (1024 * 1024)).toFixed(1) + ' MB';
+  } else if (totalSizeBytes > 0) {
+    totalSizeFormatted = Math.round(totalSizeBytes / 1024) + ' KB';
+  }
+
+  const couple = content.couple;
+
+  res.render('admin/recordings', {
+    recordings,
+    stats: {
+      totalCount: recordings.length,
+      totalDurationFormatted,
+      totalSizeFormatted,
+      attendingCount,
+      declinedCount
+    },
+    couple,
+    error: req.query.error || null
+  });
+});
+
+// Stream audio file with Range support for seeking
+router.get('/recordings/:id/stream', (req, res) => {
+  const rsvpId = toInt(req.params.id, 0);
+  const row = db.prepare(`
+    SELECT r.voice_file, r.voice_mime
+    FROM rsvps r
+    WHERE r.id = ? AND r.voice_file IS NOT NULL AND r.voice_file != ''
+  `).get(rsvpId);
+
+  if (!row || !row.voice_file) {
+    return res.status(404).send('Rekaman suara tidak ditemukan.');
+  }
+
+  const filePath = path.join(VOICE_DIR, row.voice_file);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File audio fisik tidak ditemukan di server.');
+  }
+
+  res.setHeader('Content-Type', row.voice_mime || 'audio/webm');
+  res.sendFile(path.resolve(filePath));
+});
+
+// Single audio file download
+router.get('/recordings/:id/download', (req, res) => {
+  const rsvpId = toInt(req.params.id, 0);
+  const row = db.prepare(`
+    SELECT r.voice_file, r.voice_mime, g.name, g.slug
+    FROM rsvps r
+    JOIN guests g ON r.guest_id = g.id
+    WHERE r.id = ? AND r.voice_file IS NOT NULL AND r.voice_file != ''
+  `).get(rsvpId);
+
+  if (!row || !row.voice_file) {
+    return res.status(404).send('Rekaman suara tidak ditemukan.');
+  }
+
+  const filePath = path.join(VOICE_DIR, row.voice_file);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File audio fisik tidak ditemukan di server.');
+  }
+
+  const ext = (row.voice_mime && row.voice_mime.includes('mp4')) ? 'mp4' : 'webm';
+  const safeName = (row.name || 'tamu').trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
+  const filename = `Rekaman_${safeName}.${ext}`;
+
+  res.download(path.resolve(filePath), filename);
+});
+
+// Download all recordings in a ZIP
+router.get('/recordings/download-all', (req, res) => {
+  const rows = db.prepare(`
+    SELECT 
+      r.id AS rsvp_id,
+      r.voice_file,
+      r.voice_mime,
+      r.voice_duration,
+      r.attending,
+      r.wish,
+      r.created_at,
+      g.name,
+      g.grp,
+      g.slug
+    FROM rsvps r
+    JOIN guests g ON r.guest_id = g.id
+    WHERE r.voice_file IS NOT NULL AND r.voice_file != ''
+    ORDER BY r.created_at ASC
+  `).all();
+
+  if (rows.length === 0) {
+    return res.redirect('/admin/recordings?error=no_recordings');
+  }
+
+  serveRecordingsZip(res, rows, 'Semua_Rekaman_Tamu_Farabi_Syifa.zip');
+});
+
+// Bulk download selected recordings in a ZIP
+router.post('/recordings/bulk-download', (req, res) => {
+  let ids = [];
+  if (Array.isArray(req.body.ids)) {
+    ids = req.body.ids.map(id => toInt(id, 0)).filter(id => id > 0);
+  } else if (typeof req.body.ids === 'string') {
+    ids = req.body.ids.split(',').map(id => toInt(id.trim(), 0)).filter(id => id > 0);
+  }
+
+  if (ids.length === 0) {
+    return res.redirect('/admin/recordings?error=no_selection');
+  }
+
+  const placeholders = ids.map(() => '?').join(',');
+  const rows = db.prepare(`
+    SELECT 
+      r.id AS rsvp_id,
+      r.voice_file,
+      r.voice_mime,
+      r.voice_duration,
+      r.attending,
+      r.wish,
+      r.created_at,
+      g.name,
+      g.grp,
+      g.slug
+    FROM rsvps r
+    JOIN guests g ON r.guest_id = g.id
+    WHERE r.id IN (${placeholders}) AND r.voice_file IS NOT NULL AND r.voice_file != ''
+    ORDER BY r.created_at ASC
+  `).all(...ids);
+
+  if (rows.length === 0) {
+    return res.redirect('/admin/recordings?error=no_recordings');
+  }
+
+  serveRecordingsZip(res, rows, `Rekaman_Terpilih_${rows.length}_Tamu.zip`);
 });
 
 module.exports = router;

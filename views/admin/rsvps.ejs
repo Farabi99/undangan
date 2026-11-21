@@ -17,6 +17,7 @@
       <a href="/admin/import">Import Spreadsheet</a>
       <a href="/admin/rsvps" class="active">Rekap RSVP</a>
       <a href="/admin/wishes">Moderasi Ucapan</a>
+      <a href="/admin/recordings">🎙️ Rekaman Suara</a>
       <div class="export-dropdown-wrap">
         <button type="button" class="btn-adm btn-adm-outline" onclick="toggleExportMenu(event)">📥 Ekspor Data ▾</button>
         <div id="exportMenu" class="export-menu-dropdown">
@@ -157,7 +158,7 @@
                   <% if (r.phone) { 
                      const waReply = encodeURIComponent('Halo ' + (r.title ? r.title + ' ' : '') + r.name + ', terima kasih banyak atas konfirmasi kehadirannya dan doa restunya untuk pernikahan kami!');
                   %>
-                    <a href="https://wa.me/<%= r.phone.replace(/[^0-9]/g, '') %>?text=<%= waReply %>" target="_blank" class="btn-adm btn-adm-wa" title="Kirim Ucapan Terima Kasih via WhatsApp">
+                    <a href="https://api.whatsapp.com/send?phone=<%= r.phone.replace(/[^0-9]/g, '') %>&text=<%= waReply %>" target="_blank" class="btn-adm btn-adm-wa" title="Kirim Ucapan Terima Kasih via WhatsApp">
                       💬
                     </a>
                   <% } %>

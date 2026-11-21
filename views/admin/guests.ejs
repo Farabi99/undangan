@@ -17,6 +17,7 @@
       <a href="/admin/import">Import Spreadsheet</a>
       <a href="/admin/rsvps">Rekap RSVP</a>
       <a href="/admin/wishes">Moderasi Ucapan</a>
+      <a href="/admin/recordings">🎙️ Rekaman Suara</a>
       <div class="export-dropdown-wrap">
         <button type="button" class="btn-adm btn-adm-outline" onclick="toggleExportMenu(event)">📥 Ekspor Data ▾</button>
         <div id="exportMenu" class="export-menu-dropdown">
@@ -136,7 +137,7 @@
         </div>
         <div>
           <label class="form-micro-label">No. WhatsApp</label>
-          <input type="text" name="phone" placeholder="081234567890" class="input-adm">
+          <input type="text" name="phone" placeholder="+62812... / +48... / +1..." class="input-adm">
         </div>
         <div>
           <label class="form-micro-label">Kategori / Grup</label>
@@ -426,7 +427,7 @@
             </div>
             <div>
               <label class="form-micro-label">No. WhatsApp</label>
-              <input type="text" id="editPhone" name="phone" class="input-adm" placeholder="081234567890" style="width: 100%;">
+              <input type="text" id="editPhone" name="phone" class="input-adm" placeholder="+62812... / +48... / +1..." style="width: 100%;">
             </div>
           </div>
 
@@ -595,6 +596,11 @@
   <div id="adminToast" class="admin-toast"></div>
 
   <script>
+    // Couple details for message templates (unescaped literal strings to avoid &amp; artifacts)
+    var COUPLE_SHORT = <%- JSON.stringify(couple.short) %>;
+    var GROOM_NAME = <%- JSON.stringify(couple.groom.name) %>;
+    var BRIDE_NAME = <%- JSON.stringify(couple.bride.name) %>;
+
     // State variables
     var currentGuestForWa = null;
 
@@ -885,8 +891,8 @@
           "Kepada Yth.\n" +
           "*" + recipientName + "*\n\n" +
           "Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara " + eventName + " kami:\n\n" +
-          "💍 *<%= couple.short %>*\n" +
-          "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
+          "💍 *" + COUPLE_SHORT + "*\n" +
+          "(" + GROOM_NAME + " & " + BRIDE_NAME + ")\n\n" +
           eventDetails + "\n\n" +
           "💌 *Tautan Undangan Digital:*\n" +
           finalUrl + "\n\n" +
@@ -895,7 +901,7 @@
           "Atas perhatian dan doa restunya, kami ucapkan terima kasih yang sebesar-besarnya.\n\n" +
           "Wassalamu’alaikum Warahmatullahi Wabarakatuh\n\n" +
           "Hormat kami yang berbahagia,\n" +
-          "*<%= couple.short %>*\n" +
+          "*" + COUPLE_SHORT + "*\n" +
           "Beserta segenap keluarga besar";
 
       } else if (type === 'casual') {
@@ -908,15 +914,15 @@
         var eventDayName = isRec ? "hari syukuran pernikahan kami" : isAkad ? "hari akad nikah kami" : "hari bahagia kami";
         text = "Assalamu’alaikum / Halo *" + g.name + "*! 👋✨\n\n" +
           "Alhamdulillah, dengan penuh rasa syukur kami ingin berbagi kabar bahagia dan mengundang kamu untuk hadir di " + eventDayName + ":\n\n" +
-          "💍 *<%= couple.short %>*\n" +
-          "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
+          "💍 *" + COUPLE_SHORT + "*\n" +
+          "(" + GROOM_NAME + " & " + BRIDE_NAME + ")\n\n" +
           "🗓️ *Waktu & Lokasi:*\n" +
           eventSchedule + "\n\n" +
           "Untuk detail lengkap susunan acara, peta lokasi, dan konfirmasi kehadiran (RSVP), silakan buka tautan undangan berikut ya:\n" +
           "🔗 " + finalUrl + "\n\n" +
           "Kehadiran dan doa restu darimu akan sangat melengkapi kebahagiaan kami. Sampai jumpa di hari bahagia kami! 🤍\n\n" +
           "Salam hangat,\n" +
-          "*<%= couple.short %>*";
+          "*" + COUPLE_SHORT + "*";
 
       } else if (type === 'english') {
         var recipientNameEn = salutation + g.name + (g.with_partner ? ' & Partner' : '');
@@ -931,27 +937,32 @@
                             "⏰ 12.30 – 15.00 WIB (GMT+7)\n" +
                             "📍 Masjid Agung At-Tin, East Jakarta";
         } else {
-          eventScheduleEn = "💍 *ʿAqd al-Nikāḥ:* Saturday, 5 Dec 2026 | 12.30 – 15.00 WIB (Masjid Agung At-Tin, East Jakarta)\n" +
-                            "🥂 *Syukuran:* Saturday, 26 Dec 2026 | 10.00 – 13.00 WIB (Smamda Tower, Surabaya)";
+          eventScheduleEn = "📅 Saturday, 5 December 2026\n" +
+                            "⏰ 12.30 – 15.00 WIB (GMT+7)\n" +
+                            "📍 Masjid Agung At-Tin, East Jakarta\n\n" +
+                            "🥂 *Wedding Syukuran:*\n" +
+                            "📅 Saturday, 26 December 2026\n" +
+                            "⏰ 10.00 – 13.00 WIB (GMT+7)\n" +
+                            "📍 Smamda Tower, Surabaya";
         }
 
         text = "Bismillahirrahmaanirrahiim\n\n" +
           "✨ *We're getting married!*✨\n\n" +
           "Dear *" + recipientNameEn + "*,\n\n" +
           "We would be so happy to have you join us in celebrating our " + eventDayEn + " day!\n\n" +
-          "💍 *<%= couple.short.toUpperCase() %>*\n" +
-          "<%= couple.groom.name %> & <%= couple.bride.name %>\n\n" +
+          "💍 *" + COUPLE_SHORT.toUpperCase() + "*\n" +
+          GROOM_NAME + " & " + BRIDE_NAME + "\n\n" +
           eventScheduleEn + "\n\n" +
           "💌 *Your presence and prayers mean the world to us.* You're special to us, and we'd love to share this beautiful moment with you!\n\n" +
           "🌷 *A special invitation awaits!*\n" +
           "Please open our digital invitation here:\n" +
           "🔗 " + finalUrl + "\n\n" +
-          "You can leave us a personal message and even a *VOICE NOTE! 🎙️*, even better, combined with your own language, e.g. Polish, Deutsch, Vietnamese, Chinese, Tamil, Sinhala, Italian, Arabic, or others!\n\n" +
+          "You can leave us a personal message and even a *VOICE NOTE! 🎙️*, even better, combined with your own language, e.g. Polish, Deutsch, Vietnamese, Chinese, Tamil, Sinhala, Italian, Arabic, Portuguese, or others!\n\n" +
           "Yes, we'd love to hear your voice! It's a rare little feature, and we'd love to keep your wishes as a special memory❤️\n\n" +
           "If you have any trouble opening the invitation or leaving a message, just let us know!\n\n" +
           "Whether near or far, your prayers are always cherished. We hope to celebrate with you!\n\n" +
           "With love,\n" +
-          "*<%= couple.short %>*";
+          "*" + COUPLE_SHORT + "*";
       }
 
       var textarea = document.getElementById('waMessageText');
@@ -962,14 +973,27 @@
     function updateWaDirectBtn() {
       if (!currentGuestForWa) return;
       var msg = encodeURIComponent(document.getElementById('waMessageText').value);
-      var phone = (currentGuestForWa.phone || '').replace(/[^0-9]/g, '');
-      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+      var rawPhone = String(currentGuestForWa.phone || '').trim();
+      var hasPlus = rawPhone.startsWith('+');
+      var has00 = rawPhone.startsWith('00');
+      var phone = rawPhone.replace(/[^0-9]/g, '');
+      if (has00) {
+        phone = phone.slice(2);
+      } else if (!hasPlus && phone.startsWith('08')) {
+        phone = '62' + phone.slice(1);
+      } else if (!hasPlus && phone.startsWith('0') && phone.length >= 10 && phone.length <= 12) {
+        phone = '62' + phone.slice(1);
+      } else if (!hasPlus && /^8[1-3,5,7-9]\d{7,10}$/.test(phone)) {
+        phone = '62' + phone;
+      }
       
       var waBtn = document.getElementById('waDirectBtn');
+      // Use https://api.whatsapp.com/send directly instead of wa.me
+      // wa.me's 302 redirector is known to corrupt multi-byte UTF-8 emojis into %EF%BF%BD (replacement character)
       if (phone) {
-        waBtn.href = 'https://wa.me/' + phone + '?text=' + msg;
+        waBtn.href = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + msg;
       } else {
-        waBtn.href = 'https://wa.me/?text=' + msg;
+        waBtn.href = 'https://api.whatsapp.com/send?text=' + msg;
       }
     }
 

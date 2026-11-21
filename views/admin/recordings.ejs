@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rekaman Suara Tamu — Admin Undangan</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=<%= Date.now() %>">
+  <link rel="icon" type="image/svg+xml" href="/img/logo-fs-badge.svg?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .audio-player-custom {
+      height: 38px;
+      width: 100%;
+      min-width: 200px;
+      max-width: 270px;
+      border-radius: 20px;
+      outline: none;
+      vertical-align: middle;
+    }
+    .badge-audio {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #F0F5FF;
+      color: #1D39C4;
+      border: 1px solid #ADC6FF;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+    .badge-dur {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: #FFF7E6;
+      color: #D46B08;
+      border: 1px solid #FFD591;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .bulk-bar {
+      background: #2C2621;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-sm);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      animation: fadeIn 0.2s ease-out;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <nav class="admin-nav">
+    <div class="admin-nav-brand">💍 Admin Undangan (<%- couple.short %>)</div>
+    <div class="admin-nav-links">
+      <a href="/admin/guests">Daftar Tamu</a>
+      <a href="/admin/import">Import Spreadsheet</a>
+      <a href="/admin/rsvps">Rekap RSVP</a>
+      <a href="/admin/wishes">Moderasi Ucapan</a>
+      <a href="/admin/recordings" class="active">🎙️ Rekaman Suara</a>
+      <div class="export-dropdown-wrap">
+        <button type="button" class="btn-adm btn-adm-outline" onclick="toggleExportMenu(event)">📥 Ekspor Data ▾</button>
+        <div id="exportMenu" class="export-menu-dropdown">
+          <a href="/admin/export?format=xlsx" class="export-menu-item">📊 Format Excel (.xlsx)</a>
+          <a href="/admin/export?format=csv" class="export-menu-item">📄 Format CSV (.csv)</a>
+        </div>
+      </div>
+      <a href="/" target="_blank">Lihat Web ↗</a>
+      <a href="/admin/logout" style="color: #FFA39E;">Keluar</a>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+
+    <!-- Flash Alerts -->
+    <% if (error) { %>
+      <div class="admin-alert admin-alert-error">
+        <% if (error === 'no_recordings') { %>⚠️ Tidak ada file rekaman suara yang tersedia untuk diunduh.
+        <% } else if (error === 'no_selection') { %>⚠️ Pilih minimal satu rekaman untuk diunduh.
+        <% } else { %>⚠️ Terjadi kesalahan saat memproses unduhan rekaman.
+        <% } %>
+      </div>
+    <% } %>
+
+    <!-- KPI Summary Grid -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total Rekaman Suara</div>
+        <div class="admin-stat-val" style="color: var(--admin-primary);"><%= stats.totalCount %></div>
+        <div class="admin-stat-sub">Pesan suara dari tamu</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total Durasi</div>
+        <div class="admin-stat-val" style="color: #D46B08;"><%= stats.totalDurationFormatted %></div>
+        <div class="admin-stat-sub">Akumulasi suara tamu</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total Ukuran File</div>
+        <div class="admin-stat-val" style="color: #1D39C4;"><%= stats.totalSizeFormatted %></div>
+        <div class="admin-stat-sub">Format WebM / MP4 Audio</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Pengirim Rekaman</div>
+        <div class="admin-stat-val" style="color: var(--admin-success);"><%= stats.attendingCount %> <span style="font-size: 0.95rem; font-weight: normal; color: var(--admin-text-sub);">Hadir</span></div>
+        <div class="admin-stat-sub"><%= stats.declinedCount %> berhalangan hadir</div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="admin-card">
+      <div class="admin-header-row" style="flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.2rem; margin: 0 0 0.25rem 0;">
+            🎙️ Rekaman Pesan Suara Tamu (<%= recordings.length %>)
+          </h2>
+          <p style="font-size: 0.85rem; color: var(--admin-text-sub); margin: 0;">
+            Dengarkan ucapan langsung dari para tamu dan unduh file audio secara perorangan maupun massal (.ZIP).
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <% if (recordings.length > 0) { %>
+            <a href="/admin/recordings/download-all" class="btn-adm btn-adm-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none;">
+              📦 Unduh Semua Rekaman (.ZIP)
+            </a>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Bulk Actions Floating Bar -->
+      <form id="bulkDownloadForm" action="/admin/recordings/bulk-download" method="POST">
+        <input type="hidden" name="ids" id="bulkRecIds" value="">
+        <div id="bulkRecToolbar" class="bulk-bar">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span>Terpilih: <strong id="bulkSelectedCount" style="color: #95DE64;">0</strong> rekaman suara</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <button type="button" class="btn-adm btn-adm-outline" style="color: #fff; border-color: rgba(255,255,255,0.4);" onclick="clearBulkSelection()">
+              Batal Pilih
+            </button>
+            <button type="submit" class="btn-adm btn-adm-primary" style="background: var(--admin-success); border-color: var(--admin-success);">
+              📥 Unduh Terpilih (.ZIP)
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Filter / Search Row -->
+      <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 220px;">
+          <input type="text" id="searchRecInput" class="input-adm" placeholder="🔍 Cari nama tamu atau kategori grup..." oninput="filterRecordings()" style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div style="min-width: 160px;">
+          <select id="filterAttendance" class="input-adm" onchange="filterRecordings()" style="width: 100%;">
+            <option value="all">Semua Status Kehadiran</option>
+            <option value="1">Hanya Hadir</option>
+            <option value="0">Hanya Tidak Hadir</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table of Recordings -->
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 38px; text-align: center;">
+                <input type="checkbox" id="selectAllRecs" onchange="toggleSelectAll(this)" title="Pilih Semua">
+              </th>
+              <th>Tamu Undangan</th>
+              <th>Kehadiran &amp; Doa Tertulis</th>
+              <th>Info Rekaman</th>
+              <th style="min-width: 220px;">Pemutar Suara</th>
+              <th style="text-align: right; width: 110px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (recordings.length === 0) { %>
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--admin-text-sub); padding: 3.5rem 1rem;">
+                  <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎙️</div>
+                  <strong style="color: var(--admin-text); display: block; margin-bottom: 0.25rem;">Belum ada rekaman suara dari tamu.</strong>
+                  <span style="font-size: 0.85rem;">Tamu dapat mengirimkan voice note melalui formulir RSVP di halaman undangan digital.</span>
+                </td>
+              </tr>
+            <% } %>
+
+            <% recordings.forEach(function(r) { %>
+              <tr class="rec-row" data-name="<%= (r.name || '').toLowerCase() %>" data-grp="<%= (r.grp || '').toLowerCase() %>" data-attending="<%= r.attending %>">
+                <!-- Checkbox -->
+                <td style="text-align: center;">
+                  <input type="checkbox" class="rec-checkbox" value="<%= r.rsvp_id %>" onchange="updateBulkState()">
+                </td>
+
+                <!-- Guest Details -->
+                <td>
+                  <strong><%= r.title ? r.title + ' ' : '' %><%= r.name %></strong>
+                  <% if (r.with_partner && r.partner_name) { %>
+                    <span style="font-size: 0.78rem; color: var(--admin-text-sub); display: block;">&amp; <%= r.partner_name %></span>
+                  <% } else if (r.with_partner) { %>
+                    <span style="font-size: 0.78rem; color: var(--admin-text-sub); display: block;">&amp; Pasangan</span>
+                  <% } %>
+
+                  <div style="margin-top: 0.25rem; display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                    <% if (r.grp) { %>
+                      <span class="badge" style="background: #F4F6F8; color: var(--admin-text-sub);"><%= r.grp %></span>
+                    <% } %>
+                    <a href="/<%= r.slug %>" target="_blank" style="font-size: 0.76rem; color: var(--admin-primary); text-decoration: none;" title="Buka tautan undangan tamu">
+                      🔗 /<%= r.slug %> ↗
+                    </a>
+                  </div>
+                </td>
+
+                <!-- Attendance & Text Wish -->
+                <td>
+                  <div style="margin-bottom: 0.25rem;">
+                    <% if (r.attending === 1) { %>
+                      <span class="badge badge-success">✓ Hadir (<%= r.pax || 1 %> pax)</span>
+                    <% } else { %>
+                      <span class="badge badge-danger">✕ Berhalangan</span>
+                    <% } %>
+                  </div>
+                  <% if (r.wish) { %>
+                    <div style="font-size: 0.83rem; color: var(--admin-text); line-height: 1.4; font-style: italic; max-width: 320px;">
+                      “<%= r.wish %>”
+                    </div>
+                  <% } else { %>
+                    <span style="font-size: 0.78rem; color: var(--admin-text-sub); font-style: italic;">(Tidak ada pesan tertulis)</span>
+                  <% } %>
+                </td>
+
+                <!-- File Info -->
+                <td>
+                  <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
+                    <span class="badge-dur" title="Durasi Rekaman">⏱️ <%= r.durationFormatted %></span>
+                    <span class="badge-audio" title="Ukuran File Audio"><%= r.sizeFormatted %></span>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--admin-text-sub);">
+                    <%= r.recorded_at || '-' %>
+                  </div>
+                </td>
+
+                <!-- Audio Player -->
+                <td>
+                  <% if (r.fileExists) { %>
+                    <audio class="audio-player-custom" controls preload="none">
+                      <source src="/admin/recordings/<%= r.rsvp_id %>/stream" type="<%= r.voice_mime || 'audio/webm' %>">
+                      Browser Anda tidak mendukung pemutar suara.
+                    </audio>
+                  <% } else { %>
+                    <span style="font-size: 0.78rem; color: var(--admin-error); font-weight: 500;">
+                      ⚠️ File audio di server tidak ditemukan
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Action Button -->
+                <td style="text-align: right; white-space: nowrap;">
+                  <% if (r.fileExists) { %>
+                    <a href="/admin/recordings/<%= r.rsvp_id %>/download" class="btn-adm btn-adm-outline" title="Unduh File Rekaman Ini">
+                      ⬇️ Unduh
+                    </a>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+
+            <tr id="emptySearchRow" style="display: none;">
+              <td colspan="6" style="text-align: center; color: var(--admin-text-sub); padding: 2rem;">
+                Tidak ada rekaman yang sesuai dengan pencarian.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script>
+    // Pause other audio players when one starts playing
+    document.addEventListener('play', function(e) {
+      if (e.target.tagName.toLowerCase() === 'audio') {
+        var audios = document.getElementsByTagName('audio');
+        for (var i = 0; i < audios.length; i++) {
+          if (audios[i] !== e.target) {
+            audios[i].pause();
+          }
+        }
+      }
+    }, true);
+
+    // Toast Notification Helper
+    function showToast(msg) {
+      var t = document.getElementById('adminToast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 2500);
+    }
+
+    // Toggle Export Menu
+    function toggleExportMenu(e) {
+      e.stopPropagation();
+      var m = document.getElementById('exportMenu');
+      m.classList.toggle('show');
+    }
+    document.addEventListener('click', function() {
+      var m = document.getElementById('exportMenu');
+      if (m) m.classList.remove('show');
+    });
+
+    // Bulk Checkbox Handling
+    function toggleSelectAll(master) {
+      var checkboxes = document.querySelectorAll('.rec-checkbox');
+      checkboxes.forEach(function(cb) {
+        cb.checked = master.checked;
+      });
+      updateBulkState();
+    }
+
+    function updateBulkState() {
+      var checkboxes = document.querySelectorAll('.rec-checkbox:checked');
+      var toolbar = document.getElementById('bulkRecToolbar');
+      var countEl = document.getElementById('bulkSelectedCount');
+      var idsInput = document.getElementById('bulkRecIds');
+
+      var ids = [];
+      checkboxes.forEach(function(cb) {
+        ids.push(cb.value);
+      });
+
+      if (ids.length > 0) {
+        toolbar.style.display = 'flex';
+        countEl.textContent = ids.length;
+        idsInput.value = ids.join(',');
+      } else {
+        toolbar.style.display = 'none';
+        idsInput.value = '';
+        var master = document.getElementById('selectAllRecs');
+        if (master) master.checked = false;
+      }
+    }
+
+    function clearBulkSelection() {
+      var checkboxes = document.querySelectorAll('.rec-checkbox');
+      checkboxes.forEach(function(cb) { cb.checked = false; });
+      var master = document.getElementById('selectAllRecs');
+      if (master) master.checked = false;
+      updateBulkState();
+    }
+
+    // Client-side Filter
+    function filterRecordings() {
+      var q = (document.getElementById('searchRecInput').value || '').toLowerCase().trim();
+      var attFilter = document.getElementById('filterAttendance').value;
+      var rows = document.querySelectorAll('.rec-row');
+      var visibleCount = 0;
+
+      rows.forEach(function(row) {
+        var name = row.getAttribute('data-name') || '';
+        var grp = row.getAttribute('data-grp') || '';
+        var att = row.getAttribute('data-attending') || '';
+
+        var matchQuery = !q || name.includes(q) || grp.includes(q);
+        var matchAtt = (attFilter === 'all') || (att === attFilter);
+
+        if (matchQuery && matchAtt) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      var emptyEl = document.getElementById('emptySearchRow');
+      if (emptyEl) {
+        emptyEl.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -18,13 +18,39 @@ function toInt(value, fallback) {
 
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-/** Normalizes Indonesian phone numbers to wa.me format: 0812.. / +62812.. / 812.. -> 62812.. */
+/**
+ * Normalizes global / international phone numbers to E.164 wa.me format.
+ * Accepts global numbers (+48..., +1..., +44..., +84..., etc.) as well as Indonesian local numbers (08... -> 628...).
+ */
 function normalizePhone(value) {
-  let d = String(value || '').replace(/[^0-9]/g, '');
-  if (!d) return '';
-  if (d.startsWith('0')) d = '62' + d.slice(1);
-  else if (d.startsWith('8')) d = '62' + d;
-  return d.length >= 9 && d.length <= 15 ? d : '';
+  if (value === undefined || value === null) return '';
+  const raw = String(value).trim();
+  if (!raw) return '';
+
+  const hasPlus = raw.startsWith('+');
+  const has00 = raw.startsWith('00');
+
+  let digits = raw.replace(/[^0-9]/g, '');
+  if (!digits) return '';
+
+  if (hasPlus) {
+    // Explicit international format (e.g. +48..., +84..., +1..., +62...)
+  } else if (has00) {
+    // International dial prefix 00 (e.g. 0048... -> 48...)
+    digits = digits.slice(2);
+  } else if (digits.startsWith('08')) {
+    // Indonesian mobile format starting with 08 (e.g. 0812... -> 62812...)
+    digits = '62' + digits.slice(1);
+  } else if (digits.startsWith('0') && digits.length >= 10 && digits.length <= 12) {
+    // Indonesian landline format starting with 0 (e.g. 021..., 031...)
+    digits = '62' + digits.slice(1);
+  } else if (/^8[1-3,5,7-9]\d{7,10}$/.test(digits)) {
+    // Indonesian mobile number without leading 0 (e.g. 812..., 857...)
+    digits = '62' + digits;
+  }
+
+  // Valid global phone numbers in E.164 format: 7 to 15 digits
+  return digits.length >= 7 && digits.length <= 15 ? digits : '';
 }
 
 function yes(value) {
