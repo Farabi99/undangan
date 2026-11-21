@@ -53,6 +53,13 @@ try {
   // column already exists
 }
 
+// Safe column migration for per-guest Kisah Kami / Story toggle (NULL = follow global, 0 = hide, 1 = show)
+try {
+  db.exec("ALTER TABLE guests ADD COLUMN show_story INTEGER DEFAULT NULL");
+} catch (e) {
+  // column already exists
+}
+
 // Safe column migrations for private voice notes
 try {
   db.exec("ALTER TABLE rsvps ADD COLUMN voice_file TEXT DEFAULT NULL");

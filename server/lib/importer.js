@@ -13,8 +13,17 @@ const HEADER_ALIASES = {
   max_pax: ['max pax', 'max_pax', 'maks pax', 'maksimal pax', 'maksimum pax', 'maks tamu', 'jumlah pax', 'pax', 'jumlah', 'jumlah tamu', 'maks', 'max', 'kuota', 'quota', 'alokasi'],
   phone: ['phone', 'hp', 'no hp', 'no. hp', 'nomor hp', 'whatsapp', 'wa', 'no wa', 'no. wa', 'nomor wa', 'telepon', 'telp', 'mobile', 'kontak'],
   grp: ['group', 'grup', 'kelompok', 'kategori', 'category', 'relasi', 'hubungan', 'instansi'],
-  event_type: ['event type', 'event_type', 'acara', 'jenis acara', 'tipe acara', 'event', 'tipe', 'tema', 'design', 'sesi', 'sesi acara']
+  event_type: ['event type', 'event_type', 'acara', 'jenis acara', 'tipe acara', 'event', 'tipe', 'tema', 'design', 'sesi', 'sesi acara'],
+  show_story: ['show story', 'show_story', 'kisah kami', 'kisah_kami', 'story', 'cerita', 'love story']
 };
+
+function parseShowStory(raw) {
+  if (raw === undefined || raw === null || String(raw).trim() === '') return null;
+  const s = String(raw).trim().toLowerCase();
+  if (/^0$|^no$|^false$|^hide$|^sembunyi$|^tidak$/.test(s)) return 0;
+  if (/^1$|^yes$|^true$|^show$|^tampil$|^ya$/.test(s)) return 1;
+  return null;
+}
 
 function mapHeader(h) {
   const key = String(h || '')
@@ -83,6 +92,7 @@ function parseGuestFile(buffer, maxPaxDefault) {
       phone: normalizePhone(r.phone),
       grp: cleanText(r.grp, 60),
       event_type: eventType,
+      show_story: parseShowStory(r.show_story),
       errors: [],
       warnings: [],
       duplicate: false
@@ -115,10 +125,10 @@ function parseGuestFile(buffer, maxPaxDefault) {
 
 function templateWorkbook(format) {
   const data = [
-    ['title', 'name', 'with_partner', 'partner_name', 'max_pax', 'phone', 'group', 'event_type'],
-    ['Bpk.', 'Farhan Pratama', 'yes', 'Dinda Permata', 2, '081234567890', 'Keluarga', 'syukuran'],
-    ['Ibu', 'Siti Aminah', 'no', '', 1, '081987654321', 'Kantor', 'akad'],
-    ['', 'Budi Santoso', 'yes', 'Ani Lestari', 2, '081298765432', 'Sahabat', 'both']
+    ['title', 'name', 'with_partner', 'partner_name', 'max_pax', 'phone', 'group', 'event_type', 'show_story'],
+    ['Bpk.', 'Farhan Pratama', 'yes', 'Dinda Permata', 2, '081234567890', 'Keluarga', 'syukuran', 'yes'],
+    ['Ibu', 'Siti Aminah', 'no', '', 1, '081987654321', 'Kantor', 'akad', 'no'],
+    ['', 'Budi Santoso', 'yes', 'Ani Lestari', 2, '081298765432', 'Sahabat', 'both', '']
   ];
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(data);
@@ -132,7 +142,8 @@ function templateWorkbook(format) {
     { wch: 10 }, // max_pax
     { wch: 16 }, // phone
     { wch: 14 }, // group
-    { wch: 14 }  // event_type
+    { wch: 14 }, // event_type
+    { wch: 12 }  // show_story
   ];
 
   XLSX.utils.book_append_sheet(wb, ws, 'Daftar Tamu');

@@ -111,6 +111,11 @@
                       <% } else { %>
                         <span class="badge badge-info">Keduanya</span>
                       <% } %>
+                      <% if (r.show_story === 0) { %>
+                        <span class="badge" style="background:#FFF1F2; color:#E11D48; border:1px solid rgba(225,29,72,0.3); margin-top:2px; display:inline-block;" title="Kisah Kami dinonaktifkan khusus">🚫 Tanpa Kisah</span>
+                      <% } else if (r.show_story === 1) { %>
+                        <span class="badge" style="background:#F0FDF4; color:#16A34A; border:1px solid rgba(22,163,74,0.3); margin-top:2px; display:inline-block;" title="Kisah Kami diaktifkan khusus">📖 Ada Kisah</span>
+                      <% } %>
                     </td>
                     <td>
                       <% if (r.errors.length) { %>

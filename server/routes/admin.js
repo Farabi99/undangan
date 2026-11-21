@@ -166,6 +166,12 @@ router.post('/guests/add', sameOrigin, (req, res) => {
   const phone = normalizePhone(req.body.phone);
   const grp = cleanText(req.body.grp, 60);
   const event_type = req.body.event_type === 'reception' ? 'reception' : req.body.event_type === 'akad' ? 'akad' : 'both';
+  let show_story = null;
+  if (req.body.show_story === '0' || req.body.show_story === 0) {
+    show_story = 0;
+  } else if (req.body.show_story === '1' || req.body.show_story === 1) {
+    show_story = 1;
+  }
 
   if (!name) {
     return res.redirect('/admin/guests?error=nama_wajib');
@@ -187,9 +193,9 @@ router.post('/guests/add', sameOrigin, (req, res) => {
   }
 
   db.prepare(`
-    INSERT INTO guests (slug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(slug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type);
+    INSERT INTO guests (slug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type, show_story)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(slug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type, show_story);
 
   res.redirect('/admin/guests?success=added');
 });
@@ -205,6 +211,12 @@ router.post('/guests/:id/edit', sameOrigin, (req, res) => {
   const phone = normalizePhone(req.body.phone);
   const grp = cleanText(req.body.grp, 60);
   const event_type = req.body.event_type === 'reception' ? 'reception' : req.body.event_type === 'akad' ? 'akad' : 'both';
+  let show_story = null;
+  if (req.body.show_story === '0' || req.body.show_story === 0) {
+    show_story = 0;
+  } else if (req.body.show_story === '1' || req.body.show_story === 1) {
+    show_story = 1;
+  }
 
   if (!name) {
     return res.redirect('/admin/guests?error=nama_wajib');
@@ -232,9 +244,9 @@ router.post('/guests/:id/edit', sameOrigin, (req, res) => {
 
   db.prepare(`
     UPDATE guests
-    SET slug = ?, title = ?, name = ?, with_partner = ?, partner_name = ?, max_pax = ?, phone = ?, grp = ?, event_type = ?, updated_at = datetime('now')
+    SET slug = ?, title = ?, name = ?, with_partner = ?, partner_name = ?, max_pax = ?, phone = ?, grp = ?, event_type = ?, show_story = ?, updated_at = datetime('now')
     WHERE id = ?
-  `).run(targetSlug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type, id);
+  `).run(targetSlug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type, show_story, id);
 
   res.redirect('/admin/guests?success=updated');
 });
@@ -367,12 +379,12 @@ router.post('/import/confirm', sameOrigin, (req, res) => {
   const takenSlugs = new Set();
   tx(() => {
     const stmt = db.prepare(`
-      INSERT INTO guests (slug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO guests (slug, title, name, with_partner, partner_name, max_pax, phone, grp, event_type, show_story)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     rowsToInsert.forEach((r) => {
       const slug = uniqueSlug(r.name, takenSlugs);
-      stmt.run(slug, r.title, r.name, r.with_partner, r.partner_name, r.max_pax, r.phone, r.grp, r.event_type || 'both');
+      stmt.run(slug, r.title, r.name, r.with_partner, r.partner_name, r.max_pax, r.phone, r.grp, r.event_type || 'both', r.show_story !== undefined ? r.show_story : null);
     });
   });
 

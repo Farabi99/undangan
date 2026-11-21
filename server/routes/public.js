@@ -446,7 +446,24 @@ function renderGuestInvitation(req, res, forcedTheme, forcedStory) {
 
   const cdTarget = theme === 'reception' ? content.receptionCountdownTarget : content.countdownTarget;
   const existingRsvp = db.prepare('SELECT * FROM rsvps WHERE guest_id = ?').get(guest.id);
-  const showStory = forcedStory !== undefined ? forcedStory : getShowStory(req);
+
+  // Determine whether Kisah Kami (story timeline) is shown for this guest:
+  // 1. Explicit forced route (/0/:slug or /1/:slug) takes priority
+  // 2. Explicit query parameter (?story=0 or ?story=1) for debugging/override
+  // 3. Per-guest setting: 0 = always hide (even on standard/correct URL), 1 = always show
+  // 4. Default: fallback to global admin setting (show_story)
+  let showStory;
+  if (forcedStory !== undefined) {
+    showStory = forcedStory;
+  } else if (req.query.story !== undefined || req.query.s !== undefined) {
+    showStory = getShowStory(req);
+  } else if (guest.show_story === 0 || guest.show_story === '0') {
+    showStory = false;
+  } else if (guest.show_story === 1 || guest.show_story === '1') {
+    showStory = true;
+  } else {
+    showStory = getShowStory(req);
+  }
 
   res.render('invitation', {
     lang,

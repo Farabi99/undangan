@@ -151,6 +151,14 @@
           </select>
         </div>
         <div>
+          <label class="form-micro-label">Kisah Kami</label>
+          <select name="show_story" class="input-adm">
+            <option value="default">⚙️ Ikuti Global</option>
+            <option value="0">🚫 Sembunyikan (Kode 0)</option>
+            <option value="1">📖 Tampilkan (Kode 1)</option>
+          </select>
+        </div>
+        <div>
           <label class="form-micro-label">Kustom Slug / URL</label>
           <input type="text" name="slug" placeholder="otomatis jika kosong" class="input-adm" style="font-family: monospace;">
         </div>
@@ -267,6 +275,7 @@
                  phone: g.phone || '',
                  grp: g.grp || '',
                  event_type: g.event_type || 'both',
+                 show_story: g.show_story,
                  attending: g.attending,
                  pax: g.pax,
                  wish: g.wish || '',
@@ -299,6 +308,11 @@
                     <span class="badge" style="background: #FAF0EE; color: #8E4F49; border: 1px solid rgba(201,138,134,0.45);">🌸 Akad (Dusty Rose)</span>
                   <% } else { %>
                     <span class="badge badge-muted">Keduanya</span>
+                  <% } %>
+                  <% if (g.show_story === 0) { %>
+                    <span class="badge" style="background:#FFF1F2; color:#E11D48; border:1px solid rgba(225,29,72,0.3); margin-top:3px; display:inline-block;" title="Kisah Kami dinonaktifkan khusus untuk tamu ini">🚫 Tanpa Kisah</span>
+                  <% } else if (g.show_story === 1) { %>
+                    <span class="badge" style="background:#F0FDF4; color:#16A34A; border:1px solid rgba(226,232,240,0.3); margin-top:3px; display:inline-block;" title="Kisah Kami diaktifkan khusus untuk tamu ini">📖 Ada Kisah</span>
                   <% } %>
                 </td>
                 <td>
@@ -432,6 +446,15 @@
           </div>
 
           <div style="margin-bottom: 0.75rem;">
+            <label class="form-micro-label">Bagian "Kisah Kami"</label>
+            <select id="editShowStory" name="show_story" class="input-adm" style="width: 100%;">
+              <option value="default">⚙️ Ikuti Pengaturan Global (Default)</option>
+              <option value="0">🚫 Sembunyikan Khusus Tamu Ini (Selalu Nonaktif)</option>
+              <option value="1">📖 Tampilkan Khusus Tamu Ini (Selalu Aktif)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
             <label class="form-micro-label">Tautan URL / Slug *</label>
             <div style="display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 4px; padding: 0 0.5rem;">
               <span id="editSlugPrefix" style="font-size: 0.85rem; color: var(--admin-text-sub); font-family: monospace; font-weight: 600; user-select: none;">/</span>
@@ -461,6 +484,7 @@
         <div style="background: #F8FAF9; padding: 0.75rem; border-radius: 6px; border: 1px solid #E1E8E5; margin-bottom: 1rem; font-size: 0.85rem;">
           <div><strong>Penerima:</strong> <span id="waModalGuestName"></span></div>
           <div style="color: var(--admin-text-sub); font-size: 0.78rem;"><strong>No. HP:</strong> <span id="waModalPhone">-</span> | <strong>Tautan:</strong> <span id="waModalUrl" style="word-break: break-all;"></span></div>
+          <div id="waModalStoryBadge" style="display: none;"></div>
         </div>
 
         <!-- Template Tabs -->
@@ -673,6 +697,10 @@
       document.getElementById('editPhone').value = g.phone || '';
       document.getElementById('editGrp').value = g.grp || '';
       document.getElementById('editEventType').value = g.event_type || 'both';
+      var storyVal = 'default';
+      if (g.show_story === 0 || g.show_story === '0') storyVal = '0';
+      else if (g.show_story === 1 || g.show_story === '1') storyVal = '1';
+      document.getElementById('editShowStory').value = storyVal;
       document.getElementById('editSlug').value = g.slug || '';
       updateEditSlugPrefix();
       document.getElementById('editModal').style.display = 'flex';
@@ -769,6 +797,21 @@
       document.getElementById('waModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name;
       document.getElementById('waModalPhone').textContent = g.phone || 'Belum diisi';
       document.getElementById('waModalUrl').textContent = g.fullUrl;
+
+      var storyBadge = document.getElementById('waModalStoryBadge');
+      if (storyBadge) {
+        if (g.show_story === 0 || g.show_story === '0') {
+          storyBadge.style.display = 'block';
+          storyBadge.style.marginTop = '4px';
+          storyBadge.innerHTML = '<span class="badge" style="background:#FFF1F2; color:#E11D48; border:1px solid rgba(225,29,72,0.3); font-size:0.7rem;">🚫 Kisah Kami dinonaktifkan khusus untuk tamu ini (URL standar otomatis tanpa Kisah)</span>';
+        } else if (g.show_story === 1 || g.show_story === '1') {
+          storyBadge.style.display = 'block';
+          storyBadge.style.marginTop = '4px';
+          storyBadge.innerHTML = '<span class="badge" style="background:#F0FDF4; color:#16A34A; border:1px solid rgba(22,163,74,0.3); font-size:0.7rem;">📖 Kisah Kami diaktifkan khusus untuk tamu ini (URL standar otomatis ada Kisah)</span>';
+        } else {
+          storyBadge.style.display = 'none';
+        }
+      }
 
       // Reset story mode to default
       waStoryMode = 'default';
@@ -876,25 +919,39 @@
           "*<%= couple.short %>*";
 
       } else if (type === 'english') {
-        var eventScheduleEn = isRec 
-          ? "Saturday, December 26, 2026 at Smamda Tower Surabaya" 
-          : isAkad 
-          ? "Saturday, December 5, 2026 at At-Tin Grand Mosque, Jakarta" 
-          : "ʿAqd al-Nikāḥ (Dec 5, Jakarta) & Reception (Dec 26, Surabaya)";
+        var recipientNameEn = salutation + g.name + (g.with_partner ? ' & Partner' : '');
+        var eventDayEn = isRec ? "*WEDDING SYUKURAN*" : isAkad ? "*AQD AL-NIKKA*" : "*WEDDING*";
+        var eventScheduleEn = '';
+        if (isRec) {
+          eventScheduleEn = "📅 Saturday, 26 December 2026\n" +
+                            "⏰ 10.00 – 13.00 WIB (GMT+7)\n" +
+                            "📍 Smamda Tower, Surabaya";
+        } else if (isAkad) {
+          eventScheduleEn = "📅 Saturday, 5 December 2026\n" +
+                            "⏰ 12.30 – 15.00 WIB (GMT+7)\n" +
+                            "📍 Masjid Agung At-Tin, East Jakarta";
+        } else {
+          eventScheduleEn = "💍 *ʿAqd al-Nikāḥ:* Saturday, 5 Dec 2026 | 12.30 – 15.00 WIB (Masjid Agung At-Tin, East Jakarta)\n" +
+                            "🥂 *Syukuran:* Saturday, 26 Dec 2026 | 10.00 – 13.00 WIB (Smamda Tower, Surabaya)";
+        }
 
-        var eventTitleEn = isRec ? "our wedding syukuran" : isAkad ? "the ʿAqd al-Nikāḥ of" : "our wedding";
-
-        text = "Dear *" + recipientName + "*,\n\n" +
-          "Together with our families, with joyful hearts we invite you to celebrate " + eventTitleEn + ":\n\n" +
-          "✨ *<%= couple.short %>* ✨\n" +
-          "(<%= couple.groom.name %> & <%= couple.bride.name %>)\n\n" +
-          "📅 *Event Details:*\n" +
+        text = "Bismillahirrahmaanirrahiim\n\n" +
+          "✨ *We're getting married!*✨\n\n" +
+          "Dear *" + recipientNameEn + "*,\n\n" +
+          "We would be so happy to have you join us in celebrating our " + eventDayEn + " day!\n\n" +
+          "💍 *<%= couple.short.toUpperCase() %>*\n" +
+          "<%= couple.groom.name %> & <%= couple.bride.name %>\n\n" +
           eventScheduleEn + "\n\n" +
-          "Please find the complete event schedule, venue map, and kindly confirm your attendance (RSVP) via the link below:\n" +
+          "💌 *Your presence and prayers mean the world to us.* You're special to us, and we'd love to share this beautiful moment with you!\n\n" +
+          "🌷 *A special invitation awaits!*\n" +
+          "Please open our digital invitation here:\n" +
           "🔗 " + finalUrl + "\n\n" +
-          "Your warm presence, prayers, and blessings would mean the world to us.\n\n" +
-          "Warmest regards,\n" +
-          "*<%= couple.short %>* & Family";
+          "You can leave us a personal message and even a *VOICE NOTE! 🎙️*, even better, combined with your own language, e.g. Polish, Deutsch, Vietnamese, Chinese, Tamil, Sinhala, Italian, Arabic, or others!\n\n" +
+          "Yes, we'd love to hear your voice! It's a rare little feature, and we'd love to keep your wishes as a special memory❤️\n\n" +
+          "If you have any trouble opening the invitation or leaving a message, just let us know!\n\n" +
+          "Whether near or far, your prayers are always cherished. We hope to celebrate with you!\n\n" +
+          "With love,\n" +
+          "*<%= couple.short %>*";
       }
 
       var textarea = document.getElementById('waMessageText');
