@@ -508,9 +508,9 @@ button {
 }
 
 .cover-guest-name .guest-partner {
-  font-size: 1rem;
-  font-weight: 400;
-  opacity: 0.9;
+  font-size: 1em;
+  font-weight: inherit;
+  opacity: 1;
 }
 
 .btn-open-curtain {
@@ -2015,7 +2015,7 @@ body.stage-unlocked .welcome-parchment-card {
 .guest-partner-tag {
   color: var(--color-dusty-rose-dark);
   font-style: italic;
-  font-size: 0.85em;
+  font-size: 1em;
   font-weight: 500;
 }
 
