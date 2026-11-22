@@ -1134,6 +1134,7 @@ body.stage-unlocked .welcome-parchment-card {
   font-family: var(--font-body);
   font-size: 0.86rem;
   font-style: italic;
+  white-space: pre-line;
   color: var(--color-dusty-rose-dark);
   margin: 1.15rem auto 0;
   padding-top: 0.75rem;
