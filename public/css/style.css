@@ -1132,15 +1132,14 @@ body.stage-unlocked .welcome-parchment-card {
 
 .welcome-maker-note {
   font-family: var(--font-body);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-style: italic;
-  font-weight: 600;
   color: var(--color-dusty-rose-dark);
   margin: 1.15rem auto 0;
   padding-top: 0.75rem;
   border-top: 1px dashed rgba(201, 138, 134, 0.45);
   max-width: 330px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .welcome-scroll-cue {
