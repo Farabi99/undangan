@@ -42,6 +42,10 @@ const guestService = {
       query += ` AND g.open_count > 0`;
     } else if (status === 'unopened') {
       query += ` AND g.open_count = 0`;
+    } else if (status === 'shared') {
+      query += ` AND g.is_shared = 1`;
+    } else if (status === 'unshared') {
+      query += ` AND g.is_shared = 0`;
     }
 
     if (event_type === 'both' || event_type === 'reception' || event_type === 'akad') {
@@ -78,6 +82,8 @@ const guestService = {
       .prepare(`
         SELECT
           COUNT(g.id) AS totalGuests,
+          SUM(CASE WHEN g.is_shared = 1 THEN 1 ELSE 0 END) AS totalShared,
+          SUM(CASE WHEN g.is_shared = 0 THEN 1 ELSE 0 END) AS totalUnshared,
           SUM(CASE WHEN g.open_count > 0 THEN 1 ELSE 0 END) AS totalOpened,
           SUM(CASE WHEN r.attending = 1 THEN 1 ELSE 0 END) AS totalAttending,
           SUM(CASE WHEN r.attending = 0 THEN 1 ELSE 0 END) AS totalAbsent,
@@ -243,6 +249,61 @@ const guestService = {
   },
 
   /**
+   * Toggle or set the invitation sharing status for a guest.
+   */
+  toggleShared(id, forceValue = null) {
+    const numId = toInt(id, 0);
+    if (!numId) return null;
+    const guest = this.getGuestById(numId);
+    if (!guest) return null;
+
+    let nextShared;
+    if (forceValue !== null && forceValue !== undefined) {
+      nextShared = forceValue === 1 || forceValue === '1' || forceValue === true || forceValue === 'true' ? 1 : 0;
+    } else {
+      nextShared = guest.is_shared === 1 ? 0 : 1;
+    }
+
+    const sharedAt = nextShared === 1 ? new Date().toISOString() : null;
+    db.prepare(`
+      UPDATE guests
+      SET is_shared = ?, shared_at = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).run(nextShared, sharedAt, numId);
+
+    return { id: numId, is_shared: nextShared, shared_at: sharedAt };
+  },
+
+  /**
+   * Bulk set sharing status for multiple guests within a transaction.
+   */
+  bulkSetShared(ids, isShared = 1) {
+    let cleanIds = [];
+    if (typeof ids === 'string') {
+      cleanIds = ids.split(',').map((s) => toInt(s.trim(), 0)).filter((n) => n > 0);
+    } else if (Array.isArray(ids)) {
+      cleanIds = ids.map((s) => toInt(s, 0)).filter((n) => n > 0);
+    }
+    if (cleanIds.length === 0) return 0;
+
+    const val = isShared ? 1 : 0;
+    const sharedAt = val === 1 ? new Date().toISOString() : null;
+
+    tx(() => {
+      const stmt = db.prepare(`
+        UPDATE guests
+        SET is_shared = ?, shared_at = ?, updated_at = datetime('now')
+        WHERE id = ?
+      `);
+      for (const id of cleanIds) {
+        stmt.run(val, sharedAt, id);
+      }
+    });
+
+    return cleanIds.length;
+  },
+
+  /**
    * Record that a guest opened their invitation.
    */
   recordGuestOpen(guestId) {
@@ -262,11 +323,17 @@ const guestService = {
 
   /**
    * Construct WhatsApp invitation text with personalized link.
+   * Inherits partner name if specified, otherwise uses ' & Pasangan' if with_partner.
    */
   formatWhatsAppMessage(guest, baseUrl) {
     const isReception = guest.event_type === 'reception';
     const url = `${baseUrl}/${guest.slug}`;
-    const recipientName = `${guest.title ? guest.title + ' ' : ''}${guest.name}${guest.with_partner ? ' & Pasangan' : ''}`;
+    const partnerSuffix = guest.partner_name
+      ? ` & ${guest.partner_name}`
+      : guest.with_partner
+      ? ' & Pasangan'
+      : '';
+    const recipientName = `${guest.title ? guest.title + ' ' : ''}${guest.name}${partnerSuffix}`;
     const eventName = isReception ? 'Syukuran Pernikahan' : guest.event_type === 'akad' ? 'Akad Nikah' : 'Pernikahan';
     return `Assalamu’alaikum Wr. Wb. Kepada Yth. ${recipientName}, tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara ${eventName} Farabi & Syifa: ${url}`;
   }

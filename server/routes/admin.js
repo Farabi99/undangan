@@ -141,6 +141,30 @@ router.post('/guests/bulk-delete', sameOrigin, (req, res) => {
   res.redirect('/admin/guests?success=bulk_deleted&count=' + count);
 });
 
+// Toggle Shared Status for Single Guest (Supports AJAX and Form POST)
+router.post('/guests/:id/toggle-shared', sameOrigin, (req, res) => {
+  const forceVal = req.body && req.body.is_shared !== undefined ? req.body.is_shared : null;
+  const result = guestService.toggleShared(req.params.id, forceVal);
+  if (!result) {
+    if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json')) || (req.body && req.body.ajax)) {
+      return res.status(404).json({ ok: false, error: 'Tamu tidak ditemukan.' });
+    }
+    return res.redirect('/admin/guests?error=tamu_tidak_ada');
+  }
+  if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json')) || (req.body && req.body.ajax)) {
+    return res.json({ ok: true, ...result });
+  }
+  res.redirect('/admin/guests?success=shared_updated');
+});
+
+// Bulk Set Shared Status POST
+router.post('/guests/bulk-share', sameOrigin, (req, res) => {
+  const isShared = req.body.action === 'unshare' ? 0 : 1;
+  const count = guestService.bulkSetShared(req.body.ids, isShared);
+  const msg = isShared ? 'bulk_shared' : 'bulk_unshared';
+  res.redirect(`/admin/guests?success=${msg}&count=${count}`);
+});
+
 // Manual RSVP Entry / Override POST
 router.post('/guests/:id/rsvp', sameOrigin, (req, res) => {
   try {

@@ -30,4 +30,6 @@ test('exportService - generates valid Excel and CSV buffers', () => {
   const csvStr = csvBuf.toString('utf8');
   assert.ok(csvStr.includes('Test Guest'));
   assert.ok(csvStr.includes('081234567890'));
+  assert.ok(csvStr.includes('Status Dibagikan'));
+  assert.ok(csvStr.includes('Bpk. Test Guest & Partner'));
 });

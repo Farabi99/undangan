@@ -39,6 +39,9 @@
         <% } else if (success === 'updated') { %>✓ Data tamu berhasil diperbarui!
         <% } else if (success === 'deleted') { %>✓ Tamu berhasil dihapus.
         <% } else if (success === 'bulk_deleted') { %>✓ Berhasil menghapus tamu yang dipilih.
+        <% } else if (success === 'bulk_shared') { %>✓ Berhasil menandai tamu terpilih sebagai sudah dikirim!
+        <% } else if (success === 'bulk_unshared') { %>✓ Berhasil menandai tamu terpilih sebagai belum dikirim.
+        <% } else if (success === 'shared_updated') { %>✓ Status pengiriman berhasil diperbarui.
         <% } else if (success === 'rsvp_saved') { %>✓ Status RSVP berhasil disimpan!
         <% } else { %>✓ Tindakan berhasil diselesaikan.
         <% } %>
@@ -83,6 +86,11 @@
         <div class="admin-stat-label">Total Tamu Diundang</div>
         <div class="admin-stat-value"><%= stats.totalGuests || 0 %></div>
         <div class="stat-hint">Lihat Semua</div>
+      </a>
+      <a href="/admin/guests?status=shared" class="admin-stat-card <%= status === 'shared' ? 'stat-active' : '' %>" title="Filter tamu yang sudah dibagikan undangannya">
+        <div class="admin-stat-label">Sudah Dibagikan</div>
+        <div class="admin-stat-value" style="color: #0284C7;"><%= stats.totalShared || 0 %></div>
+        <div class="stat-hint"><%= stats.totalGuests ? Math.round(((stats.totalShared || 0) / stats.totalGuests) * 100) : 0 %>% Terkirim</div>
       </a>
       <a href="/admin/guests?status=opened" class="admin-stat-card <%= status === 'opened' ? 'stat-active' : '' %>" title="Filter tamu yang sudah buka link">
         <div class="admin-stat-label">Telah Buka Link</div>
@@ -193,12 +201,14 @@
           </select>
 
           <select name="status" class="input-adm" onchange="this.form.submit()">
-            <option value="">Semua Status RSVP</option>
+            <option value="">Semua Status Tamu</option>
+            <option value="shared" <%= status === 'shared' ? 'selected' : '' %>>📤 Sudah Dibagikan</option>
+            <option value="unshared" <%= status === 'unshared' ? 'selected' : '' %>>⚪ Belum Dibagikan</option>
+            <option value="opened" <%= status === 'opened' ? 'selected' : '' %>>👁️ Sudah Buka Link</option>
+            <option value="unopened" <%= status === 'unopened' ? 'selected' : '' %>>🔒 Belum Buka Link</option>
             <option value="attending" <%= status === 'attending' ? 'selected' : '' %>>✓ Konfirmasi Hadir</option>
             <option value="absent" <%= status === 'absent' ? 'selected' : '' %>>✗ Tidak Hadir</option>
             <option value="unconfirmed" <%= status === 'unconfirmed' ? 'selected' : '' %>>⏳ Belum Konfirmasi</option>
-            <option value="opened" <%= status === 'opened' ? 'selected' : '' %>>👁️ Sudah Buka Link</option>
-            <option value="unopened" <%= status === 'unopened' ? 'selected' : '' %>>🔒 Belum Buka Link</option>
           </select>
 
           <select name="event_type" class="input-adm" onchange="this.form.submit()">
@@ -220,8 +230,18 @@
         <div class="bulk-info">
           <span id="bulkCount">0</span> tamu dipilih
         </div>
-        <div class="bulk-actions">
-          <form id="bulkDeleteForm" action="/admin/guests/bulk-delete" method="POST" onsubmit="return confirmBulkDelete()">
+        <div class="bulk-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <form id="bulkShareForm" action="/admin/guests/bulk-share" method="POST" style="display: inline;">
+            <input type="hidden" name="ids" id="bulkShareIds" value="">
+            <input type="hidden" name="action" value="share">
+            <button type="submit" class="btn-adm btn-adm-wa" title="Tandai semua tamu terpilih sebagai sudah dikirim">📤 Tandai Terkirim</button>
+          </form>
+          <form id="bulkUnshareForm" action="/admin/guests/bulk-share" method="POST" style="display: inline;">
+            <input type="hidden" name="ids" id="bulkUnshareIds" value="">
+            <input type="hidden" name="action" value="unshare">
+            <button type="submit" class="btn-adm btn-adm-outline" title="Tandai semua tamu terpilih sebagai belum dikirim">⚪ Tandai Belum</button>
+          </form>
+          <form id="bulkDeleteForm" action="/admin/guests/bulk-delete" method="POST" onsubmit="return confirmBulkDelete()" style="display: inline;">
             <input type="hidden" name="ids" id="bulkDeleteIds" value="">
             <button type="submit" class="btn-adm btn-adm-danger">🗑️ Hapus Tamu Terpilih</button>
           </form>
@@ -240,6 +260,7 @@
               <th>Acara</th>
               <th>Kategori</th>
               <th>Maks</th>
+              <th>Dibagikan</th>
               <th>Dibuka</th>
               <th>Status RSVP</th>
               <th>Tautan Unik</th>
@@ -249,7 +270,7 @@
           <tbody>
             <% if (guests.length === 0) { %>
               <tr>
-                <td colspan="9" style="text-align: center; color: var(--admin-text-sub); padding: 3rem 1rem;">
+                <td colspan="10" style="text-align: center; color: var(--admin-text-sub); padding: 3rem 1rem;">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
                   <p style="margin: 0; font-size: 0.95rem;">Tidak ada tamu yang cocok dengan filter saat ini.</p>
                   <p style="margin: 0.5rem 0 0; font-size: 0.85rem;"><a href="/admin/guests">Reset Filter</a> atau <a href="/admin/import">Import Tamu</a></p>
@@ -288,6 +309,8 @@
                  grp: g.grp || '',
                  event_type: g.event_type || 'both',
                  show_story: g.show_story,
+                 is_shared: g.is_shared || 0,
+                 shared_at: g.shared_at || null,
                  attending: g.attending,
                  pax: g.pax,
                  wish: g.wish || '',
@@ -338,6 +361,11 @@
                 </td>
                 <td>
                   <%= g.max_pax %> pax
+                </td>
+                <td>
+                  <button type="button" id="share-btn-<%= g.id %>" class="badge-shared <%= g.is_shared === 1 ? 'badge-shared-yes' : 'badge-shared-no' %>" onclick="toggleSharedAjax(<%= g.id %>, this)" title="<%= g.is_shared === 1 ? ('Terkirim' + (g.shared_at ? ': ' + new Date(g.shared_at).toLocaleDateString('id-ID') : '') + ' (Klik untuk ubah)') : 'Belum dikirim (Klik untuk tandai terkirim)' %>">
+                    <%= g.is_shared === 1 ? '✓ Terkirim' : '⚪ Belum' %>
+                  </button>
                 </td>
                 <td>
                   <% if (g.open_count > 0) { %>
@@ -502,6 +530,11 @@
         <div style="background: #F8FAF9; padding: 0.75rem; border-radius: 6px; border: 1px solid #E1E8E5; margin-bottom: 1rem; font-size: 0.85rem;">
           <div><strong>Penerima:</strong> <span id="waModalGuestName"></span></div>
           <div style="color: var(--admin-text-sub); font-size: 0.78rem;"><strong>No. HP:</strong> <span id="waModalPhone">-</span> | <strong>Tautan:</strong> <span id="waModalUrl" style="word-break: break-all;"></span></div>
+          <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="font-size: 0.78rem; color: var(--admin-text-sub);"><strong>Status Kirim:</strong></span>
+            <span id="waModalSharedBadge"></span>
+            <button type="button" id="waModalToggleSharedBtn" class="btn-adm btn-adm-outline" style="padding: 2px 8px; font-size: 0.72rem;" onclick="toggleCurrentGuestShared()">Ubah Status</button>
+          </div>
           <div id="waModalStoryBadge" style="display: none;"></div>
         </div>
 
@@ -555,7 +588,7 @@
       </div>
       <div class="admin-modal-footer">
         <button type="button" class="btn-adm btn-adm-outline" onclick="copyWaText()">📋 Salin Pesan</button>
-        <a id="waDirectBtn" href="#" target="_blank" class="btn-adm btn-adm-wa" style="text-decoration:none;">
+        <a id="waDirectBtn" href="#" target="_blank" class="btn-adm btn-adm-wa" style="text-decoration:none;" onclick="onDirectWaClick()">
           Buka WhatsApp ↗
         </a>
       </div>
@@ -690,6 +723,8 @@
       var toolbar = document.getElementById('bulkToolbar');
       var countEl = document.getElementById('bulkCount');
       var idsInput = document.getElementById('bulkDeleteIds');
+      var shareIdsInput = document.getElementById('bulkShareIds');
+      var unshareIdsInput = document.getElementById('bulkUnshareIds');
 
       var ids = [];
       checkboxes.forEach(function(cb) {
@@ -699,10 +734,15 @@
       if (ids.length > 0) {
         toolbar.style.display = 'flex';
         countEl.textContent = ids.length;
-        idsInput.value = ids.join(',');
+        var joined = ids.join(',');
+        if (idsInput) idsInput.value = joined;
+        if (shareIdsInput) shareIdsInput.value = joined;
+        if (unshareIdsInput) unshareIdsInput.value = joined;
       } else {
         toolbar.style.display = 'none';
-        idsInput.value = '';
+        if (idsInput) idsInput.value = '';
+        if (shareIdsInput) shareIdsInput.value = '';
+        if (unshareIdsInput) unshareIdsInput.value = '';
         var master = document.getElementById('selectAllCheckbox');
         if (master) master.checked = false;
       }
@@ -848,8 +888,10 @@
 
     function openWaModal(g) {
       currentGuestForWa = g;
-      document.getElementById('waModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name;
+      var partnerSuffix = g.partner_name ? (' & ' + g.partner_name) : (g.with_partner ? ' & Pasangan' : '');
+      document.getElementById('waModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name + partnerSuffix;
       document.getElementById('waModalPhone').textContent = g.phone || 'Belum diisi';
+      updateWaModalSharedBadge(g.is_shared || 0);
 
       // Update Guest Event Type Badge inside Auto button
       var evBadge = document.getElementById('waModalGuestEventBadge');
@@ -916,7 +958,9 @@
       currentWaType = type || 'formal';
       var g = currentGuestForWa;
       var salutation = g.title ? g.title + ' ' : '';
-      var recipientName = salutation + g.name + (g.with_partner ? ' & Pasangan' : '');
+      var partnerSuffix = g.partner_name ? (' & ' + g.partner_name) : (g.with_partner ? ' & Pasangan' : '');
+      var partnerSuffixEn = g.partner_name ? (' & ' + g.partner_name) : (g.with_partner ? ' & Partner' : '');
+      var recipientName = salutation + g.name + partnerSuffix;
 
       // Determine effective event: 'auto' uses g.event_type (fallback 'both')
       var effectiveEvent = (waEventMode === 'auto') ? (g.event_type || 'both') : waEventMode;
@@ -1019,7 +1063,8 @@
                       "🥂 *Tautan Syukuran (Surabaya):*\n🔗 " + syukuranUrl;
         }
 
-        text = "Assalamu’alaikum / Halo *" + g.name + "*! 👋✨\n\n" +
+        var casualRecipient = g.name + partnerSuffix;
+        text = "Assalamu’alaikum / Halo *" + casualRecipient + "*! 👋✨\n\n" +
           "Alhamdulillah, dengan penuh rasa syukur kami ingin berbagi kabar bahagia dan mengundang kamu untuk hadir di " + eventDayName + ":\n\n" +
           "💍 *" + COUPLE_SHORT + "*\n" +
           "(" + GROOM_NAME + " & " + BRIDE_NAME + ")\n\n" +
@@ -1031,7 +1076,7 @@
           "*" + COUPLE_SHORT + "*";
 
       } else if (type === 'english') {
-        var recipientNameEn = salutation + g.name + (g.with_partner ? ' & Partner' : '');
+        var recipientNameEn = salutation + g.name + partnerSuffixEn;
         var eventDayEn = isRec ? "*WEDDING SYUKURAN*" : isAkad ? "*AQD AL-NIKKA*" : "*WEDDING*";
         var eventScheduleEn = '';
         var linkBlockEn = '';
@@ -1116,16 +1161,111 @@
 
     document.getElementById('waMessageText').addEventListener('input', updateWaDirectBtn);
 
+    function updateShareButtonUI(id, isShared, sharedAt) {
+      var btn = document.getElementById('share-btn-' + id);
+      if (btn) {
+        if (isShared === 1) {
+          btn.className = 'badge-shared badge-shared-yes';
+          btn.textContent = '✓ Terkirim';
+          btn.title = 'Terkirim' + (sharedAt ? ': ' + new Date(sharedAt).toLocaleDateString('id-ID') : '') + ' (Klik untuk ubah)';
+        } else {
+          btn.className = 'badge-shared badge-shared-no';
+          btn.textContent = '⚪ Belum';
+          btn.title = 'Belum dikirim (Klik untuk tandai terkirim)';
+        }
+      }
+      if (currentGuestForWa && currentGuestForWa.id === id) {
+        currentGuestForWa.is_shared = isShared;
+        currentGuestForWa.shared_at = sharedAt;
+        updateWaModalSharedBadge(isShared);
+      }
+    }
+
+    function toggleSharedAjax(id, btn) {
+      if (btn) btn.style.opacity = '0.5';
+      fetch('/admin/guests/' + id + '/toggle-shared', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ ajax: true })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (btn) btn.style.opacity = '1';
+        if (data.ok) {
+          updateShareButtonUI(id, data.is_shared, data.shared_at);
+          var msg = data.is_shared === 1 ? '✓ Tamu ditandai sudah dikirim!' : '⚪ Tamu ditandai belum dikirim.';
+          showToast(msg);
+        }
+      })
+      .catch(function() {
+        if (btn) btn.style.opacity = '1';
+        showToast('⚠️ Gagal memperbarui status pengiriman.');
+      });
+    }
+
+    function markSharedAjax(id, isShared) {
+      fetch('/admin/guests/' + id + '/toggle-shared', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ is_shared: isShared, ajax: true })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.ok) {
+          updateShareButtonUI(id, data.is_shared, data.shared_at);
+        }
+      })
+      .catch(function() {});
+    }
+
+    function updateWaModalSharedBadge(isShared) {
+      var badge = document.getElementById('waModalSharedBadge');
+      var toggleBtn = document.getElementById('waModalToggleSharedBtn');
+      if (badge && toggleBtn) {
+        if (isShared === 1) {
+          badge.innerHTML = '<span class="badge" style="background:#E0F2FE; color:#0369A1; border:1px solid #BAE6FD;">✓ Sudah Dikirim</span>';
+          toggleBtn.textContent = 'Tandai Belum';
+        } else {
+          badge.innerHTML = '<span class="badge badge-muted">⚪ Belum Dikirim</span>';
+          toggleBtn.textContent = 'Tandai Sudah';
+        }
+      }
+    }
+
+    function toggleCurrentGuestShared() {
+      if (!currentGuestForWa) return;
+      var nextVal = currentGuestForWa.is_shared === 1 ? 0 : 1;
+      markSharedAjax(currentGuestForWa.id, nextVal);
+      currentGuestForWa.is_shared = nextVal;
+      updateWaModalSharedBadge(nextVal);
+      showToast(nextVal === 1 ? '✓ Ditandai sudah dikirim!' : '⚪ Ditandai belum dikirim.');
+    }
+
+    function onDirectWaClick() {
+      if (currentGuestForWa) {
+        markSharedAjax(currentGuestForWa.id, 1);
+      }
+    }
+
     function copyWaText() {
       var textarea = document.getElementById('waMessageText');
+      if (currentGuestForWa) {
+        markSharedAjax(currentGuestForWa.id, 1);
+      }
       if (navigator.clipboard) {
         navigator.clipboard.writeText(textarea.value).then(function() {
-          showToast('✓ Pesan WhatsApp berhasil disalin!');
+          showToast('✓ Pesan WhatsApp disalin & tamu ditandai sudah dikirim!');
         });
       } else {
         textarea.select();
         document.execCommand('copy');
-        showToast('✓ Pesan WhatsApp berhasil disalin!');
+        showToast('✓ Pesan WhatsApp disalin & tamu ditandai sudah dikirim!');
       }
     }
 

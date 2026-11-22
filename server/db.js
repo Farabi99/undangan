@@ -60,6 +60,18 @@ try {
   // column already exists
 }
 
+// Safe column migrations for invitation sharing tracking
+try {
+  db.exec("ALTER TABLE guests ADD COLUMN is_shared INTEGER NOT NULL DEFAULT 0");
+} catch (e) {
+  // column already exists
+}
+try {
+  db.exec("ALTER TABLE guests ADD COLUMN shared_at TEXT DEFAULT NULL");
+} catch (e) {
+  // column already exists
+}
+
 // Safe column migrations for private voice notes
 try {
   db.exec("ALTER TABLE rsvps ADD COLUMN voice_file TEXT DEFAULT NULL");

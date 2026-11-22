@@ -30,6 +30,8 @@ const exportService = {
       'No. HP',
       'Kategori',
       'Tautan Undangan',
+      'Status Dibagikan',
+      'Waktu Dibagikan',
       'Status RSVP',
       'Jumlah Hadir',
       'Doa/Ucapan',
@@ -41,9 +43,16 @@ const exportService = {
       const url = `${baseUrl}/${g.slug}`;
       const rsvpStatus = g.attending === 1 ? 'Hadir' : g.attending === 0 ? 'Tidak Hadir' : 'Belum Konfirmasi';
       const eventLabel = isReception ? 'Syukuran (Navy & Silver)' : g.event_type === 'akad' ? 'Akad (Dusty Rose)' : 'Keduanya';
-      const recipientName = `${g.title ? g.title + ' ' : ''}${g.name}${g.with_partner ? ' & Pasangan' : ''}`;
+      const partnerSuffix = g.partner_name
+        ? ` & ${g.partner_name}`
+        : g.with_partner
+        ? ' & Pasangan'
+        : '';
+      const recipientName = `${g.title ? g.title + ' ' : ''}${g.name}${partnerSuffix}`;
       const eventName = isReception ? 'Syukuran Pernikahan' : g.event_type === 'akad' ? 'Akad Nikah' : 'Pernikahan';
       const waText = `Assalamu’alaikum Wr. Wb. Kepada Yth. ${recipientName}, tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara ${eventName} Farabi & Syifa: ${url}`;
+      const sharedStatus = g.is_shared === 1 ? 'Sudah Dikirim' : 'Belum Dikirim';
+      const sharedAtFormatted = g.shared_at ? new Date(g.shared_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '';
 
       return [
         g.id,
@@ -56,6 +65,8 @@ const exportService = {
         g.phone || '',
         g.grp || '',
         url,
+        sharedStatus,
+        sharedAtFormatted,
         rsvpStatus,
         g.pax || 0,
         g.wish || '',
@@ -86,7 +97,9 @@ const exportService = {
       { wch: 16 }, // Phone
       { wch: 16 }, // Kategori
       { wch: 38 }, // URL
-      { wch: 18 }, // Status
+      { wch: 16 }, // Status Dibagikan
+      { wch: 22 }, // Waktu Dibagikan
+      { wch: 18 }, // Status RSVP
       { wch: 12 }, // Hadir Pax
       { wch: 35 }, // Doa
       { wch: 50 }  // WhatsApp text

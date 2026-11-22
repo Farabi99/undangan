@@ -374,6 +374,42 @@ a.admin-stat-card:hover {
 .badge-muted { background: #EDEFF1; color: #637381; border: 1px solid #DFE3E8; }
 .badge-warning { background: #FFF1D6; color: #B78103; border: 1px solid #FFE58F; }
 
+/* Interactive Sharing Badge */
+.badge-shared {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  background: none;
+  font-family: inherit;
+  outline: none;
+}
+.badge-shared-yes {
+  background: #E0F2FE;
+  color: #0369A1;
+  border-color: #BAE6FD;
+}
+.badge-shared-yes:hover {
+  background: #BAE6FD;
+  box-shadow: 0 1px 3px rgba(3, 105, 161, 0.2);
+}
+.badge-shared-no {
+  background: #F1F5F9;
+  color: #64748B;
+  border-color: #CBD5E1;
+}
+.badge-shared-no:hover {
+  background: #E2E8F0;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(100, 116, 139, 0.2);
+}
+
 /* Table */
 .admin-table-wrap {
   overflow-x: auto;
