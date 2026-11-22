@@ -1792,7 +1792,7 @@ body.stage-unlocked .welcome-parchment-card {
   margin-bottom: 0;
 }
 
-/* Authentic Tilted Square Botanical Photo Frame (Kisah Kami) */
+/* Authentic Tilted Clean Photo Frame (Kisah Kami) - Image As It Is */
 .story-frame-wrap,
 .polaroid-card-wrap {
   width: 155px;
@@ -1809,29 +1809,18 @@ body.stage-unlocked .welcome-parchment-card {
 
 .story-photo-card {
   width: 100%;
-  aspect-ratio: 1 / 1;
   position: relative;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 16px 36px -4px rgba(42, 58, 32, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
   background: #FDFBF7;
+  border: 1px solid rgba(126, 131, 108, 0.2);
 }
 
 .story-photo-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
   display: block;
-}
-
-.story-botanical-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
-  object-fit: fill;
 }
 
 .polaroid-card {
@@ -3393,6 +3382,7 @@ body.theme-reception .story-chapter-body {
 body.theme-reception .story-photo-card {
   box-shadow: 0 20px 42px -4px rgba(0, 0, 0, 0.8), 0 6px 16px rgba(14, 27, 51, 0.5) !important;
   background: #0E1B33 !important;
+  border: 1px solid rgba(226, 232, 240, 0.22) !important;
 }
 
 body.theme-reception .polaroid-card {
