@@ -1130,6 +1130,19 @@ body.stage-unlocked .welcome-parchment-card {
   box-shadow: 0 2px 8px rgba(201, 138, 134, 0.12);
 }
 
+.welcome-maker-note {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--color-dusty-rose-dark);
+  margin: 1.15rem auto 0;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(201, 138, 134, 0.45);
+  max-width: 330px;
+  line-height: 1.4;
+}
+
 .welcome-scroll-cue {
   margin-top: 1.5rem;
   font-family: var(--font-body);
@@ -1341,39 +1354,41 @@ body.stage-unlocked .welcome-parchment-card {
 .quote-rococo-box {
   width: 96%;
   max-width: 520px;
-  margin: 3.5rem auto 0;
+  margin: 0 auto 3rem;
   position: relative;
   overflow: hidden;
   border: 1.5px solid #4A5E3A;
   border-radius: 6px;
   background-color: #FFFFFF;
-  box-shadow: 0 12px 32px rgba(201, 138, 134, 0.20), 0 2px 8px rgba(142, 79, 73, 0.08);
+  box-shadow: 0 10px 28px rgba(74, 94, 58, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .quote-corner-flower {
   position: absolute;
-  width: 86px;
-  height: 86px;
+  width: 52px;
+  height: 52px;
   pointer-events: none;
   z-index: 1;
+  opacity: 0.85;
 }
 
 .quote-corner-flower.flower-top-right {
-  top: -4px;
-  right: -4px;
-  transform: rotate(180deg);
+  top: 4px;
+  right: 4px;
+  transform: scaleX(-1);
 }
 
 .quote-corner-flower.flower-bottom-left {
-  bottom: -4px;
-  left: -4px;
+  bottom: 4px;
+  left: 4px;
+  transform: scaleY(-1);
 }
 
 .quote-rococo-inner {
   width: 100%;
   position: relative;
   z-index: 2;
-  padding: 2.6rem 2.8rem 2rem;
+  padding: 2.2rem 2.8rem 1.8rem;
   text-align: center;
 }
 
@@ -1406,16 +1421,16 @@ body.stage-unlocked .welcome-parchment-card {
 @media (max-width: 480px) {
   .quote-rococo-box {
     width: 96%;
-    margin: 2.5rem auto 0;
+    margin: 0 auto 2.2rem;
   }
 
   .quote-rococo-inner {
-    padding: 2.2rem 1.4rem 1.6rem;
+    padding: 1.8rem 1.8rem 1.4rem;
   }
 
   .quote-corner-flower {
-    width: 72px;
-    height: 72px;
+    width: 44px;
+    height: 44px;
   }
 
   .quote-text {
@@ -1477,7 +1492,7 @@ body.stage-unlocked .welcome-parchment-card {
   flex-direction: column;
   gap: 1.5rem;
   max-width: 440px;
-  margin: 0 auto 2.5rem;
+  margin: 0 auto;
 }
 
 .event-frosted-card {
@@ -1591,7 +1606,7 @@ body.stage-unlocked .welcome-parchment-card {
 /* Countdown Grid */
 .countdown-container {
   max-width: 440px;
-  margin: 0 auto;
+  margin: 0 auto 2.5rem;
   text-align: center;
 }
 
@@ -1778,25 +1793,56 @@ body.stage-unlocked .welcome-parchment-card {
   margin-bottom: 0;
 }
 
-/* Authentic Tilted Polaroid Frame */
+/* Authentic Tilted Square Botanical Photo Frame (Kisah Kami) */
+.story-frame-wrap,
 .polaroid-card-wrap {
-  width: 145px;
+  width: 155px;
   flex-shrink: 0;
-  transform: rotate(var(--polaroid-angle, 0deg));
+  transform: rotate(var(--story-angle, var(--polaroid-angle, 0deg)));
   transform-origin: center center;
   transition: transform 0.6s var(--ease-spring);
 }
 
+.story-frame-wrap:hover,
 .polaroid-card-wrap:hover {
   transform: rotate(0deg) scale(1.04);
 }
 
+.story-photo-card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px -4px rgba(42, 58, 32, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #FDFBF7;
+}
+
+.story-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.story-botanical-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  object-fit: fill;
+}
+
 .polaroid-card {
-  background: #FCFAF6;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 2px;
-  padding: 8px 8px 14px 8px;
-  box-shadow: var(--shadow-polaroid);
+  background: #FFFFFF;
+  border: 1px solid rgba(126, 131, 108, 0.25);
+  outline: 1px solid rgba(197, 160, 89, 0.32);
+  outline-offset: -4px;
+  border-radius: 4px;
+  padding: 10px 10px 14px 10px;
+  box-shadow: 0 16px 36px -4px rgba(42, 58, 32, 0.20), 0 4px 12px rgba(0, 0, 0, 0.08);
   text-align: center;
 }
 
@@ -1805,13 +1851,17 @@ body.stage-unlocked .welcome-parchment-card {
   aspect-ratio: 1/1;
   overflow: hidden;
   background: #E8E2D6;
-  margin-bottom: 8px;
+  margin-bottom: 9px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .polaroid-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .polaroid-caption {
@@ -1837,8 +1887,9 @@ body.stage-unlocked .welcome-parchment-card {
     gap: 2.2rem;
   }
 
+  .story-frame-wrap,
   .polaroid-card-wrap {
-    width: 125px;
+    width: 135px;
   }
 
   .polaroid-card {
@@ -3070,6 +3121,11 @@ body.theme-reception .welcome-couple-highlight {
   text-shadow: none !important;
 }
 
+body.theme-reception .welcome-maker-note {
+  color: #3B4B61 !important;
+  border-top: 1px dashed rgba(14, 27, 51, 0.22) !important;
+}
+
 body.theme-reception .scroll-arrow-anim {
   color: #0E1B33;
 }
@@ -3174,7 +3230,8 @@ body.theme-reception .quote-rococo-box {
 }
 
 body.theme-reception .quote-corner-flower {
-  display: none !important;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
 }
 
 body.theme-reception .quote-text {
@@ -3334,9 +3391,21 @@ body.theme-reception .story-chapter-body {
   color: rgba(226, 232, 240, 0.85) !important;
 }
 
+body.theme-reception .story-photo-card {
+  box-shadow: 0 20px 42px -4px rgba(0, 0, 0, 0.8), 0 6px 16px rgba(14, 27, 51, 0.5) !important;
+  background: #0E1B33 !important;
+}
+
 body.theme-reception .polaroid-card {
-  background: #FAF8F5 !important;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  background: #0E1B33 !important;
+  border: 1px solid rgba(226, 232, 240, 0.28) !important;
+  outline: 1px solid rgba(226, 232, 240, 0.16) !important;
+  outline-offset: -4px;
+  box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.8), 0 6px 16px rgba(14, 27, 51, 0.5) !important;
+}
+
+body.theme-reception .polaroid-caption {
+  color: #E2E8F0 !important;
 }
 
 /* 6. Flowy Dividers for Resepsi (Deep Blue Navy & Silver Crest) */

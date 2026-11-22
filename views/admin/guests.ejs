@@ -265,6 +265,17 @@
                const fullUrl = protocol + '://' + host + '/' + path;
                const fullUrl0 = protocol + '://' + host + '/' + path0;
                const fullUrl1 = protocol + '://' + host + '/' + path1;
+
+               const akadUrl = protocol + '://' + host + '/' + g.slug;
+               const akadUrl0 = protocol + '://' + host + '/0/' + g.slug;
+               const akadUrl1 = protocol + '://' + host + '/1/' + g.slug;
+               const syukuranPath = isReception ? g.slug : ('syukuran/' + g.slug);
+               const syukuranPath0 = isReception ? ('0/' + g.slug) : ('syukuran/0/' + g.slug);
+               const syukuranPath1 = isReception ? ('1/' + g.slug) : ('syukuran/1/' + g.slug);
+               const syukuranUrl = protocol + '://' + host + '/' + syukuranPath;
+               const syukuranUrl0 = protocol + '://' + host + '/' + syukuranPath0;
+               const syukuranUrl1 = protocol + '://' + host + '/' + syukuranPath1;
+
                const guestJson = JSON.stringify({
                  id: g.id,
                  slug: g.slug,
@@ -282,7 +293,13 @@
                  wish: g.wish || '',
                  fullUrl: fullUrl,
                  fullUrl0: fullUrl0,
-                 fullUrl1: fullUrl1
+                 fullUrl1: fullUrl1,
+                 akadUrl: akadUrl,
+                 akadUrl0: akadUrl0,
+                 akadUrl1: akadUrl1,
+                 syukuranUrl: syukuranUrl,
+                 syukuranUrl0: syukuranUrl0,
+                 syukuranUrl1: syukuranUrl1
                });
             %>
               <tr id="row-<%= g.id %>">
@@ -494,6 +511,25 @@
           <button type="button" class="tab-btn active" onclick="switchWaTemplate('formal', this)">📜 Formal (Baku / Orang Tua / VIP)</button>
           <button type="button" class="tab-btn" onclick="switchWaTemplate('casual', this)">☕ Santai (Sahabat / Teman)</button>
           <button type="button" class="tab-btn" onclick="switchWaTemplate('english', this)">🌐 English</button>
+        </div>
+
+        <!-- Mode Acara & Tautan Undangan: Otomatis Sesuai Tamu / Akad Saja / Syukuran Saja / Keduanya -->
+        <div style="margin-top: 0.85rem; background: #F8FAF9; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid #E1E8E5;">
+          <label class="form-micro-label" style="margin-bottom: 0.4rem; display: block;">Pilihan Acara &amp; Tautan Undangan:</label>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="tab-btn active" id="btnEventModeAuto" onclick="setWaEventMode('auto', this)" title="Otomatis mengikuti pengaturan acara tamu di database">
+              🔘 Sesuai Tamu (<span id="waModalGuestEventBadge">Otomatis</span>)
+            </button>
+            <button type="button" class="tab-btn" id="btnEventModeAkad" onclick="setWaEventMode('akad', this)" title="Kirim tautan &amp; jadwal Akad Nikah saja">
+              💍 Akad Saja
+            </button>
+            <button type="button" class="tab-btn" id="btnEventModeRec" onclick="setWaEventMode('reception', this)" title="Kirim tautan &amp; jadwal Syukuran saja">
+              🥂 Syukuran Saja
+            </button>
+            <button type="button" class="tab-btn" id="btnEventModeBoth" onclick="setWaEventMode('both', this)" title="Kirim tautan &amp; jadwal Kedua Acara (Akad &amp; Syukuran)">
+              ✨ Kedua Acara (Akad &amp; Syukuran)
+            </button>
+          </div>
         </div>
 
         <!-- Mode Tautan Kisah Kami: Jalur /0/ atau /1/ atau Standar -->
@@ -786,6 +822,7 @@
     // WhatsApp Modal Logic
     var currentWaType = 'formal';
     var waStoryMode = 'default'; // 'default', '0', '1'
+    var waEventMode = 'auto'; // 'auto', 'akad', 'reception', 'both'
 
     function setWaStoryMode(mode, btn) {
       waStoryMode = mode;
@@ -798,11 +835,28 @@
       generateWaText(currentWaType);
     }
 
+    function setWaEventMode(mode, btn) {
+      waEventMode = mode;
+      var buttons = ['btnEventModeAuto', 'btnEventModeAkad', 'btnEventModeRec', 'btnEventModeBoth'];
+      buttons.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      if (btn) btn.classList.add('active');
+      generateWaText(currentWaType);
+    }
+
     function openWaModal(g) {
       currentGuestForWa = g;
       document.getElementById('waModalGuestName').textContent = (g.title ? g.title + ' ' : '') + g.name;
       document.getElementById('waModalPhone').textContent = g.phone || 'Belum diisi';
-      document.getElementById('waModalUrl').textContent = g.fullUrl;
+
+      // Update Guest Event Type Badge inside Auto button
+      var evBadge = document.getElementById('waModalGuestEventBadge');
+      if (evBadge) {
+        var evText = (g.event_type === 'reception') ? 'Syukuran Saja' : (g.event_type === 'akad') ? 'Akad Saja' : 'Kedua Acara';
+        evBadge.textContent = evText;
+      }
 
       var storyBadge = document.getElementById('waModalStoryBadge');
       if (storyBadge) {
@@ -818,6 +872,16 @@
           storyBadge.style.display = 'none';
         }
       }
+
+      // Reset event mode to auto
+      waEventMode = 'auto';
+      var evButtons = ['btnEventModeAuto', 'btnEventModeAkad', 'btnEventModeRec', 'btnEventModeBoth'];
+      evButtons.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      var autoBtn = document.getElementById('btnEventModeAuto');
+      if (autoBtn) autoBtn.classList.add('active');
 
       // Reset story mode to default
       waStoryMode = 'default';
@@ -853,39 +917,70 @@
       var g = currentGuestForWa;
       var salutation = g.title ? g.title + ' ' : '';
       var recipientName = salutation + g.name + (g.with_partner ? ' & Pasangan' : '');
-      var isRec = g.event_type === 'reception';
-      var isAkad = g.event_type === 'akad';
 
-      var finalUrl = g.fullUrl;
+      // Determine effective event: 'auto' uses g.event_type (fallback 'both')
+      var effectiveEvent = (waEventMode === 'auto') ? (g.event_type || 'both') : waEventMode;
+      var isRec = effectiveEvent === 'reception';
+      var isAkad = effectiveEvent === 'akad';
+      var isBoth = !isRec && !isAkad; // 'both'
+
+      // Compute links for Akad and Syukuran based on Kisah Kami mode
+      var origin = window.location.origin;
+      var akadUrl = g.akadUrl || (origin + '/' + g.slug);
+      var syukuranUrl = g.syukuranUrl || (origin + '/syukuran/' + g.slug);
+
       if (waStoryMode === '1') {
-        finalUrl = g.fullUrl1 || (window.location.origin + '/1/' + g.slug);
+        akadUrl = g.akadUrl1 || (origin + '/1/' + g.slug);
+        syukuranUrl = g.syukuranUrl1 || (origin + '/syukuran/1/' + g.slug);
       } else if (waStoryMode === '0') {
-        finalUrl = g.fullUrl0 || (window.location.origin + '/0/' + g.slug);
+        akadUrl = g.akadUrl0 || (origin + '/0/' + g.slug);
+        syukuranUrl = g.syukuranUrl0 || (origin + '/syukuran/0/' + g.slug);
       }
 
+      // Update URL display preview in modal header
       var urlEl = document.getElementById('waModalUrl');
-      if (urlEl) urlEl.textContent = finalUrl;
+      if (urlEl) {
+        if (isBoth) {
+          urlEl.textContent = '💍 Akad: ' + akadUrl + ' | 🥂 Syukuran: ' + syukuranUrl;
+        } else if (isRec) {
+          urlEl.textContent = syukuranUrl;
+        } else {
+          urlEl.textContent = akadUrl;
+        }
+      }
 
       var text = '';
 
       if (type === 'formal') {
         var eventDetails = '';
+        var linkBlock = '';
+        var eventName = isRec ? 'Syukuran Pernikahan' : isAkad ? 'Akad Nikah' : 'Pernikahan';
+
         if (isRec) {
           eventDetails = "🗓️ *Hari/Tanggal:* Sabtu, 26 Desember 2026\n" +
                          "⏰ *Waktu:* 10.00 – 13.00 WIB\n" +
                          "📍 *Tempat:* Smamda Tower Surabaya\n" +
                          "   Jl. Pucang Anom No. 91, Kertajaya, Surabaya";
+          linkBlock = "💌 *Tautan Undangan Digital:*\n" + syukuranUrl;
         } else if (isAkad) {
           eventDetails = "🗓️ *Hari/Tanggal:* Sabtu, 5 Desember 2026\n" +
                          "⏰ *Waktu:* 12.30 – 15.00 WIB\n" +
                          "📍 *Tempat:* Masjid Agung At-Tin\n" +
                          "   Jl. Taman Mini I No. 3, Jakarta Timur";
+          linkBlock = "💌 *Tautan Undangan Digital:*\n" + akadUrl;
         } else {
-          eventDetails = "💍 *Akad Nikah:* Sabtu, 5 Des 2026 (Masjid Agung At-Tin, Jakarta)\n" +
-                         "🥂 *Syukuran:* Sabtu, 26 Des 2026 (Smamda Tower, Surabaya)";
+          eventDetails = "💍 *Akad Nikah:*\n" +
+                         "🗓️ *Hari/Tanggal:* Sabtu, 5 Desember 2026\n" +
+                         "⏰ *Waktu:* 12.30 – 15.00 WIB\n" +
+                         "📍 *Tempat:* Masjid Agung At-Tin, Jakarta Timur\n\n" +
+                         "🥂 *Syukuran Pernikahan:*\n" +
+                         "🗓️ *Hari/Tanggal:* Sabtu, 26 Desember 2026\n" +
+                         "⏰ *Waktu:* 10.00 – 13.00 WIB\n" +
+                         "📍 *Tempat:* Smamda Tower Surabaya";
+          linkBlock = "💌 *Tautan Undangan Digital:*\n" +
+                      "💍 *Tautan Akad Nikah (Jakarta):*\n" + akadUrl + "\n\n" +
+                      "🥂 *Tautan Syukuran (Surabaya):*\n" + syukuranUrl;
         }
-
-        var eventName = isRec ? 'Syukuran Pernikahan' : isAkad ? 'Akad Nikah' : 'Pernikahan';
 
         text = "Assalamu’alaikum Warahmatullahi Wabarakatuh\n\n" +
           "Kepada Yth.\n" +
@@ -894,8 +989,7 @@
           "💍 *" + COUPLE_SHORT + "*\n" +
           "(" + GROOM_NAME + " & " + BRIDE_NAME + ")\n\n" +
           eventDetails + "\n\n" +
-          "💌 *Tautan Undangan Digital:*\n" +
-          finalUrl + "\n\n" +
+          linkBlock + "\n\n" +
           "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi kami berdua.\n\n" +
           "Mengingat situasi dan keterbatasan jarak, mohon maaf perihal undangan hanya dapat kami sampaikan melalui pesan digital ini.\n\n" +
           "Atas perhatian dan doa restunya, kami ucapkan terima kasih yang sebesar-besarnya.\n\n" +
@@ -905,21 +999,33 @@
           "Beserta segenap keluarga besar";
 
       } else if (type === 'casual') {
-        var eventSchedule = isRec 
-          ? "Sabtu, 26 Desember 2026 di Smamda Tower Surabaya" 
-          : isAkad 
-          ? "Sabtu, 5 Desember 2026 di Masjid Agung At-Tin Jakarta" 
-          : "Akad (5 Des di Jakarta) & Syukuran (26 Des di Surabaya)";
-
+        var eventSchedule = '';
+        var linkBlock = '';
         var eventDayName = isRec ? "hari syukuran pernikahan kami" : isAkad ? "hari akad nikah kami" : "hari bahagia kami";
+
+        if (isRec) {
+          eventSchedule = "Sabtu, 26 Desember 2026 di Smamda Tower Surabaya";
+          linkBlock = "Untuk detail lengkap susunan acara, peta lokasi, dan konfirmasi kehadiran (RSVP), silakan buka tautan undangan berikut ya:\n" +
+                      "🔗 " + syukuranUrl;
+        } else if (isAkad) {
+          eventSchedule = "Sabtu, 5 Desember 2026 di Masjid Agung At-Tin Jakarta";
+          linkBlock = "Untuk detail lengkap susunan acara, peta lokasi, dan konfirmasi kehadiran (RSVP), silakan buka tautan undangan berikut ya:\n" +
+                      "🔗 " + akadUrl;
+        } else {
+          eventSchedule = "💍 *Akad Nikah:* Sabtu, 5 Des 2026 di Masjid Agung At-Tin, Jakarta\n" +
+                          "🥂 *Syukuran:* Sabtu, 26 Des 2026 di Smamda Tower, Surabaya";
+          linkBlock = "Untuk detail lengkap susunan acara, peta lokasi, dan konfirmasi kehadiran (RSVP), silakan buka tautan undangan berikut ya:\n" +
+                      "💍 *Tautan Akad (Jakarta):*\n🔗 " + akadUrl + "\n\n" +
+                      "🥂 *Tautan Syukuran (Surabaya):*\n🔗 " + syukuranUrl;
+        }
+
         text = "Assalamu’alaikum / Halo *" + g.name + "*! 👋✨\n\n" +
           "Alhamdulillah, dengan penuh rasa syukur kami ingin berbagi kabar bahagia dan mengundang kamu untuk hadir di " + eventDayName + ":\n\n" +
           "💍 *" + COUPLE_SHORT + "*\n" +
           "(" + GROOM_NAME + " & " + BRIDE_NAME + ")\n\n" +
           "🗓️ *Waktu & Lokasi:*\n" +
           eventSchedule + "\n\n" +
-          "Untuk detail lengkap susunan acara, peta lokasi, dan konfirmasi kehadiran (RSVP), silakan buka tautan undangan berikut ya:\n" +
-          "🔗 " + finalUrl + "\n\n" +
+          linkBlock + "\n\n" +
           "Kehadiran dan doa restu darimu akan sangat melengkapi kebahagiaan kami. Sampai jumpa di hari bahagia kami! 🤍\n\n" +
           "Salam hangat,\n" +
           "*" + COUPLE_SHORT + "*";
@@ -928,22 +1034,35 @@
         var recipientNameEn = salutation + g.name + (g.with_partner ? ' & Partner' : '');
         var eventDayEn = isRec ? "*WEDDING SYUKURAN*" : isAkad ? "*AQD AL-NIKKA*" : "*WEDDING*";
         var eventScheduleEn = '';
+        var linkBlockEn = '';
+
         if (isRec) {
           eventScheduleEn = "📅 Saturday, 26 December 2026\n" +
                             "⏰ 10.00 – 13.00 WIB (GMT+7)\n" +
                             "📍 Smamda Tower, Surabaya";
+          linkBlockEn = "🌷 *A special invitation awaits!*\n" +
+                        "Please open our digital invitation here:\n" +
+                        "🔗 " + syukuranUrl;
         } else if (isAkad) {
           eventScheduleEn = "📅 Saturday, 5 December 2026\n" +
                             "⏰ 12.30 – 15.00 WIB (GMT+7)\n" +
                             "📍 Masjid Agung At-Tin, East Jakarta";
+          linkBlockEn = "🌷 *A special invitation awaits!*\n" +
+                        "Please open our digital invitation here:\n" +
+                        "🔗 " + akadUrl;
         } else {
-          eventScheduleEn = "📅 Saturday, 5 December 2026\n" +
+          eventScheduleEn = "💍 *ʿAqd al-Nikāḥ:*\n" +
+                            "📅 Saturday, 5 December 2026\n" +
                             "⏰ 12.30 – 15.00 WIB (GMT+7)\n" +
                             "📍 Masjid Agung At-Tin, East Jakarta\n\n" +
                             "🥂 *Wedding Syukuran:*\n" +
                             "📅 Saturday, 26 December 2026\n" +
                             "⏰ 10.00 – 13.00 WIB (GMT+7)\n" +
                             "📍 Smamda Tower, Surabaya";
+          linkBlockEn = "🌷 *A special invitation awaits!*\n" +
+                        "Please open our digital invitation here:\n" +
+                        "💍 *ʿAqd al-Nikāḥ (Jakarta):*\n🔗 " + akadUrl + "\n\n" +
+                        "🥂 *Wedding Syukuran (Surabaya):*\n🔗 " + syukuranUrl;
         }
 
         text = "Bismillahirrahmaanirrahiim\n\n" +
@@ -954,9 +1073,7 @@
           GROOM_NAME + " & " + BRIDE_NAME + "\n\n" +
           eventScheduleEn + "\n\n" +
           "💌 *Your presence and prayers mean the world to us.* You're special to us, and we'd love to share this beautiful moment with you!\n\n" +
-          "🌷 *A special invitation awaits!*\n" +
-          "Please open our digital invitation here:\n" +
-          "🔗 " + finalUrl + "\n\n" +
+          linkBlockEn + "\n\n" +
           "You can leave us a personal message and even a *VOICE NOTE! 🎙️*, even better, combined with your own language, e.g. Polish, Deutsch, Vietnamese, Chinese, Tamil, Sinhala, Italian, Arabic, Portuguese, or others!\n\n" +
           "Yes, we'd love to hear your voice! It's a rare little feature, and we'd love to keep your wishes as a special memory❤️\n\n" +
           "If you have any trouble opening the invitation or leaving a message, just let us know!\n\n" +

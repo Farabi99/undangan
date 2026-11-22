@@ -144,7 +144,7 @@
 
         <!-- Pop-Up House Anchored at the BOTTOM END of Section -->
         <div class="welcome-cottage welcome-house-bottom" id="welcomeCottage" aria-hidden="true">
-          <img src="<%= theme === 'reception' ? '/img/rumah-joglo-silver.webp?v=1.1.0' : '/img/rumah-joglo.webp?v=1.1.0' %>" alt="Traditional Indonesian House" class="welcome-cottage-img" onerror="this.src='<%= theme === 'reception' ? '/img/rumah-joglo-silver.png' : '/img/rumah-joglo.png' %>'">
+          <img src="<%= theme === 'reception' ? '/img/rumah-madura.webp?v=1.2.0' : '/img/rumah-gadang.webp?v=1.2.0' %>" alt="<%= theme === 'reception' ? 'Rumah Adat Madura' : 'Rumah Gadang' %>" class="welcome-cottage-img" onerror="this.src='<%= theme === 'reception' ? '/img/rumah-madura.png' : '/img/rumah-gadang.png' %>'">
         </div>
 
         <!-- Welcome Letter Parchment Card -->
@@ -156,10 +156,10 @@
             </div>
           </div>
           <div class="welcome-card-body">
-            <h2 class="welcome-title"><%= theme === 'reception' ? t('welcome.receptionTitle') : t('welcome.title') %></h2>
-            <p class="welcome-text"><%= theme === 'reception' ? t('welcome.receptionIntro1') : t('welcome.intro1') %></p>
+            <h2 class="welcome-title"><%- (theme === 'reception' ? t('welcome.receptionTitle') : t('welcome.title')).replace(/\n/g, '<br>') %></h2>
             <p class="welcome-couple-highlight"><%= content.couple.short %></p>
-            <p class="welcome-text"><%= theme === 'reception' ? t('welcome.receptionIntro2') : t('welcome.intro2') %></p>
+            <p class="welcome-text"><%= theme === 'reception' ? t('welcome.receptionIntro') : t('welcome.intro') %></p>
+            <p class="welcome-maker-note"><%= t('welcome.makerNote') %></p>
 
             <div class="welcome-scroll-cue">
               <span><%= t('welcome.scroll') %></span>
@@ -184,6 +184,18 @@
            ==================================================================== -->
       <section class="section section-couple" id="coupleSection">
         <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
+
+        <!-- Holy Verse Quote Card (Contained Floral Frame) - Placed before "TENTANG MEMPELAI" -->
+        <div class="quote-rococo-box reveal-on-scroll">
+          <img src="/img/ornament-quran-corner<%= theme === 'reception' ? '-silver' : '' %>.webp" alt="" class="quote-corner-flower flower-top-right" aria-hidden="true">
+          <img src="/img/ornament-quran-corner<%= theme === 'reception' ? '-silver' : '' %>.webp" alt="" class="quote-corner-flower flower-bottom-left" aria-hidden="true">
+          <div class="quote-rococo-inner">
+            <p class="quote-text">“<%= t('quote.text') %>”</p>
+            <div class="quote-divider-line" aria-hidden="true"></div>
+            <p class="quote-attribution">— <%= content.quote.source %></p>
+          </div>
+        </div>
+
         <div class="section-header reveal-on-scroll">
           <p class="section-eyebrow"><%= t('couple.headline') %></p>
           <h2 class="section-title"><%= content.couple.short %></h2>
@@ -219,19 +231,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Holy Verse Quote Card (Contained Floral Frame) -->
-        <div class="quote-rococo-box reveal-on-scroll">
-          <% if (theme !== 'reception') { %>
-            <img src="/img/flower-corner.png" alt="" class="quote-corner-flower flower-top-right" aria-hidden="true">
-            <img src="/img/flower-corner.png" alt="" class="quote-corner-flower flower-bottom-left" aria-hidden="true">
-          <% } %>
-          <div class="quote-rococo-inner">
-            <p class="quote-text">“<%= t('quote.text') %>”</p>
-            <div class="quote-divider-line" aria-hidden="true"></div>
-            <p class="quote-attribution">— <%= content.quote.source %></p>
-          </div>
-        </div>
       </section>
 
       <!-- Flowy Wave Divider: Couple to Event -->
@@ -252,6 +251,37 @@
         <div class="section-header-gold reveal-on-scroll">
           <p class="gold-eyebrow"><%= t('day.headline') %></p>
           <p class="gold-tagline">“<%= t('day.tagline') %>”</p>
+        </div>
+
+        <!-- Save the Date Countdown -->
+        <div class="countdown-container reveal-on-scroll">
+          <p class="countdown-eyebrow"><%= t('day.countdown') %></p>
+
+          <div class="countdown-grid">
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdDays">00</span>
+              <span class="countdown-label"><%= t('day.days') %></span>
+            </div>
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdHours">00</span>
+              <span class="countdown-label"><%= t('day.hours') %></span>
+            </div>
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdMinutes">00</span>
+              <span class="countdown-label"><%= t('day.minutes') %></span>
+            </div>
+            <div class="countdown-box">
+              <span class="countdown-num" id="cdSeconds">00</span>
+              <span class="countdown-label"><%= t('day.seconds') %></span>
+            </div>
+          </div>
+
+          <!-- Add to Calendar Button -->
+          <div class="calendar-actions">
+            <a href="/calendar.ics?theme=<%= theme === 'reception' ? 'reception' : 'akad' %>" class="btn-white-glass">
+              <span>📅 <%= t('day.addCalendar') %></span>
+            </a>
+          </div>
         </div>
 
         <!-- Ceremonial Cards with Frosted Glassmorphism -->
@@ -300,37 +330,6 @@
             </div>
           <% }); %>
         </div>
-
-        <!-- Save the Date Countdown -->
-        <div class="countdown-container reveal-on-scroll">
-          <p class="countdown-eyebrow"><%= t('day.countdown') %></p>
-
-          <div class="countdown-grid">
-            <div class="countdown-box">
-              <span class="countdown-num" id="cdDays">00</span>
-              <span class="countdown-label"><%= t('day.days') %></span>
-            </div>
-            <div class="countdown-box">
-              <span class="countdown-num" id="cdHours">00</span>
-              <span class="countdown-label"><%= t('day.hours') %></span>
-            </div>
-            <div class="countdown-box">
-              <span class="countdown-num" id="cdMinutes">00</span>
-              <span class="countdown-label"><%= t('day.minutes') %></span>
-            </div>
-            <div class="countdown-box">
-              <span class="countdown-num" id="cdSeconds">00</span>
-              <span class="countdown-label"><%= t('day.seconds') %></span>
-            </div>
-          </div>
-
-          <!-- Add to Calendar Button -->
-          <div class="calendar-actions">
-            <a href="/calendar.ics?theme=<%= theme === 'reception' ? 'reception' : 'akad' %>" class="btn-white-glass">
-              <span>📅 <%= t('day.addCalendar') %></span>
-            </a>
-          </div>
-        </div>
       </section>
 
       <% if (typeof showStory !== 'undefined' && showStory) { %>
@@ -351,7 +350,7 @@
           <% if (theme === 'reception') { %><%- include('partials/twinkling-stars') %><% } %>
           <div class="section-header reveal-on-scroll">
             <p class="section-eyebrow"><%= t('story.eyebrow') %></p>
-            <h2 class="section-title"><%= t('story.title') %></h2>
+            <h2 class="section-title"><%- t('story.title') %></h2>
             <p class="section-subtitle"><%= t('story.subtitle') %></p>
           </div>
 
@@ -391,16 +390,14 @@
                   <div class="story-chapter-body"><%- bodyHtml %></div>
                 </div>
 
-                <!-- Organic Tilted Polaroid Photo Card -->
-                <div class="polaroid-card-wrap" style="--polaroid-angle: <%= angle %>deg;">
-                  <div class="polaroid-card">
-                    <div class="polaroid-photo-frame">
-                      <picture>
-                        <source srcset="<%= photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp') %>" type="image/webp">
-                        <img src="<%= photo %>" alt="<%= titleLabel %>" loading="lazy" class="polaroid-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
-                      </picture>
-                    </div>
-                    <p class="polaroid-caption">“<%= titleLabel %>”</p>
+                <!-- Organic Tilted Botanical Photo Frame (No Polaroid, No Caption) -->
+                <div class="story-frame-wrap" style="--story-angle: <%= angle %>deg;">
+                  <div class="story-photo-card">
+                    <picture>
+                      <source srcset="<%= photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp') %>" type="image/webp">
+                      <img src="<%= photo %>" alt="<%= titleLabel %>" loading="lazy" class="story-photo-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
+                    </picture>
+                    <img src="/img/botanical-photo-frame<%= theme === 'reception' ? '-silver' : '' %>.webp?v=1.2.0" alt="" class="story-botanical-overlay" aria-hidden="true">
                   </div>
                 </div>
               </div>

@@ -362,6 +362,8 @@ router.get('/1/:slug', (req, res) => renderGuestInvitation(req, res, null, true)
 // 4. Backwards compatibility for legacy /syukuran/ paths:
 router.get('/syukuran/0/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', false));
 router.get('/syukuran/1/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', true));
+router.get('/0/syukuran/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', false));
+router.get('/1/syukuran/:slug', (req, res) => renderGuestInvitation(req, res, 'reception', true));
 
 // 5. Root: Standard generic preview or query-based guest link
 router.get('/', (req, res) => {
