@@ -87,7 +87,10 @@ const upload = multer({
 // Middleware to protect admin routes
 function requireAuth(req, res, next) {
   if (!hasAdminPassword()) {
-    // If no password set in env, allow access with warning banner or direct setup
+    // In production, strictly fail closed to protect guest data if env is missing
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(503).send('Admin panel is disabled because ADMIN_PASSWORD is not configured in environment variables.');
+    }
     return next();
   }
   if (!isLoggedIn(req)) {

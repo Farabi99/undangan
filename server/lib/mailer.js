@@ -48,6 +48,9 @@ async function sendVoiceNoteNotification({
     const safeGuestName = (guestName || 'Tamu').replace(/[^a-zA-Z0-9_-]/g, '_');
     const attachmentFilename = `Voicenote-${safeGuestName}-${guestSlug || 'tamu'}.${ext}`;
 
+    const baseUrl = (process.env.APP_URL || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000')).replace(/\/+$/, '');
+    const adminRsvpUrl = `${baseUrl}/admin/rsvps`;
+
     const mailOptions = {
       from: `"Farabi & Syifa Wedding" <${gmailUser}>`,
       to: recipient,
@@ -75,7 +78,7 @@ async function sendVoiceNoteNotification({
               Anda dapat langsung memutarnya di layar HP atau mengunduhnya untuk disimpan sebagai kenang-kenangan.
             </div>
             <div style="text-align: center; margin-top: 26px;">
-              <a href="http://localhost:3000/admin/rsvps" style="display: inline-block; background: #0A1325; color: #ffffff; text-decoration: none; padding: 11px 22px; border-radius: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.03em;">
+              <a href="${adminRsvpUrl}" style="display: inline-block; background: #0A1325; color: #ffffff; text-decoration: none; padding: 11px 22px; border-radius: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.03em;">
                 Buka Admin Dashboard RSVP →
               </a>
             </div>

@@ -102,6 +102,22 @@ function translator(lang) {
   };
 }
 
+// Lightweight in-memory cache for high-concurrency burst traffic (5s TTL)
+const cache = {
+  poll: { data: null, expiresAt: 0 },
+  wishesPage1: { data: null, expiresAt: 0 }
+};
+
+function invalidatePollCache() {
+  cache.poll.data = null;
+  cache.poll.expiresAt = 0;
+}
+
+function invalidateWishesCache() {
+  cache.wishesPage1.data = null;
+  cache.wishesPage1.expiresAt = 0;
+}
+
 // Download calendar .ics
 router.get('/calendar.ics', (req, res) => {
   res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
@@ -118,6 +134,11 @@ router.get('/calendar.ics', (req, res) => {
 // Public API: Get paginated wishes
 router.get('/api/wishes', (req, res) => {
   const page = Math.max(1, toInt(req.query.page, 1));
+  const now = Date.now();
+  if (page === 1 && cache.wishesPage1.data && cache.wishesPage1.expiresAt > now) {
+    return res.json(cache.wishesPage1.data);
+  }
+
   const limit = 8;
   const offset = (page - 1) * limit;
 
@@ -139,22 +160,36 @@ router.get('/api/wishes', (req, res) => {
     createdAt: r.created_at
   }));
 
-  res.json({ ok: true, items, hasMore });
+  const result = { ok: true, items, hasMore };
+  if (page === 1) {
+    cache.wishesPage1.data = result;
+    cache.wishesPage1.expiresAt = now + 5000;
+  }
+  res.json(result);
 });
 
 // Public API: Get community poll stats
 router.get('/api/poll', (req, res) => {
+  const now = Date.now();
+  if (cache.poll.data && cache.poll.expiresAt > now) {
+    return res.json(cache.poll.data);
+  }
+
   const brideCount = db.prepare("SELECT COUNT(*) AS count FROM votes WHERE side = 'bride'").get().count;
   const groomCount = db.prepare("SELECT COUNT(*) AS count FROM votes WHERE side = 'groom'").get().count;
   const total = brideCount + groomCount;
   const bridePct = total > 0 ? Math.round((brideCount / total) * 100) : 50;
   const groomPct = total > 0 ? (100 - bridePct) : 50;
-  res.json({
+  const result = {
     ok: true,
     total,
     bride: { count: brideCount, percentage: bridePct },
     groom: { count: groomCount, percentage: groomPct }
-  });
+  };
+
+  cache.poll.data = result;
+  cache.poll.expiresAt = now + 5000;
+  res.json(result);
 });
 
 // Public API: Submit vote
@@ -172,6 +207,8 @@ router.post('/api/poll', (req, res) => {
         side = excluded.side,
         created_at = datetime('now')
     `).run(voterKey, side);
+
+    invalidatePollCache();
 
     const brideCount = db.prepare("SELECT COUNT(*) AS count FROM votes WHERE side = 'bride'").get().count;
     const groomCount = db.prepare("SELECT COUNT(*) AS count FROM votes WHERE side = 'groom'").get().count;
@@ -266,6 +303,8 @@ router.post('/api/rsvp', rsvpLimiter, handleRsvpUpload, (req, res) => {
         voice_duration = CASE WHEN excluded.voice_file IS NOT NULL THEN excluded.voice_duration ELSE rsvps.voice_duration END,
         created_at = datetime('now')
     `).run(guest.id, isAttending, safePax, cleanWish, voiceFile, voiceMime, voiceDuration);
+
+    invalidateWishesCache();
 
     // Asynchronously dispatch email notification if voice note was included
     if (voiceFile) {
