@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/css/style.css?v=1.5.0">
+  <link rel="stylesheet" href="/css/style.css?v=1.5.1">
 </head>
 <body class="<%= theme === 'reception' ? 'theme-reception' : '' %>">
 
@@ -390,13 +390,16 @@
                   <div class="story-chapter-body"><%- bodyHtml %></div>
                 </div>
 
-                <!-- Organic Tilted Photo Frame (No Polaroid, No Caption, Image As It Is) -->
+                <!-- Organic Tilted Botanical Photo Frame (No Polaroid, No Caption) -->
                 <div class="story-frame-wrap" style="--story-angle: <%= angle %>deg;">
                   <div class="story-photo-card">
-                    <picture>
-                      <source srcset="<%= photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp') %>" type="image/webp">
-                      <img src="<%= photo %>" alt="<%= titleLabel %>" loading="lazy" class="story-photo-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
-                    </picture>
+                    <div class="story-photo-inner">
+                      <picture>
+                        <source srcset="<%= (photo.endsWith('.webp') ? photo : photo.replace(/\.(jpg|png)$/, '.webp')) %>?v=1.5.1" type="image/webp">
+                        <img src="<%= photo %>?v=1.5.1" alt="<%= titleLabel %>" loading="lazy" class="story-photo-img" onerror="this.src='/img/cameo-couple-fs.jpg'">
+                      </picture>
+                    </div>
+                    <img src="/img/botanical-photo-frame<%= theme === 'reception' ? '-silver' : '' %>.webp?v=1.5.1" alt="" class="story-botanical-overlay" aria-hidden="true">
                   </div>
                 </div>
               </div>
@@ -790,6 +793,6 @@
     window.__GUEST_SLUG = <%- JSON.stringify(guest ? guest.slug : '') %>;
     window.__MAX_PAX = <%- JSON.stringify(guest ? guest.max_pax : 2) %>;
   </script>
-  <script src="/js/app.js?v=1.5.0" defer></script>
+  <script src="/js/app.js?v=1.5.1" defer></script>
 </body>
 </html>
